@@ -13,6 +13,7 @@
   --gl-bg:rgba(26,26,31,.82);--gl-bdr:rgba(91,33,182,.3);
   --red:#ef4444;--green:#22c55e;--amber:#f59e0b;--blue:#3b82f6;
   --sidebar-w:380px;
+  --vtab-w:44px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",sans-serif;background:var(--base);color:var(--tx);overflow:hidden}
@@ -30,16 +31,10 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 .chrome-dots{display:flex;gap:6px;padding-right:8px}
 .chrome-dots span{width:11px;height:11px;border-radius:50%}
 .chrome-dots .d1{background:#ff5f57}.chrome-dots .d2{background:#febc2e}.chrome-dots .d3{background:#28c840}
-.tab-pill{
-  display:flex;align-items:center;gap:6px;
-  background:var(--el2);border-radius:8px;padding:5px 14px 5px 10px;font-size:12px;font-weight:500;
-}
-.tab-pill .tab-icon{width:14px;height:14px;border-radius:3px;background:linear-gradient(135deg,#f97316,#ea580c)}
-.tab-pill .tab-close{width:14px;height:14px;display:grid;place-items:center;opacity:.4;margin-left:4px}
-.tab-pill .tab-close svg{width:9px;height:9px;stroke:var(--sub);stroke-width:2}
 .url-bar{
   flex:1;height:30px;background:var(--el1);border:1px solid #2a2a31;border-radius:8px;
   padding:0 12px;font-size:12px;color:var(--sub);display:flex;align-items:center;gap:6px;
+  margin-left:4px;
 }
 .url-bar .lock svg{width:12px;height:12px;stroke:var(--sub);stroke-width:1.8;fill:none}
 .url-bar .url-text{color:#888;font-size:12px}
@@ -50,6 +45,38 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 
 /* ==================== Main row ==================== */
 .main-row{display:flex;flex:1;overflow:hidden}
+
+/* ==================== Vertical tab bar ==================== */
+.vtab-bar{
+  width:var(--vtab-w);min-width:var(--vtab-w);background:#111114;
+  border-right:1px solid #222228;display:flex;flex-direction:column;
+  align-items:center;padding:8px 0;gap:4px;flex-shrink:0;z-index:40;
+}
+.vtab{
+  width:34px;height:34px;border-radius:8px;display:grid;place-items:center;
+  cursor:pointer;transition:background .12s;position:relative;
+}
+.vtab:hover{background:var(--el2)}
+.vtab.active{background:var(--el2)}
+.vtab.active::before{
+  content:'';position:absolute;left:0;top:6px;bottom:6px;width:2px;
+  background:var(--acb);border-radius:0 2px 2px 0;
+}
+.vtab .vtab-icon{
+  width:20px;height:20px;border-radius:4px;
+  display:grid;place-items:center;font-size:10px;font-weight:700;color:#fff;
+}
+.vtab .vtab-icon.fi-hn{background:linear-gradient(135deg,#f97316,#ea580c)}
+.vtab .vtab-icon.fi-gh{background:linear-gradient(135deg,#333,#555)}
+.vtab .vtab-icon.fi-gd{background:linear-gradient(135deg,#4285f4,#34a853)}
+.vtab-sep{
+  width:24px;height:1px;background:#2a2a31;margin:4px 0;
+}
+.vtab-add{
+  width:34px;height:34px;border-radius:8px;display:grid;place-items:center;
+  cursor:pointer;color:var(--fnt);font-size:18px;transition:background .12s,color .12s;
+}
+.vtab-add:hover{background:var(--el2);color:var(--sub)}
 
 /* ==================== Left: Viewport ==================== */
 .viewport{flex:1;position:relative;overflow-y:auto;background:#fafafa}
@@ -63,11 +90,11 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 .article .img-ph{width:100%;height:140px;border-radius:8px;margin:16px 0;background:linear-gradient(135deg,#eee,#ddd)}
 .article blockquote{border-left:3px solid #ddd;padding:8px 0 8px 16px;margin:12px 0;color:#666;font-style:italic}
 
-/* ==================== Overlay widgets ==================== */
-.overlay{position:absolute;z-index:10;pointer-events:auto}
+/* ==================== Overlay widgets (FIXED) ==================== */
+.overlay{position:fixed;z-index:10;pointer-events:auto}
 
 /* --- Top-left: RSS --- */
-.o-rss{top:16px;left:16px}
+.o-rss{top:60px;left:calc(var(--vtab-w) + 16px)}
 .o-rss .gl{
   padding:7px 14px;border-radius:10px;display:flex;align-items:center;gap:8px;
   font-size:12px;font-weight:600;
@@ -76,7 +103,7 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 .o-rss .site{font-size:11px;color:var(--sub);font-weight:400;margin-left:2px}
 
 /* --- Top-right: Actions --- */
-.o-act{top:16px;right:16px}
+.o-act{top:60px;right:calc(var(--sidebar-w) + 16px)}
 .o-act .gl{
   padding:6px 8px;border-radius:10px;display:flex;gap:2px;
 }
@@ -91,7 +118,7 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.35)}70%{transform:scale(.92)}100%{transform:scale(1.05)}}
 
 /* --- Bottom-left: Memory --- */
-.o-mind{bottom:20px;left:16px;width:240px}
+.o-mind{bottom:20px;left:calc(var(--vtab-w) + 16px);width:240px}
 .o-mind .gl{padding:12px 14px;border-radius:12px}
 .mind-h{font-size:11px;font-weight:600;color:var(--acb);margin-bottom:2px;letter-spacing:.04em}
 .mind-sub{font-size:10px;color:var(--sub);margin-bottom:8px}
@@ -101,7 +128,7 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 }
 
 /* --- Bottom-right: Recommendation --- */
-.o-reco{bottom:20px;right:16px;width:260px}
+.o-reco{bottom:20px;right:calc(var(--sidebar-w) + 16px);width:260px}
 .o-reco .gl{border-radius:12px;overflow:hidden;padding:0}
 .reco-head{padding:10px 12px 6px;display:flex;align-items:center;justify-content:space-between}
 .reco-t{font-size:11px;font-weight:600;color:var(--acb);letter-spacing:.04em}
@@ -159,7 +186,7 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 .pane{display:none;padding:14px 16px}
 .pane.active{display:block}
 
-/* Now pane */
+/* Chat pane */
 .tab-card{background:var(--el1);border:1px solid #2a2a31;border-radius:10px;padding:12px;margin-bottom:12px}
 .tc-title{font-size:13px;font-weight:600;margin-bottom:2px;line-height:1.35}
 .tc-url{font-size:10px;color:var(--fnt);margin-bottom:8px;word-break:break-all}
@@ -191,25 +218,6 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 .mem-kind.question{background:rgba(34,197,94,.15);color:#4ade80}
 .mem-text{font-size:12px;line-height:1.45;color:var(--sub)}
 .mem-ts{font-size:9px;color:var(--fnt);margin-top:3px}
-
-/* Runs pane */
-.mission-card{background:var(--el1);border:1px solid #2a2a31;border-radius:10px;padding:12px;margin-bottom:10px}
-.mc-title{font-size:13px;font-weight:600;margin-bottom:4px}
-.mc-desc{font-size:11px;color:var(--sub);margin-bottom:10px;line-height:1.4}
-.step-list{display:flex;flex-direction:column;gap:0}
-.step{
-  display:flex;align-items:center;gap:10px;padding:8px 0;
-  border-top:1px solid rgba(42,42,49,.5);font-size:12px;
-}
-.step:first-child{border-top:none}
-.step-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:2px solid var(--el3)}
-.step-dot.done{background:var(--green);border-color:var(--green)}
-.step-dot.running{background:var(--amber);border-color:var(--amber);animation:pulse-dot 1.2s infinite}
-.step-dot.queued{background:transparent}
-@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
-.step-label{flex:1;color:var(--sub)}
-.step.active .step-label{color:var(--tx);font-weight:500}
-.step-time{font-size:10px;color:var(--fnt)}
 
 /* --- Sidebar composer --- */
 .sb-composer{
@@ -243,7 +251,7 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 
 /* ==================== Demo button ==================== */
 .demo-btn{
-  position:fixed;top:50%;left:calc((100vw - var(--sidebar-w)) / 2);
+  position:fixed;top:50%;left:calc((100vw - var(--sidebar-w) + var(--vtab-w)) / 2);
   transform:translate(-50%,-50%);z-index:100;
   background:var(--ac);color:#fff;padding:14px 32px;border-radius:14px;
   font-size:16px;font-weight:700;letter-spacing:.02em;
@@ -266,11 +274,6 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 <!-- ══════════ Browser chrome ══════════ -->
 <div class="chrome-bar">
   <div class="chrome-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
-  <div class="tab-pill">
-    <div class="tab-icon"></div>
-    <span>The Memex We Didn't Get</span>
-    <div class="tab-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg></div>
-  </div>
   <div class="url-bar">
     <span class="lock"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
     <span class="url-text">news.ycombinator.com/item?id=41902834</span>
@@ -284,6 +287,23 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 
 <!-- ══════════ Main row ══════════ -->
 <div class="main-row">
+
+<!-- ══════════ Vertical tab bar ══════════ -->
+<div class="vtab-bar">
+  <div class="vtab active" title="The Memex We Didn't Get">
+    <div class="vtab-icon fi-hn">Y</div>
+  </div>
+  <div class="vtab" title="GitHub - efg-technologies/zeed">
+    <div class="vtab-icon fi-gh">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.39.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.08 1.85 1.24 1.85 1.24 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6.02 0c2.3-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.82.58A12.01 12.01 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+    </div>
+  </div>
+  <div class="vtab" title="Google Docs - 設計書">
+    <div class="vtab-icon fi-gd">D</div>
+  </div>
+  <div class="vtab-sep"></div>
+  <div class="vtab-add" title="新しいタブ">+</div>
+</div>
 
 <!-- ══════════ Left: Viewport ══════════ -->
 <div class="viewport" id="viewport">
@@ -313,37 +333,40 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
     <p>The thread quickly converges on the observation that most AI browsers optimize for prompt engineering rather than knowledge engineering. Several commenters point to academic work on associative memory systems and semantic trails &mdash; exactly what Bush envisioned.</p>
     <p>One recurring question: can a browser really hold long-term memory across sessions without becoming a privacy nightmare? The consensus seems to be that local-first, user-owned storage is non-negotiable.</p>
   </article>
+</div>
 
-  <!-- Overlay: Top-left RSS -->
-  <div class="overlay o-rss" style="position:absolute;top:16px;left:16px">
-    <div class="gl">
-      <div class="dot"></div>
-      <span>RSS 登録</span>
-      <span class="site">news.ycombinator.com</span>
-    </div>
+<!-- ══════════ 4-corner overlays (position:fixed) ══════════ -->
+
+<!-- Overlay: Top-left RSS -->
+<div class="overlay o-rss">
+  <div class="gl">
+    <div class="dot"></div>
+    <span>RSS 登録</span>
+    <span class="site">news.ycombinator.com</span>
   </div>
+</div>
 
-  <!-- Overlay: Top-right Actions -->
-  <div class="overlay o-act" style="position:absolute;top:16px;right:16px">
-    <div class="gl">
-      <button class="abtn" id="al" title="Like">
-        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      </button>
-      <button class="abtn" id="ab" title="Bookmark">
-        <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-      </button>
-      <button class="abtn" id="ar" title="Read Later">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6"/><path d="M22 6l-3-3"/></svg>
-      </button>
-    </div>
+<!-- Overlay: Top-right Actions -->
+<div class="overlay o-act">
+  <div class="gl">
+    <button class="abtn" id="al" title="Like">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </button>
+    <button class="abtn" id="ab" title="Bookmark">
+      <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+    </button>
+    <button class="abtn" id="ar" title="Read Later">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6"/><path d="M22 6l-3-3"/></svg>
+    </button>
   </div>
+</div>
 
-  <!-- Overlay: Bottom-left Memory -->
-  <div class="overlay o-mind" style="position:absolute;bottom:20px;left:16px">
-    <div class="gl">
-      <div class="mind-h">二人で同じ記憶</div>
-      <div class="mind-sub">12 件の意図 / 決定</div>
-      <div class="mind-tree">Memex
+<!-- Overlay: Bottom-left Memory -->
+<div class="overlay o-mind">
+  <div class="gl">
+    <div class="mind-h">二人で同じ記憶</div>
+    <div class="mind-sub">12 件の意図 / 決定</div>
+    <div class="mind-tree">Memex
 ├ extract→embed ✓
 ├ Vector DB (1.5b)
 │ └ sqlite-vec 候補
@@ -351,21 +374,20 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 │ ├ 階層コンテキスト
 │ └ Intent Model
 └ 記憶=ユーザーのもの</div>
-    </div>
   </div>
+</div>
 
-  <!-- Overlay: Bottom-right Recommendation -->
-  <div class="overlay o-reco" style="position:absolute;bottom:20px;right:16px">
-    <div class="gl">
-      <div class="reco-head"><span class="reco-t">次に読むなら</span><span class="reco-src">HN</span></div>
-      <div class="reco-thumb">sqlite-vec: fast vector<br>search in the browser</div>
-      <div class="reco-body">
-        <div class="reco-hl">sqlite-vec: vector search in 200 LOC</div>
-        <div class="reco-why">先週 EmbeddingGemma + sqlite-vec を検討 &mdash; 今の記事と直結</div>
-        <div class="reco-btns">
-          <button class="reco-btn" id="reco-later">後で</button>
-          <button class="reco-btn pri" id="reco-open">開く</button>
-        </div>
+<!-- Overlay: Bottom-right Recommendation -->
+<div class="overlay o-reco">
+  <div class="gl">
+    <div class="reco-head"><span class="reco-t">次に読むなら</span><span class="reco-src">HN</span></div>
+    <div class="reco-thumb">sqlite-vec: fast vector<br>search in the browser</div>
+    <div class="reco-body">
+      <div class="reco-hl">sqlite-vec: vector search in 200 LOC</div>
+      <div class="reco-why">先週 EmbeddingGemma + sqlite-vec を検討 &mdash; 今の記事と直結</div>
+      <div class="reco-btns">
+        <button class="reco-btn" id="reco-later">後で</button>
+        <button class="reco-btn pri" id="reco-open">開く</button>
       </div>
     </div>
   </div>
@@ -381,16 +403,15 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
       <span class="sc-active">Tab</span>
     </div>
     <div class="mode-tabs">
-      <div class="mode-tab active" data-pane="now">Now</div>
+      <div class="mode-tab active" data-pane="chat">Chat</div>
       <div class="mode-tab" data-pane="memory">Memory<span class="mode-badge" id="mem-badge">5</span></div>
-      <div class="mode-tab" data-pane="runs">Runs<span class="mode-badge" id="runs-badge">0</span></div>
     </div>
   </div>
 
   <!-- Body -->
   <div class="sb-body">
-    <!-- Now pane -->
-    <div class="pane active" id="pane-now">
+    <!-- Chat pane -->
+    <div class="pane active" id="pane-chat">
       <div class="tab-card">
         <div class="tc-title">The Memex We Didn't Get</div>
         <div class="tc-url">news.ycombinator.com/item?id=41902834</div>
@@ -443,26 +464,6 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
         </div>
       </div>
     </div>
-
-    <!-- Runs pane -->
-    <div class="pane" id="pane-runs">
-      <div class="mission-card" id="mission-card" style="display:none">
-        <div class="mc-title">Vector DB 比較レポート作成</div>
-        <div class="mc-desc">sqlite-vec, LanceDB, Chroma の 3 候補を ブラウザ組込み観点で比較</div>
-        <div class="step-list" id="step-list">
-          <div class="step" id="s0"><span class="step-dot queued"></span><span class="step-label">候補リスト確認</span><span class="step-time"></span></div>
-          <div class="step" id="s1"><span class="step-dot queued"></span><span class="step-label">各 DB のドキュメント取得</span><span class="step-time"></span></div>
-          <div class="step" id="s2"><span class="step-dot queued"></span><span class="step-label">ベンチマーク条件の整理</span><span class="step-time"></span></div>
-          <div class="step" id="s3"><span class="step-dot queued"></span><span class="step-label">比較表を Markdown で生成</span><span class="step-time"></span></div>
-          <div class="step" id="s4"><span class="step-dot queued"></span><span class="step-label">推薦と根拠をまとめる</span><span class="step-time"></span></div>
-        </div>
-      </div>
-      <div id="runs-empty" style="text-align:center;padding:40px 0;color:var(--fnt);font-size:12px">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:8px;opacity:.4"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        <div>実行中のタスクはありません</div>
-        <div style="margin-top:4px;font-size:10px;color:var(--fnt)">Run モードでタスクを送信してください</div>
-      </div>
-    </div>
   </div>
 
   <!-- Composer -->
@@ -475,7 +476,6 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
     </div>
     <div class="mode-btns">
       <button class="mode-btn active" data-mode="ask" id="mode-ask">Ask</button>
-      <button class="mode-btn" data-mode="run" id="mode-run">Run</button>
       <button class="mode-btn" data-mode="auto" id="mode-auto">Auto</button>
     </div>
   </div>
@@ -495,6 +495,14 @@ const slp=ms=>new Promise(r=>setTimeout(r,ms));
 
 /* ── Action buttons toggle ── */
 $$('.abtn').forEach(b=>{b.onclick=()=>{b.classList.toggle('on')}});
+
+/* ── Vertical tab clicks ── */
+$$('.vtab').forEach(t=>{
+  t.onclick=()=>{
+    $$('.vtab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+  };
+});
 
 /* ── Mode tabs ── */
 $$('.mode-tab').forEach(t=>{
@@ -553,21 +561,12 @@ $('#send-btn').onclick=()=>{
   if(!text)return;
   ta.value='';ta.style.height='36px';
 
-  const mode=currentMode();
-
-  /* Ensure Now pane is active */
+  /* Ensure Chat pane is active */
   $$('.mode-tab').forEach(x=>x.classList.remove('active'));
-  if(mode==='run'){
-    $$('.mode-tab')[2].classList.add('active');
-    $$('.pane').forEach(p=>p.classList.remove('active'));
-    $('#pane-runs').classList.add('active');
-    handleRun(text);
-  }else{
-    $$('.mode-tab')[0].classList.add('active');
-    $$('.pane').forEach(p=>p.classList.remove('active'));
-    $('#pane-now').classList.add('active');
-    handleAsk(text);
-  }
+  $$('.mode-tab')[0].classList.add('active');
+  $$('.pane').forEach(p=>p.classList.remove('active'));
+  $('#pane-chat').classList.add('active');
+  handleAsk(text);
 };
 
 /* Enter to send */
@@ -589,46 +588,6 @@ async function handleAsk(text){
   /* Update memory badge */
   const badge=$('#mem-badge');
   badge.textContent=parseInt(badge.textContent)+1;
-}
-
-async function handleRun(text){
-  $('#runs-empty').style.display='none';
-  const mc=$('#mission-card');
-  mc.style.display='block';
-  mc.querySelector('.mc-title').textContent=text.length>30?text.slice(0,30)+'...':text;
-  mc.querySelector('.mc-desc').textContent=text;
-
-  const badge=$('#runs-badge');
-  badge.textContent='1';
-
-  const steps=$$('.step');
-  const dots=$$('.step-dot');
-  const times=$$('.step-time');
-
-  for(let i=0;i<steps.length;i++){
-    dots[i].className='step-dot queued';
-    steps[i].classList.remove('active');
-    times[i].textContent='';
-  }
-
-  for(let i=0;i<steps.length;i++){
-    dots[i].className='step-dot running';
-    steps[i].classList.add('active');
-    await slp(800+Math.random()*600);
-    dots[i].className='step-dot done';
-    times[i].textContent=(1+Math.floor(Math.random()*4))+'s';
-    steps[i].classList.remove('active');
-  }
-  badge.textContent='0';
-
-  /* Add memory item */
-  const ml=$('#mem-list');
-  const item=document.createElement('div');
-  item.className='mem-item';
-  item.innerHTML='<span class="mem-kind decision">Decision</span><div><div class="mem-text">Run 完了: '+text.slice(0,40)+'</div><div class="mem-ts">just now</div></div>';
-  ml.insertBefore(item,ml.firstChild);
-  const memBadge=$('#mem-badge');
-  memBadge.textContent=parseInt(memBadge.textContent)+1;
 }
 
 /* ══════════ Demo sequence ══════════ */
@@ -667,33 +626,33 @@ demoBtn.onclick=()=>{void(async()=>{
   }
   await slp(600);
 
-  /* Step 5: Send */
+  /* Step 5: Send (Ask mode) */
   $('#send-btn').click();
   await slp(4200);
 
-  /* Step 6: Switch to Run mode */
-  $('#mode-run').click();
+  /* Step 6: Switch to Auto mode */
+  $('#mode-auto').click();
   await slp(500);
 
-  /* Step 7: Type run command */
+  /* Step 7: Type auto command */
   ta.value='';
-  const runCmd='Vector DB 比較レポート作成';
-  for(let i=0;i<runCmd.length;i++){
-    ta.value+=runCmd[i];
+  const autoCmd='この記事の関連リンクを全部開いて';
+  for(let i=0;i<autoCmd.length;i++){
+    ta.value+=autoCmd[i];
     ta.dispatchEvent(new Event('input'));
     await slp(45);
   }
   await slp(500);
 
-  /* Step 8: Send run */
+  /* Step 8: Send auto (handled as ask in mock) */
   $('#send-btn').click();
-  await slp(6000);
+  await slp(4000);
 
-  /* Step 9: Switch to Memory */
+  /* Step 9: Switch to Memory tab */
   $$('.mode-tab')[1].click();
   await slp(2000);
 
-  /* Step 10: Back to Now */
+  /* Step 10: Back to Chat */
   $$('.mode-tab')[0].click();
   await slp(400);
 
