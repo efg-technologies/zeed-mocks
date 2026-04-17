@@ -3,246 +3,204 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Zeed — SP Demo</title>
+<title>Zeed — SP</title>
 <style>
-:root{--base:#0f0f12;--gl:rgba(22,22,28,.88);--el2:#25252a;--el3:#34343c;--bdr:rgba(60,60,70,.5);--ac:#5b21b6;--acb:#a78bfa;--acs:rgba(91,33,182,.25);--tx:#e8e8e8;--sub:#9e9ea8;--fnt:#6b6b73}
+:root{--gl:rgba(22,22,28,.88);--bdr:rgba(60,60,70,.45);--ac:#5b21b6;--acb:#a78bfa;--acs:rgba(91,33,182,.25);--tx:#e8e8e8;--sub:#9e9ea8;--fnt:#6b6b73}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;background:#fafafa;color:#1a1a1a;overscroll-behavior:none}
 button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
 
-/* ═══ Article ═══ */
-.page{min-height:100vh;padding:56px 20px 100px;max-width:620px;margin:0 auto;font-size:15px;line-height:1.8;color:#2a2a31}
-.page h1{font-size:21px;line-height:1.3;margin:0 0 6px;color:#111;font-weight:700}
-.page .meta{font-size:11px;color:#999;margin-bottom:18px;letter-spacing:.01em}
-.page p{margin:0 0 14px}
-.page h2{font-size:16px;margin:24px 0 8px;color:#111;font-weight:600}
-.page .img-ph{width:100%;height:130px;border-radius:8px;margin:14px 0;background:linear-gradient(135deg,#e8e8eb,#d8d8dc)}
+/* ═══ Page ═══ */
+.page{min-height:100vh;padding:48px 18px 80px;padding-right:52px;max-width:640px;margin:0 auto;font-size:15px;line-height:1.75;color:#2a2a31}
+.page h1{font-size:20px;line-height:1.3;margin:0 0 4px;color:#111;font-weight:700}
+.page .meta{font-size:10px;color:#aaa;margin-bottom:16px}
+.page p{margin:0 0 12px}
+.page h2{font-size:15px;margin:20px 0 6px;color:#111;font-weight:600}
+.page .img-ph{width:100%;height:100px;border-radius:6px;margin:12px 0;background:linear-gradient(135deg,#eee,#ddd)}
 
 /* ═══ Glass ═══ */
-.gl{
-  background:var(--gl);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
-  border:1px solid var(--bdr);border-radius:10px;
-  box-shadow:0 4px 16px rgba(0,0,0,.4);color:var(--tx);font-size:12px;
+.gl{background:var(--gl);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);border:1px solid var(--bdr);box-shadow:0 3px 12px rgba(0,0,0,.35);color:var(--tx);font-size:11px}
+
+/* ═══ 左上: RSS (ミニマル) ═══ */
+.o-rss{position:fixed;top:max(8px,env(safe-area-inset-top));left:6px;z-index:20}
+.o-rss .gl{padding:5px 9px;border-radius:8px;display:flex;align-items:center;gap:5px}
+.o-rss .dot{width:6px;height:6px;border-radius:999px;background:#ef4444;flex-shrink:0}
+.o-rss .lbl{font-weight:600;font-size:10.5px}
+
+/* ═══ 右: アクション縦並び ═══ */
+.o-act{
+  position:fixed;top:50%;right:6px;transform:translateY(-50%);z-index:20;
 }
-
-/* ═══ 左上: RSS ═══ */
-.o-rss{position:fixed;top:max(10px,env(safe-area-inset-top));left:8px;z-index:20}
-.o-rss .gl{padding:6px 11px;display:flex;align-items:center;gap:7px}
-.rss-dot{width:7px;height:7px;border-radius:999px;background:#ef4444;flex-shrink:0}
-.rss-lbl{font-weight:600;font-size:11.5px;letter-spacing:.01em}
-.rss-n{font-size:10px;color:var(--sub)}
-
-/* ═══ 右上: Actions ═══ */
-.o-act{position:fixed;top:max(10px,env(safe-area-inset-top));right:8px;z-index:20}
-.o-act .gl{padding:4px 5px;display:flex;gap:1px}
+.o-act .gl{
+  padding:5px;border-radius:10px;
+  display:flex;flex-direction:column;gap:1px;
+}
 .abtn{
-  width:38px;height:38px;display:grid;place-items:center;border-radius:7px;
+  width:36px;height:36px;display:grid;place-items:center;border-radius:7px;
   transition:background .12s,transform .1s;-webkit-user-select:none;user-select:none;
 }
-.abtn svg{width:18px;height:18px;stroke:var(--sub);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s,fill .15s}
-.abtn:active{transform:scale(.85);background:var(--el2)}
+.abtn svg{width:17px;height:17px;stroke:var(--sub);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s,fill .15s}
+.abtn:active{transform:scale(.85);background:rgba(255,255,255,.08)}
 .abtn.on svg{stroke:var(--acb);fill:var(--acs);animation:pop .3s ease}
 @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.35)}70%{transform:scale(.92)}100%{transform:scale(1.05)}}
 
-/* ═══ Bottom peek tabs (collapsed) ═══ */
-.peek{
-  position:fixed;z-index:20;
-  transition:transform .35s cubic-bezier(.4,0,.2,1);
+/* ═══ 底: 左右サイドピーク ═══ */
+.side-peek{
+  position:fixed;bottom:max(48px,calc(env(safe-area-inset-bottom) + 44px));z-index:20;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
 }
-.peek-tab{
-  background:var(--gl);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
-  border:1px solid var(--bdr);color:var(--sub);
-  padding:6px 12px;font-size:10px;font-weight:600;letter-spacing:.04em;
-  cursor:pointer;display:flex;align-items:center;gap:5px;
+
+/* 左: 記憶 */
+.sp-left{left:0;transform:translateX(calc(-100% + 28px))}
+.sp-left.open{transform:translateX(0)}
+.sp-left .sp-wrap{display:flex;flex-direction:row}
+.sp-left .sp-body{
+  border-radius:0 10px 10px 0;padding:8px 10px;width:180px;
+}
+.sp-left .sp-tab{
+  writing-mode:vertical-rl;text-orientation:mixed;
+  padding:8px 5px;border-radius:0 6px 6px 0;
+  font-size:9px;font-weight:600;color:var(--sub);letter-spacing:.06em;
+  cursor:pointer;display:flex;align-items:center;
   -webkit-user-select:none;user-select:none;
 }
-.peek-body{
-  background:var(--gl);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
-  border:1px solid var(--bdr);color:var(--tx);font-size:12px;
-}
-.peek .arrow{font-size:8px;transition:transform .3s}
-.peek.open .arrow{transform:rotate(180deg)}
 
-/* 左下: 記憶 */
-.o-mind{left:8px;bottom:0}
-.o-mind .peek-tab{border-radius:8px 8px 0 0}
-.o-mind .peek-body{
-  border-radius:0 10px 0 0;padding:10px 12px;
-  max-width:calc(55vw - 12px);
-  transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
+/* 右: 次へ */
+.sp-right{right:0;transform:translateX(calc(100% - 28px))}
+.sp-right.open{transform:translateX(0)}
+.sp-right .sp-wrap{display:flex;flex-direction:row-reverse}
+.sp-right .sp-body{
+  border-radius:10px 0 0 10px;padding:0;overflow:hidden;width:190px;
 }
-.o-mind.open .peek-body{transform:translateY(0)}
+.sp-right .sp-tab{
+  writing-mode:vertical-rl;text-orientation:mixed;
+  padding:8px 5px;border-radius:6px 0 0 6px;
+  font-size:9px;font-weight:600;color:var(--sub);letter-spacing:.06em;
+  cursor:pointer;display:flex;align-items:center;
+  -webkit-user-select:none;user-select:none;
+}
 
-.mind-h{font-size:10px;font-weight:600;color:var(--acb);margin-bottom:3px;letter-spacing:.04em}
-.mind-sub{font-size:10px;color:var(--sub);margin-bottom:6px}
+/* 記憶の中身 */
+.mind-h{font-size:9px;font-weight:600;color:var(--acb);margin-bottom:2px;letter-spacing:.04em}
+.mind-sub{font-size:9px;color:var(--sub);margin-bottom:5px}
 .mind-tree{
-  font-family:"SF Mono",Menlo,monospace;font-size:9.5px;line-height:1.6;color:var(--sub);
-  background:rgba(15,15,18,.5);border-radius:6px;padding:8px;white-space:pre;overflow-x:auto;
+  font-family:"SF Mono",Menlo,monospace;font-size:8.5px;line-height:1.5;color:var(--sub);
+  background:rgba(15,15,18,.5);border-radius:5px;padding:6px;white-space:pre;overflow-x:auto;
 }
-.mind-foot{font-size:9px;color:var(--fnt);margin-top:5px}
 
-/* 右下: 次へ */
-.o-reco{right:8px;bottom:0}
-.o-reco .peek-tab{border-radius:8px 8px 0 0}
-.o-reco .peek-body{
-  border-radius:10px 0 0 0;padding:0;overflow:hidden;
-  max-width:calc(55vw - 12px);
-  transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
-}
-.o-reco.open .peek-body{transform:translateY(0)}
-
-.reco-head{padding:8px 10px 5px;display:flex;align-items:center;justify-content:space-between}
-.reco-t{font-size:10px;font-weight:600;color:var(--acb);letter-spacing:.04em}
-.reco-src{font-size:9px;color:var(--sub)}
+/* 推薦の中身 */
+.reco-head{padding:6px 8px 4px;display:flex;align-items:center;justify-content:space-between}
+.reco-t{font-size:9px;font-weight:600;color:var(--acb);letter-spacing:.04em}
+.reco-src{font-size:8px;color:var(--sub)}
 .reco-thumb{
-  width:100%;height:64px;background:linear-gradient(135deg,var(--ac),#1e1b4b);
-  display:grid;place-items:center;color:rgba(255,255,255,.9);font-size:11px;font-weight:600;line-height:1.3;text-align:center;padding:0 12px;
+  width:100%;height:48px;background:linear-gradient(135deg,var(--ac),#1e1b4b);
+  display:grid;place-items:center;color:rgba(255,255,255,.85);font-size:10px;font-weight:600;line-height:1.3;text-align:center;padding:0 8px;
 }
-.reco-body{padding:8px 10px 10px}
-.reco-hl{font-size:11.5px;font-weight:600;line-height:1.3;margin-bottom:3px}
-.reco-why{font-size:10px;color:var(--sub);line-height:1.4}
-.reco-btns{display:flex;gap:5px;margin-top:7px}
+.reco-body{padding:6px 8px 8px}
+.reco-hl{font-size:10.5px;font-weight:600;line-height:1.3;margin-bottom:2px}
+.reco-why{font-size:9px;color:var(--sub);line-height:1.4}
+.reco-btns{display:flex;gap:4px;margin-top:5px}
 .reco-btn{
-  flex:1;padding:6px;border-radius:6px;font-size:10px;text-align:center;
-  border:1px solid var(--el3);background:rgba(26,26,31,.7);color:var(--tx);
+  flex:1;padding:5px;border-radius:5px;font-size:9px;text-align:center;
+  border:1px solid rgba(60,60,70,.4);background:rgba(26,26,31,.7);color:var(--tx);
 }
 .reco-btn.pri{border-color:var(--ac);background:var(--ac);color:#fff}
 
-/* ═══ Demo ═══ */
+/* ═══ FAB ═══ */
 .fab{
-  position:fixed;bottom:max(52px,calc(env(safe-area-inset-bottom) + 48px));
+  position:fixed;bottom:max(10px,env(safe-area-inset-bottom));
   left:50%;transform:translateX(-50%);z-index:30;
   background:var(--ac);color:#fff;
-  padding:8px 20px;border-radius:999px;font-size:13px;font-weight:600;
-  box-shadow:0 4px 16px rgba(91,33,182,.45);
-  display:flex;align-items:center;gap:5px;letter-spacing:.01em;
+  padding:7px 18px;border-radius:999px;font-size:12px;font-weight:600;
+  box-shadow:0 3px 14px rgba(91,33,182,.4);
 }
 .fab:active{transform:translateX(-50%) scale(.95)}
-.fab:disabled{background:var(--el3);box-shadow:none}
-
-.info{
-  position:fixed;bottom:max(4px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:10;
-  font-size:9px;color:var(--fnt);background:var(--gl);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  padding:3px 8px;border-radius:999px;border:1px solid rgba(60,60,70,.3);pointer-events:none;white-space:nowrap;
-}
+.fab:disabled{background:#444;box-shadow:none}
 </style>
 </head>
 <body>
 
-<!-- ═══ ARTICLE ═══ -->
 <article class="page">
   <h1>The Memex We Didn't Get — And the Browser That Might Finally Deliver It</h1>
-  <div class="meta">news.ycombinator.com · 287 points · 42 comments</div>
+  <div class="meta">news.ycombinator.com · 287 pts · 42 comments</div>
   <p>Vannevar Bush described the Memex in 1945 — a personal knowledge system that would augment human memory. Eighty years later, browsers still treat knowledge as a pile of tabs and bookmarks, and AI browsers treat context as a chat history. Neither is the Memex.</p>
   <div class="img-ph"></div>
   <h2>Why current AI browsers fall short</h2>
-  <p>The recent wave of AI browsers — Comet, Atlas, Dia — layers a chat interface on top of Chromium without redesigning the underlying primitives. Tabs are still just URLs. Bookmarks are still just metadata. The "memory" lives on the vendor's side, scoped to one account, and evaporates when you switch models.</p>
-  <h2>What's missing, concretely</h2>
-  <p>The fix is hierarchical context. A Profile for role, a TabGroup for project, a Tab for the immediate object. Extracted intent lives in a shared memory layer searchable by meaning rather than keyword.</p>
+  <p>The recent wave of AI browsers — Comet, Atlas, Dia — layers a chat interface on top of Chromium without redesigning the underlying primitives. Tabs are still just URLs. Bookmarks are still just metadata.</p>
+  <h2>What's missing</h2>
+  <p>Hierarchical context: Profile for role, TabGroup for project, Tab for the immediate object. Extracted intent in a shared memory layer searchable by meaning.</p>
   <p>The question isn't whether AI browsers win — it's which primitives they commit to.</p>
   <h2>Discussion</h2>
-  <p>Most commenters agree that chat-as-memory is fundamentally broken. Several mention Mem0 and LangMem as promising server-side approaches, but note that browser-native implementations are missing entirely.</p>
-  <p>"I don't want to chat with my tabs. I want my browser to understand what I'm working on." — top comment, 94 points</p>
+  <p>"I don't want to chat with my tabs. I want my browser to understand what I'm working on." — top comment</p>
 </article>
 
-<!-- ═══ OVERLAYS ═══ -->
-
 <!-- 左上: RSS -->
-<div class="o-rss"><div class="gl"><div class="rss-dot"></div><div><span class="rss-lbl">RSS 登録</span><br><span class="rss-n">news.ycombinator.com — 3 件</span></div></div></div>
+<div class="o-rss"><div class="gl"><div class="dot"></div><span class="lbl">RSS 登録</span></div></div>
 
-<!-- 右上: Actions -->
+<!-- 右: アクション縦 -->
 <div class="o-act"><div class="gl">
   <button class="abtn" id="al" title="Like"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
   <button class="abtn" id="ab" title="Bookmark"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
   <button class="abtn" id="ar" title="Remind"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6"/><path d="M22 6l-3-3"/></svg></button>
 </div></div>
 
-<!-- 左下: 記憶 (peek) -->
-<div class="peek o-mind" id="pm">
-  <div class="peek-tab" id="pm-tab">記憶 <span class="arrow">▲</span></div>
-  <div class="peek-body">
-    <div class="mind-h">二人で同じ記憶</div>
-    <div class="mind-sub">このプロジェクトで 12 件の意図・決定</div>
-    <div class="mind-tree">Memex
-├ 記憶レイヤー
-│ ├ extract → embed ✓
-│ └ Vector DB (1.5b)
-├ 階層 context
-│ └ Profile / TG / Tab
-└ Zeed の差分
-  └ 記憶はユーザーのもの</div>
-    <div class="mind-foot">更新 2分前</div>
+<!-- 左下: 記憶 (横スライド) -->
+<div class="side-peek sp-left gl" id="pl">
+  <div class="sp-wrap">
+    <div class="sp-body">
+      <div class="mind-h">二人で同じ記憶</div>
+      <div class="mind-sub">12 件の意図・決定</div>
+      <div class="mind-tree">Memex
+├ extract→embed ✓
+├ Vector DB (1.5b)
+├ Profile/TG/Tab
+└ 記憶=ユーザーのもの</div>
+    </div>
+    <div class="sp-tab" id="pl-tab">記憶</div>
   </div>
 </div>
 
-<!-- 右下: 次へ (peek) -->
-<div class="peek o-reco" id="pr">
-  <div class="peek-tab" id="pr-tab">次に読むなら <span class="arrow">▲</span></div>
-  <div class="peek-body">
-    <div class="reco-head"><span class="reco-t">推薦</span><span class="reco-src">RSS · HN</span></div>
-    <div class="reco-thumb">Show HN: A vector DB<br>in 200 LOC</div>
-    <div class="reco-body">
-      <div class="reco-hl">sqlite-vec: fast vector search inside your browser</div>
-      <div class="reco-why">先週 "EmbeddingGemma + sqlite-vec" を検討していた。これは実装例。</div>
-      <div class="reco-btns">
-        <button class="reco-btn">後で</button>
-        <button class="reco-btn pri">開く</button>
+<!-- 右下: 次へ (横スライド) -->
+<div class="side-peek sp-right gl" id="pr">
+  <div class="sp-wrap">
+    <div class="sp-body">
+      <div class="reco-head"><span class="reco-t">次に読むなら</span><span class="reco-src">HN</span></div>
+      <div class="reco-thumb">sqlite-vec: vector DB<br>in 200 LOC</div>
+      <div class="reco-body">
+        <div class="reco-hl">sqlite-vec: fast vector search in browser</div>
+        <div class="reco-why">先週 EmbeddingGemma + sqlite-vec を検討していた</div>
+        <div class="reco-btns">
+          <button class="reco-btn">後で</button>
+          <button class="reco-btn pri">開く</button>
+        </div>
       </div>
     </div>
+    <div class="sp-tab" id="pr-tab">次へ</div>
   </div>
 </div>
 
 <button class="fab" id="fab">▶ デモ再生</button>
-<div class="info">Overlay mock · RSS / Actions / Memory / Recommend</div>
 
 <script>
-/* Actions */
-document.querySelectorAll('.abtn').forEach(b=>{
-  b.onclick=()=>{if(!b.classList.contains('on')){b.classList.add('on')}};
-});
+document.querySelectorAll('.abtn').forEach(b=>{b.onclick=()=>{if(!b.classList.contains('on'))b.classList.add('on')}});
 
-/* Peek toggle */
-function setupPeek(id,tabId){
-  const el=document.getElementById(id),tab=document.getElementById(tabId);
-  tab.onclick=()=>el.classList.toggle('open');
-}
-setupPeek('pm','pm-tab');
-setupPeek('pr','pr-tab');
+document.getElementById('pl-tab').onclick=()=>document.getElementById('pl').classList.toggle('open');
+document.getElementById('pr-tab').onclick=()=>document.getElementById('pr').classList.toggle('open');
 
-/* Demo */
-const fab=document.getElementById('fab');
-fab.onclick=()=>{void demo()};
-const slp=ms=>new Promise(r=>setTimeout(r,ms));
-
-async function demo(){
+const fab=document.getElementById('fab'),slp=ms=>new Promise(r=>setTimeout(r,ms));
+fab.onclick=()=>{void(async()=>{
   fab.disabled=true;fab.textContent='再生中…';
-
-  // 1. Like
-  await slp(500);document.getElementById('al').click();await slp(700);
-
-  // 2. Bookmark
-  document.getElementById('ab').click();await slp(900);
-
-  // 3. Open memory peek
-  document.getElementById('pm').classList.add('open');await slp(2000);
-
-  // 4. Open recommend peek
+  await slp(400);document.getElementById('al').click();await slp(600);
+  document.getElementById('ab').click();await slp(800);
+  document.getElementById('pl').classList.add('open');await slp(1800);
   document.getElementById('pr').classList.add('open');await slp(2000);
-
-  // 5. Scroll to show context
-  window.scrollTo({top:250,behavior:'smooth'});await slp(1500);
-  window.scrollTo({top:0,behavior:'smooth'});await slp(1000);
-
-  // 6. Remind
-  document.getElementById('ar').click();await slp(800);
-
-  // 7. Close peeks
-  document.getElementById('pm').classList.remove('open');
-  document.getElementById('pr').classList.remove('open');
-  await slp(500);
-
+  window.scrollTo({top:200,behavior:'smooth'});await slp(1200);
+  window.scrollTo({top:0,behavior:'smooth'});await slp(800);
+  document.getElementById('ar').click();await slp(600);
+  document.getElementById('pl').classList.remove('open');
+  document.getElementById('pr').classList.remove('open');await slp(400);
   fab.disabled=false;fab.textContent='▶ デモ再生';
-}
+})()};
 </script>
 </body>
 </html>
