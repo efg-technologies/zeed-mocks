@@ -33,21 +33,17 @@ input{font:inherit;border:none;outline:none}
 .page h2{font-size:14px;margin:18px 0 5px;color:#111;font-weight:600}
 .page .img-ph{width:100%;height:90px;border-radius:6px;margin:10px 0;background:linear-gradient(135deg,#eee,#ddd)}
 
-/* ═══ Right-edge fixed bar ═══ */
+/* ═══ Right-edge fixed bar — single glass strip ═══ */
 .r-bar{
   position:fixed;top:0;right:0;bottom:0;width:44px;z-index:40;
   display:flex;flex-direction:column;align-items:center;
   padding:max(6px,env(safe-area-inset-top)) 0 max(6px,env(safe-area-inset-bottom));
-  background:var(--gl);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
+  background:rgba(22,22,28,.75);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
   border-left:1px solid var(--bdr);
 }
 .r-bar-top,.r-bar-bot{display:flex;flex-direction:column;align-items:center;flex:0 0 auto}
 .r-bar-mid{
   flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
-}
-.r-bar-mid-group{
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  background:rgba(255,255,255,.03);border-radius:10px;padding:4px;
 }
 .r-sep{width:24px;height:0;border-top:0.5px dotted var(--bdr);margin:4px 0;flex-shrink:0}
 
@@ -86,7 +82,7 @@ input{font:inherit;border:none;outline:none}
 .fly-sub{font-size:9px;color:var(--sub);margin-bottom:8px}
 .fly-section{margin-bottom:12px}
 
-/* AI Structure flyout */
+/* AI Structure / Insight flyout */
 .struct-tag{
   display:inline-block;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:500;
   background:rgba(167,139,250,.12);color:var(--acb);border:1px solid rgba(167,139,250,.18);
@@ -98,7 +94,7 @@ input{font:inherit;border:none;outline:none}
 .struct-item:last-child{border-bottom:none}
 .struct-label{font-size:8px;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
 
-/* Memory flyout */
+/* Knowledge tree (inside Insight flyout) */
 .mind-tree{
   font-family:"SF Mono",Menlo,monospace;font-size:8.5px;line-height:1.5;color:var(--sub);
   background:rgba(15,15,18,.5);border-radius:5px;padding:6px;white-space:pre;overflow-x:auto;
@@ -147,25 +143,29 @@ input{font:inherit;border:none;outline:none}
   background:var(--gl);padding:1px 5px;border-radius:3px;border:1px solid var(--bdr);
 }
 
-/* ═══ Chat expanded overlay ═══ */
-.chat-overlay{
-  position:fixed;inset:0;z-index:55;
-  background:var(--gl);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
-  display:flex;flex-direction:column;
-  transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
-  padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));
+/* ═══ Chat response popover (above chat bar) ═══ */
+.chat-response{
+  position:fixed;
+  bottom:calc(max(8px,env(safe-area-inset-bottom)) + 50px);
+  left:8px;right:52px;z-index:51;
+  background:rgba(22,22,28,.92);backdrop-filter:blur(22px) saturate(1.3);-webkit-backdrop-filter:blur(22px) saturate(1.3);
+  border:1px solid var(--bdr);border-radius:10px;
+  padding:10px 12px;
+  box-shadow:0 6px 24px rgba(0,0,0,.4);
+  max-height:120px;overflow-y:auto;overscroll-behavior:contain;
+  color:var(--tx);font-size:11px;line-height:1.55;
+  opacity:0;transform:translateY(8px);pointer-events:none;
+  transition:opacity .2s,transform .2s;
 }
-.chat-overlay.open{transform:translateY(0)}
-.chat-ov-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.chat-ov-title{font-size:13px;font-weight:700;color:var(--acb)}
-.chat-ov-close{width:28px;height:28px;display:grid;place-items:center;border-radius:6px;background:rgba(255,255,255,.06)}
-.chat-ov-close svg{width:16px;height:16px;stroke:var(--sub);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.chat-ov-body{flex:1;overflow-y:auto;font-size:11px;color:var(--sub);display:flex;align-items:center;justify-content:center}
-.chat-ov-input{
-  display:flex;gap:6px;align-items:center;padding:8px 0 0;border-top:1px solid var(--bdr);margin-top:8px;
+.chat-response.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.chat-response-close{
+  position:absolute;top:4px;right:4px;
+  width:20px;height:20px;display:grid;place-items:center;
+  border-radius:4px;background:rgba(255,255,255,.06);cursor:pointer;
 }
-.chat-ov-input input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;color:var(--tx);font-size:12px}
-.chat-ov-input input::placeholder{color:var(--fnt)}
+.chat-response-close svg{width:12px;height:12px;stroke:var(--sub);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chat-response-close:active{background:rgba(255,255,255,.12)}
+.chat-response-label{font-size:8px;font-weight:600;color:var(--acb);letter-spacing:.04em;margin-bottom:4px}
 
 /* ═══ Typing animation for demo ═══ */
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
@@ -195,36 +195,31 @@ input{font:inherit;border:none;outline:none}
   <p>"I don't want to chat with my tabs. I want my browser to understand what I'm working on." — top comment</p>
 </article>
 
-<!-- ═══ Right-edge fixed bar ═══ -->
+<!-- ═══ Right-edge fixed bar (6 icons: Insight top, 4 mid, Next bottom) ═══ -->
 <div class="r-bar">
-  <!-- Top: AI Structure -->
+  <!-- Top: Insight (merged AI構造 + 記憶) -->
   <div class="r-bar-top">
-    <button class="rbtn" id="btn-struct" data-flyout="fly-struct">
+    <button class="rbtn" id="btn-insight" data-flyout="fly-insight">
       <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
     </button>
   </div>
 
   <div class="r-sep"></div>
 
-  <!-- Mid: 5 action icons -->
+  <!-- Mid: 4 action icons (like, bookmark, remind, RSS) -->
   <div class="r-bar-mid">
-    <div class="r-bar-mid-group">
-      <button class="rbtn" id="btn-like">
-        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      </button>
-      <button class="rbtn" id="btn-save">
-        <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-      </button>
-      <button class="rbtn" id="btn-remind">
-        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      </button>
-      <button class="rbtn" id="btn-rss">
-        <svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5"/><path d="M4 4a16 16 0 0 1 16 16"/><path d="M4 11a9 9 0 0 1 9 9"/></svg>
-      </button>
-      <button class="rbtn" id="btn-memory" data-flyout="fly-memory">
-        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-      </button>
-    </div>
+    <button class="rbtn" id="btn-like">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </button>
+    <button class="rbtn" id="btn-save">
+      <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+    </button>
+    <button class="rbtn" id="btn-remind">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </button>
+    <button class="rbtn" id="btn-rss">
+      <svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5"/><path d="M4 4a16 16 0 0 1 16 16"/><path d="M4 11a9 9 0 0 1 9 9"/></svg>
+    </button>
   </div>
 
   <div class="r-sep"></div>
@@ -240,15 +235,17 @@ input{font:inherit;border:none;outline:none}
 <!-- ═══ Flyout backdrop ═══ -->
 <div class="flyout-backdrop" id="fly-backdrop"></div>
 
-<!-- ═══ Flyout: AI Structure ═══ -->
-<div class="flyout" id="fly-struct">
+<!-- ═══ Flyout: Insight (merged AI構造 + 記憶) ═══ -->
+<div class="flyout" id="fly-insight">
   <div class="fly-section">
     <div class="fly-h">
       <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      AI構造
+      Insight
     </div>
-    <div class="fly-sub">ページ分析</div>
+    <div class="fly-sub">ページ分析 &middot; あなたの記憶</div>
   </div>
+
+  <!-- Page structure section -->
   <div class="fly-section">
     <div class="struct-label">Key Topics</div>
     <div><span class="struct-tag">Memex</span><span class="struct-tag">AI Browser</span><span class="struct-tag">Knowledge Mgmt</span><span class="struct-tag">Vector DB</span></div>
@@ -270,18 +267,13 @@ input{font:inherit;border:none;outline:none}
     <div class="struct-label">Zeed Relevance</div>
     <div style="font-size:9.5px;color:var(--acb);line-height:1.4">この記事は Zeed の中核コンセプト（Profile/TG/Tab 階層記憶）と直接関連しています</div>
   </div>
-</div>
 
-<!-- ═══ Flyout: Memory ═══ -->
-<div class="flyout" id="fly-memory">
+  <!-- Separator between page analysis and knowledge tree -->
+  <div class="r-sep" style="width:100%;margin:8px 0"></div>
+
+  <!-- Knowledge tree section (from Memory) -->
   <div class="fly-section">
-    <div class="fly-h">
-      <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-      記憶
-    </div>
-    <div class="fly-sub">二人で同じ記憶 &middot; 12 件の意図・決定</div>
-  </div>
-  <div class="fly-section">
+    <div class="struct-label">Knowledge Tree</div>
     <div class="mind-tree">Memex
 ├ extract→embed ✓
 ├ Vector DB (1.5b)
@@ -334,32 +326,19 @@ AI Browser
 <!-- ═══ Bottom chat bar ═══ -->
 <div class="chat-bar" id="chat-bar">
   <span class="chat-label">Zeed AI</span>
-  <input type="text" id="chat-input" placeholder="AIに聞く..." readonly>
+  <input type="text" id="chat-input" placeholder="AIに聞く...">
   <button class="chat-send" id="chat-send-btn">
     <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
   </button>
 </div>
 
-<!-- ═══ Chat overlay ═══ -->
-<div class="chat-overlay" id="chat-overlay">
-  <div class="chat-ov-head">
-    <span class="chat-ov-title">Zeed AI</span>
-    <button class="chat-ov-close" id="chat-ov-close">
-      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
-  <div class="chat-ov-body">
-    <div style="text-align:center">
-      <svg viewBox="0 0 24 24" style="width:32px;height:32px;stroke:var(--fnt);fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;margin-bottom:6px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <div style="font-size:10px;color:var(--fnt)">ページについて質問できます</div>
-    </div>
-  </div>
-  <div class="chat-ov-input">
-    <input type="text" id="chat-ov-input-field" placeholder="この記事について聞く...">
-    <button class="chat-send">
-      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-    </button>
-  </div>
+<!-- ═══ Chat response popover (above chat bar) ═══ -->
+<div class="chat-response" id="chat-response">
+  <button class="chat-response-close" id="chat-response-close">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <div class="chat-response-label">Zeed AI</div>
+  <div id="chat-response-body"></div>
 </div>
 
 <script>
@@ -414,14 +393,41 @@ $$('.rbtn[data-flyout]').forEach(btn=>{
   btn.addEventListener('click',()=>openFlyout(btn.dataset.flyout));
 });
 
-/* ── Chat bar ── */
-$('#chat-bar').addEventListener('click',()=>{
-  $('#chat-overlay').classList.add('open');
-  setTimeout(()=>$('#chat-ov-input-field').focus(),350);
-});
-$('#chat-ov-close').addEventListener('click',(e)=>{
+/* ── Chat bar — inline response popover ── */
+const chatInput=$('#chat-input');
+const chatResponse=$('#chat-response');
+const chatResponseBody=$('#chat-response-body');
+
+function showChatResponse(text){
+  chatResponseBody.innerHTML=text;
+  chatResponse.classList.add('show');
+}
+function hideChatResponse(){
+  chatResponse.classList.remove('show');
+}
+
+$('#chat-response-close').addEventListener('click',(e)=>{
   e.stopPropagation();
-  $('#chat-overlay').classList.remove('open');
+  hideChatResponse();
+});
+
+// Send handler — fake AI response
+function handleChatSend(){
+  const q=chatInput.value.trim();
+  if(!q)return;
+  // Simulate AI response
+  const fakeResponses={
+    'この記事の要点は？':'この記事は、1945年の Memex 構想と現代のAIブラウザを比較し、タブやブックマークの原始的な構造を超える「階層的コンテキスト」の必要性を論じています。Zeed の Profile/TG/Tab 設計と直接関連する内容です。',
+    'default':'この記事はAIブラウザの進化について論じています。現状の課題は、チャットUIをChromium上に被せるだけで根本的なプリミティブ（タブ、ブックマーク）を再設計していない点です。'
+  };
+  const answer=fakeResponses[q]||fakeResponses['default'];
+  showChatResponse(answer);
+  chatInput.value='';
+}
+
+$('#chat-send-btn').addEventListener('click',handleChatSend);
+chatInput.addEventListener('keydown',(e)=>{
+  if(e.key==='Enter'){e.preventDefault();handleChatSend();}
 });
 
 /* ── Demo auto-play ── */
@@ -435,9 +441,8 @@ $('#demo-btn').addEventListener('click',()=>{void(async()=>{
   // Reset everything
   ['btn-like','btn-save','btn-remind','btn-rss'].forEach(id=>$('#'+id).classList.remove('on','pop'));
   closeFlyout();
-  $('#chat-overlay').classList.remove('open');
-  $('#chat-ov-input-field').value='';
-  $('#chat-input').value='';
+  hideChatResponse();
+  chatInput.value='';
   await slp(400);
 
   // 1. Tap heart
@@ -450,32 +455,23 @@ $('#demo-btn').addEventListener('click',()=>{void(async()=>{
   save.classList.add('on');save.classList.add('pop');
   await slp(800);save.classList.remove('pop');
 
-  // 3. Open AI構造 flyout
-  openFlyout('fly-struct');
-  await slp(2200);
+  // 3. Open Insight flyout (merged AI構造 + 記憶)
+  openFlyout('fly-insight');
+  await slp(2800);
 
   // 4. Close
   closeFlyout();
   await slp(500);
 
-  // 5. Open 記憶 flyout
-  openFlyout('fly-memory');
+  // 5. Open 次へ flyout
+  openFlyout('fly-next');
   await slp(2200);
 
   // 6. Close
   closeFlyout();
   await slp(500);
 
-  // 7. Open 次へ flyout
-  openFlyout('fly-next');
-  await slp(2200);
-
-  // 8. Close
-  closeFlyout();
-  await slp(500);
-
-  // 9. Type in chat box — simulate typing in the bar then open overlay
-  const chatInput=$('#chat-input');
+  // 7. Type in chat box and show inline response
   const text='この記事の要点は？';
   chatInput.value='';
   for(let i=0;i<text.length;i++){
@@ -484,15 +480,13 @@ $('#demo-btn').addEventListener('click',()=>{void(async()=>{
   }
   await slp(600);
 
-  // Open chat overlay with the typed text
-  $('#chat-overlay').classList.add('open');
-  const ovField=$('#chat-ov-input-field');
-  ovField.value=text;
-  await slp(1800);
+  // Show response popover above chat bar
+  showChatResponse('この記事は、1945年の Memex 構想と現代のAIブラウザを比較し、タブやブックマークの原始的な構造を超える「階層的コンテキスト」の必要性を論じています。Zeed の Profile/TG/Tab 設計と直接関連する内容です。');
+  await slp(3000);
 
-  // Close chat overlay
-  $('#chat-overlay').classList.remove('open');
-  await slp(500);
+  // Close response
+  hideChatResponse();
+  await slp(300);
   chatInput.value='';
 
   // Done
