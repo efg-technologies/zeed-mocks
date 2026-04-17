@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zeed — SP Demo</title>
+<style>
+:root{--base:#0f0f12;--el1:#1a1a1f;--el2:#25252a;--el3:#34343c;--border:#2a2a31;--accent:#5b21b6;--accent-b:#a78bfa;--text:#e8e8e8;--sub:#9e9ea8;--faint:#6b6b73;--ok:#86efac;--warn:#fbbf24;--err:#fca5a5}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;background:var(--base);color:var(--text);overscroll-behavior:none}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+textarea{font:inherit}
+
+/* ─── Shell ─── */
+.shell{display:flex;flex-direction:column;height:100dvh;height:100vh}
+.shell-header{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;background:var(--el1);
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.shell-header .logo{font-weight:700;font-size:15px;color:var(--accent-b)}
+.shell-header .scope{
+  font-size:11px;color:var(--sub);
+  background:var(--el2);padding:3px 8px;border-radius:999px;
+}
+.shell-header .scope.hi{background:var(--accent);color:#fff}
+.shell-header .spacer{flex:1}
+
+/* ─── Tabs ─── */
+.tabs{
+  display:flex;gap:2px;padding:6px 12px 0;background:var(--el1);flex-shrink:0;
+}
+.tabs button{
+  flex:1;padding:9px 0;font-size:13px;font-weight:500;color:var(--sub);
+  border-radius:8px 8px 0 0;border-bottom:2px solid transparent;
+  background:transparent;
+}
+.tabs button.on{color:var(--text);background:var(--base);border-bottom-color:var(--accent-b)}
+.tabs .badge{
+  display:inline-block;margin-left:4px;background:var(--accent);color:#fff;
+  font-size:10px;padding:1px 6px;border-radius:999px;
+}
+
+/* ─── Body ─── */
+.body{flex:1;overflow-y:auto;padding:10px 12px;min-height:0}
+.pane{display:none}.pane.on{display:block}
+
+/* ─── Cards ─── */
+.card{background:var(--el1);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
+.card-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.card-t{font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.06em}
+.card-a{font-size:11px;color:var(--accent-b)}
+
+/* Tab info */
+.tab-row{display:flex;gap:8px;align-items:flex-start}
+.fav{width:18px;height:18px;border-radius:4px;background:var(--el3);display:grid;place-items:center;font-size:10px;color:var(--sub);flex-shrink:0}
+.tab-title{font-size:14px;line-height:1.3}
+.tab-url{font-size:11px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.signals{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
+.sig{font-size:11px;padding:4px 9px;border-radius:999px;background:var(--el2);color:var(--sub)}
+.sig.known{background:rgba(91,33,182,.18);color:var(--accent-b)}
+.sig.fresh{background:rgba(134,239,172,.12);color:var(--ok)}
+
+/* Facts */
+.fact{padding:8px 0;border-top:1px solid var(--border);font-size:12.5px;line-height:1.5}
+.fact:first-child{border-top:none;padding-top:4px}
+.kind{display:inline-block;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:4px;background:var(--el2);color:var(--sub);margin-right:6px;vertical-align:1px}
+.kind.d{background:rgba(134,239,172,.15);color:var(--ok)}
+.kind.f{background:rgba(167,139,250,.15);color:var(--accent-b)}
+.kind.i{background:rgba(251,191,36,.15);color:var(--warn)}
+.src{margin-top:3px;font-size:10px;color:var(--faint)}
+.cite{display:inline-block;margin-left:3px;background:var(--el3);color:var(--accent-b);font-size:10px;padding:1px 6px;border-radius:999px;vertical-align:1px}
+
+/* Runs */
+.run-sum{font-size:12px;color:var(--sub);margin-bottom:6px}
+.run-sum .st{font-weight:600;color:var(--warn)}
+.run-sum .st.ok{color:var(--ok)}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.step{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.4}
+.dot{width:8px;height:8px;border-radius:999px;margin-top:5px;flex-shrink:0;background:var(--el3)}
+.step.done .dot{background:var(--ok)}
+.step.run .dot{background:var(--warn);animation:pulse 1s ease-in-out infinite}
+.step.fail .dot{background:var(--err)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
+.step-m{font-size:10px;color:var(--faint)}
+
+/* Chat */
+.chat{display:flex;flex-direction:column;gap:6px}
+.msg{font-size:13.5px;line-height:1.5;padding:9px 13px;border-radius:12px;max-width:90%;white-space:pre-wrap;word-break:break-word}
+.msg.u{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg.a{background:var(--el2);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.s{background:rgba(91,33,182,.1);border:1px solid rgba(91,33,182,.3);color:var(--accent-b);align-self:stretch;font-size:11.5px;font-style:italic}
+.typing{display:inline-flex;gap:3px}
+.typing span{width:5px;height:5px;border-radius:999px;background:var(--sub);animation:typ 1.4s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes typ{0%,60%,100%{opacity:.3}30%{opacity:1}}
+
+/* ─── Composer ─── */
+.composer{
+  flex-shrink:0;padding:8px 12px;
+  padding-bottom:max(8px,env(safe-area-inset-bottom));
+  background:var(--el1);border-top:1px solid var(--border);
+}
+.composer textarea{
+  width:100%;background:var(--base);border:1px solid var(--border);border-radius:10px;
+  padding:10px 12px;color:var(--text);font-size:14px;resize:none;min-height:52px;max-height:120px;
+}
+.composer textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.composer-bar{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.modes{display:flex;gap:4px}
+.modes button{font-size:12px;padding:6px 11px;border-radius:6px;color:var(--sub);background:var(--el2)}
+.modes button.on{background:var(--accent);color:#fff}
+.send{background:var(--accent);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600}
+
+/* ─── Overlay bottom-sheet ─── */
+.overlay-sheet{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--el1);border-top:1px solid var(--border);
+  border-radius:14px 14px 0 0;
+  transform:translateY(100%);transition:transform .3s ease;
+  max-height:55vh;overflow-y:auto;z-index:100;
+  padding:16px 14px;padding-bottom:max(14px,env(safe-area-inset-bottom));
+}
+.overlay-sheet.show{transform:translateY(0)}
+.overlay-sheet .sheet-handle{
+  width:36px;height:4px;border-radius:999px;background:var(--el3);
+  margin:0 auto 12px;cursor:pointer;
+}
+.overlay-sheet .sheet-title{font-size:13px;font-weight:600;margin-bottom:10px;color:var(--accent-b)}
+.overlay-sheet .widget{
+  background:var(--el2);border-radius:10px;padding:10px 12px;margin-bottom:8px;
+}
+.overlay-sheet .widget-h{font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;margin-bottom:6px}
+.overlay-sheet .widget-item{font-size:12.5px;line-height:1.5;margin-bottom:4px}
+.overlay-sheet .widget-link{color:var(--accent-b);font-size:12px}
+.overlay-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;
+  display:none;
+}
+.overlay-backdrop.show{display:block}
+
+/* ─── Demo FAB ─── */
+.demo-fab{
+  position:fixed;bottom:max(80px,calc(env(safe-area-inset-bottom) + 80px));right:14px;z-index:50;
+  background:var(--accent);color:#fff;
+  width:56px;height:56px;border-radius:999px;
+  display:grid;place-items:center;
+  font-size:22px;font-weight:700;
+  box-shadow:0 4px 20px rgba(91,33,182,.5);
+  transition:transform .15s;
+}
+.demo-fab:hover{transform:scale(1.05)}
+.demo-fab:active{transform:scale(.95)}
+.demo-fab:disabled{background:var(--el3);box-shadow:none}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- Header -->
+  <div class="shell-header">
+    <span class="logo">Zeed</span>
+    <span class="scope" id="scope-profile">仕事</span>
+    <span style="color:var(--faint)">›</span>
+    <span class="scope hi" id="scope-tg">Memory 設計</span>
+    <span class="spacer"></span>
+    <button style="font-size:18px" id="overlay-btn" title="signal">🔔</button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="on" data-p="now">Now</button>
+    <button data-p="memory">Memory <span class="badge" id="mem-badge">5</span></button>
+    <button data-p="runs">Runs <span class="badge" id="run-badge">1</span></button>
+  </div>
+
+  <!-- Body -->
+  <div class="body" id="body">
+    <!-- NOW -->
+    <div class="pane on" data-p="now">
+      <div class="card">
+        <div class="card-h"><span class="card-t">いま見ているタブ</span></div>
+        <div class="tab-row">
+          <div class="fav">a</div>
+          <div style="min-width:0;flex:1">
+            <div class="tab-title">Mem0: Building Production-Ready AI Agents</div>
+            <div class="tab-url">arxiv.org/abs/2504.19413</div>
+          </div>
+        </div>
+        <div class="signals">
+          <span class="sig known">📎 3件似た検討あり</span>
+          <span class="sig">🏷 Memory 設計</span>
+          <span class="sig fresh">+ 新規</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><span class="card-t">TabGroup の文脈</span></div>
+        <div class="fact"><span class="kind d">Decision</span><span>extract-before-embed 採用。Mem0 / A-Mem 根拠あり</span><div class="src">4/12 · arxiv.org<span class="cite">A-Mem</span></div></div>
+        <div class="fact"><span class="kind f">Finding</span><span>embedding 全件投入は記憶を汚す</span><div class="src">4/13 · 検討メモ</div></div>
+        <div class="fact"><span class="kind i">Intent</span><span>Phase 1.5b で EmbeddingGemma を browser に置く方向</span><div class="src">4/15 · plan</div></div>
+      </div>
+
+      <div id="chat-card" class="card" style="display:none">
+        <div class="card-h"><span class="card-t">Chat</span></div>
+        <div class="chat" id="chat-list"></div>
+      </div>
+    </div>
+
+    <!-- MEMORY -->
+    <div class="pane" data-p="memory">
+      <div class="card">
+        <div class="card-h"><span class="card-t">最近の Facts</span></div>
+        <div class="fact"><span class="kind d">Decision</span><span>Native sidebar に PR 単位で移行 (PR-1〜2 完了)</span><div class="src">4/17</div></div>
+        <div class="fact"><span class="kind f">Finding</span><span>SidePanelWebUIView は Mojo ShowUI() を待つ</span><div class="src">4/17 debug</div></div>
+        <div class="fact"><span class="kind i">Intent</span><span>PR-3: SimpleURLLoader で API key を browser process 内に閉じる</span><div class="src">4/17 plan</div></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><span class="card-t">Profile スコープ</span></div>
+        <div class="fact"><span class="kind d">Decision</span><span>コンセプト「人間中心のプロ用 AI ブラウザ」。マス層は狙わない</span><div class="src">3/21 concept.md</div></div>
+      </div>
+    </div>
+
+    <!-- RUNS -->
+    <div class="pane" data-p="runs">
+      <div class="card">
+        <div class="card-h"><span class="card-t">Mission Control</span></div>
+        <div class="run-sum"><span id="run-label">Mem0 / A-Mem の差分整理</span> · <span class="st" id="run-st">running</span> · <span id="run-cnt">3/5</span></div>
+        <ol class="steps" id="steps">
+          <li class="step done"><span class="dot"></span><div><div>read_page (Mem0 abstract)</div><div class="step-m">12s</div></div></li>
+          <li class="step done"><span class="dot"></span><div><div>spawn_research_agent (A-Mem)</div><div class="step-m">28s</div></div></li>
+          <li class="step run"><span class="dot"></span><div><div>extract: 比較表ドラフト作成中</div><div class="step-m">8s</div></div></li>
+          <li class="step"><span class="dot"></span><div><div>consolidate → 記憶層</div><div class="step-m">queued</div></div></li>
+          <li class="step"><span class="dot"></span><div><div>done → 要約返却</div><div class="step-m">queued</div></div></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- Composer -->
+  <div class="composer">
+    <textarea id="input" placeholder="このタブグループの文脈で質問する" rows="2"></textarea>
+    <div class="composer-bar">
+      <div class="modes">
+        <button class="on" data-m="ask">Ask</button>
+        <button data-m="run">Run</button>
+        <button data-m="auto">Auto</button>
+      </div>
+      <button class="send" id="send">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay bottom sheet -->
+<div class="overlay-backdrop" id="ov-bg"></div>
+<div class="overlay-sheet" id="ov-sheet">
+  <div class="sheet-handle" id="sheet-close"></div>
+  <div class="sheet-title">🔔 Signal — 外側の文脈</div>
+  <div class="widget">
+    <div class="widget-h">RSS · Hacker News</div>
+    <div class="widget-item"><strong style="color:var(--accent-b)">Show HN: A vector DB in 200 LOC</strong></div>
+    <div class="widget-item">sqlite-vec: simple, fast vector search in browser</div>
+    <div class="widget-item" style="font-size:11px;color:var(--faint)">先週 "EmbeddingGemma + sqlite-vec" を検討していた。これは実装例。</div>
+    <div class="widget-link">開く →</div>
+  </div>
+  <div class="widget">
+    <div class="widget-h">📧 Email</div>
+    <div class="widget-item">@nakamori「memory 設計の relations 案、来週レビューしたい」</div>
+    <div class="widget-item" style="font-size:11px;color:var(--faint)">3h ago · gmail</div>
+  </div>
+  <div class="widget">
+    <div class="widget-h">📌 Bookmark · 未読</div>
+    <div class="widget-item">A-Mem follow-up — NeurIPS 2025</div>
+  </div>
+  <div class="widget">
+    <div class="widget-h">🧠 Mindmap (この TG の概念地図)</div>
+    <div class="widget-item" style="color:var(--faint);font-size:11px">Mem0 → extract-before-embed → Zeed Phase 1.5b<br>A-Mem → entity-link → future Phase 1.5c</div>
+  </div>
+</div>
+
+<!-- Demo FAB -->
+<button class="demo-fab" id="demo" title="デモ自動再生">▶</button>
+
+<script>
+/* ─── Tabs ─── */
+document.querySelectorAll('.tabs button').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b===t));
+    document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.dataset.p===t.dataset.p));
+  });
+});
+function showTab(name){document.querySelector(`.tabs [data-p="${name}"]`).click()}
+
+/* ─── Modes ─── */
+let mode='ask';
+document.querySelectorAll('.modes button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.modes button').forEach(x=>x.classList.toggle('on',x===b));
+    mode=b.dataset.m;
+  });
+});
+function setMode(m){document.querySelector(`.modes [data-m="${m}"]`).click()}
+
+/* ─── Overlay ─── */
+const ovBg=document.getElementById('ov-bg'),ovSheet=document.getElementById('ov-sheet');
+function openOverlay(){ovBg.classList.add('show');ovSheet.classList.add('show')}
+function closeOverlay(){ovBg.classList.remove('show');ovSheet.classList.remove('show')}
+document.getElementById('overlay-btn').addEventListener('click',openOverlay);
+document.getElementById('sheet-close').addEventListener('click',closeOverlay);
+ovBg.addEventListener('click',closeOverlay);
+
+/* ─── Chat ─── */
+const chatCard=document.getElementById('chat-card'),chatList=document.getElementById('chat-list');
+function showChat(){chatCard.style.display='';showTab('now')}
+function appendMsg(role,text,typing){
+  showChat();
+  const d=document.createElement('div');d.className=`msg ${role}`;
+  if(typing)d.innerHTML='<span class="typing"><span></span><span></span><span></span></span>';
+  else d.innerHTML=rich(text);
+  chatList.appendChild(d);d.scrollIntoView({block:'nearest'});return d;
+}
+function rich(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/【cite:([^】]+)】/g,'<span class="cite">$1</span>')}
+async function stream(el,txt){el.innerHTML='';const h=rich(txt);for(let i=0;i<h.length;i+=4){el.innerHTML+=h.slice(i,i+4);el.scrollIntoView({block:'nearest'});await sleep(10+Math.random()*12)}}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+
+/* ─── Send ─── */
+const input=document.getElementById('input'),sendBtn=document.getElementById('send');
+sendBtn.addEventListener('click',doSend);
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend()}});
+async function doSend(){
+  const txt=input.value.trim();if(!txt)return;input.value='';
+  if(mode==='run'||mode==='auto'){startRun(txt);return}
+  appendMsg('u',txt);
+  const ph=appendMsg('a','',true);
+  await stream(ph,fakeReply(txt));
+}
+function fakeReply(q){
+  const l=q.toLowerCase();
+  if(l.includes('mem0')||l.includes('差分')||l.includes('違い'))
+    return 'Mem0 は extract→consolidate の 2-phase。【cite:Mem0】\n\nA-Mem は entity tag + Zettelkasten 風 link。【cite:A-Mem】\n\nTabGroup の決定 (extract-before-embed) は Mem0 寄り。A-Mem の link を後段で重ねるのが現実解。';
+  if(l.includes('rss')||l.includes('signal'))
+    return 'Signal パネルに情報あり: sqlite-vec の実装例 (HN) + nakamori さんのレビュー依頼。開きますか?';
+  return 'TabGroup「Memory 設計」のスコープで読みます。何を比較しますか?';
+}
+
+/* ─── Run ─── */
+function startRun(prompt){
+  showTab('runs');
+  document.getElementById('run-label').textContent=prompt.slice(0,40)+(prompt.length>40?'…':'');
+  document.getElementById('run-st').textContent='running';document.getElementById('run-st').className='st';
+  const names=['read_page','search_memory (5 hits)','spawn_research_agent','extract: ドラフト','done: 要約返却'];
+  const el=document.getElementById('steps');el.innerHTML='';
+  names.forEach(n=>{const li=document.createElement('li');li.className='step';li.innerHTML=`<span class="dot"></span><div><div>${esc(n)}</div><div class="step-m">queued</div></div>`;el.appendChild(li)});
+  document.getElementById('run-cnt').textContent=`0/${names.length}`;
+  let i=0;
+  (function tick(){
+    el.querySelectorAll('.step').forEach((li,idx)=>{li.classList.remove('run','done');if(idx<i)li.classList.add('done');else if(idx===i)li.classList.add('run')});
+    document.getElementById('run-cnt').textContent=`${i}/${names.length}`;
+    if(i<names.length){i++;setTimeout(tick,1200+Math.random()*500)}
+    else{document.getElementById('run-st').textContent='done';document.getElementById('run-st').className='st ok';
+      document.getElementById('mem-badge').textContent=String(parseInt(document.getElementById('mem-badge').textContent)+2)}
+  })();
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+
+/* ─── DEMO ─── */
+const demoBtn=document.getElementById('demo');
+demoBtn.addEventListener('click',()=>{void runDemo()});
+async function runDemo(){
+  demoBtn.disabled=true;demoBtn.textContent='…';
+
+  // 1. Show overlay signal
+  await sleep(500);
+  openOverlay();
+  await sleep(2500);
+  closeOverlay();
+  await sleep(600);
+
+  // 2. Ask in chat
+  showTab('now');setMode('ask');
+  await typeIn('Mem0 と A-Mem の差分は?');
+  await sleep(300);
+  sendBtn.click();
+  await sleep(3000);
+
+  // 3. Switch to Run mode
+  await sleep(600);
+  setMode('run');
+  await typeIn('比較を Decision 候補として記憶層に書く');
+  await sleep(300);
+  sendBtn.click();
+  await sleep(7000);
+
+  // 4. Show Memory
+  showTab('memory');
+  await sleep(2000);
+
+  // 5. Back to Now
+  showTab('now');
+  setMode('ask');
+  demoBtn.disabled=false;demoBtn.textContent='▶';
+}
+async function typeIn(txt){input.focus();input.value='';for(const c of txt){input.value+=c;await sleep(22+Math.random()*18)}}
+</script>
+</body>
+</html>
