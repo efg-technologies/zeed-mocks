@@ -129,31 +129,39 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 .abtn.rss-btn.on svg{fill:none;stroke:var(--acb)}
 @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.35)}70%{transform:scale(.92)}100%{transform:scale(1.05)}}
 
-/* --- Bottom-right: Recommendation (hidden until scroll) --- */
-.o-reco{bottom:20px;right:calc(var(--sidebar-w) + 16px);width:260px;
-  opacity:0;transform:translateY(16px);pointer-events:none;
-  transition:opacity .5s ease,transform .5s ease;
+/* --- Bottom-right: Recommendation stack --- */
+.reco-stack{
+  position:fixed;bottom:20px;right:calc(var(--sidebar-w) + 16px);
+  z-index:10;display:flex;flex-direction:column-reverse;gap:8px;
+  pointer-events:none;
 }
-.o-reco.visible{opacity:1;transform:translateY(0);pointer-events:auto}
-.o-reco .gl{border-radius:12px;overflow:hidden;padding:0}
-.reco-head{padding:10px 12px 6px;display:flex;align-items:center;justify-content:space-between}
-.reco-t{font-size:11px;font-weight:600;color:var(--acb);letter-spacing:.04em}
-.reco-src{font-size:9px;color:var(--sub)}
-.reco-thumb{
-  width:100%;height:64px;background:linear-gradient(135deg,var(--ac),#1e1b4b);
-  display:grid;place-items:center;color:rgba(255,255,255,.9);font-size:12px;font-weight:600;line-height:1.3;text-align:center;padding:0 12px;
+.reco-card{
+  width:220px;pointer-events:auto;
+  opacity:0;transform:translateX(60px);
+  transition:opacity .4s ease,transform .4s ease;
 }
-.reco-body{padding:8px 12px 10px}
-.reco-hl{font-size:12px;font-weight:600;line-height:1.35;margin-bottom:4px}
-.reco-why{font-size:10px;color:var(--sub);line-height:1.45;margin-bottom:8px}
-.reco-btns{display:flex;gap:6px}
-.reco-btn{
-  flex:1;padding:6px;border-radius:6px;font-size:11px;text-align:center;font-weight:500;
-  border:1px solid rgba(60,60,70,.4);background:rgba(26,26,31,.7);color:var(--tx);transition:background .15s;
+.reco-card.visible{opacity:1;transform:translateX(0)}
+.reco-card .gl{border-radius:10px;overflow:hidden;padding:0}
+.reco-card .rc-head{padding:7px 10px 4px;display:flex;align-items:center;justify-content:space-between}
+.reco-card .rc-label{font-size:10px;font-weight:600;color:var(--acb);letter-spacing:.03em}
+.reco-card .rc-src{font-size:9px;color:var(--sub)}
+.reco-card .rc-thumb{
+  width:100%;height:40px;display:grid;place-items:center;
+  color:rgba(255,255,255,.9);font-size:10px;font-weight:600;line-height:1.3;text-align:center;padding:0 10px;
 }
-.reco-btn:hover{background:rgba(40,40,48,.9)}
-.reco-btn.pri{border-color:var(--ac);background:var(--ac);color:#fff}
-.reco-btn.pri:hover{background:#6d28d9}
+.reco-card .rc-body{padding:6px 10px 8px}
+.reco-card .rc-title{font-size:11px;font-weight:600;line-height:1.3;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reco-card .rc-reason{font-size:9px;color:var(--sub);line-height:1.4;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reco-card .rc-open{
+  width:100%;padding:4px;border-radius:5px;font-size:10px;text-align:center;font-weight:500;
+  border:1px solid var(--ac);background:var(--ac);color:#fff;transition:background .15s;cursor:pointer;
+}
+.reco-card .rc-open:hover{background:#6d28d9}
+
+/* Card gradient thumbs */
+.rc-thumb.thumb-memex{background:linear-gradient(135deg,#f97316,#b45309)}
+.rc-thumb.thumb-vec{background:linear-gradient(135deg,var(--ac),#1e1b4b)}
+.rc-thumb.thumb-local{background:linear-gradient(135deg,#16a34a,#064e3b)}
 
 /* --- Glass --- */
 .gl{
@@ -342,27 +350,27 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
     <h1>The Memex We Didn't Get &mdash; And the Browser That Might Finally Deliver It</h1>
     <div class="meta">news.ycombinator.com &middot; 287 pts &middot; 42 comments &middot; 3 hours ago</div>
 
-    <p>Vannevar Bush described the <span class="kw" data-kw="memex">Memex</span> in 1945 &mdash; a personal knowledge system that would augment human memory. Eighty years later, browsers still treat knowledge as a pile of tabs and bookmarks, and AI browsers treat context as a chat history. Neither is the <span class="kw" data-kw="memex">Memex</span>.</p>
+    <p>Vannevar Bush described the <span class="kw" data-kw="memex" data-group="1">Memex</span> in 1945 &mdash; a personal <span class="kw" data-kw="knowledge management" data-group="1">knowledge management</span> system that would augment human memory. Eighty years later, browsers still treat knowledge as a pile of tabs and bookmarks, and AI browsers treat context as a chat history. Neither is the <span class="kw" data-kw="memex" data-group="1">Memex</span>.</p>
 
     <div class="img-ph"></div>
 
     <h2>Why current AI browsers fall short</h2>
     <p>The recent wave of AI browsers &mdash; Comet, Atlas, Dia &mdash; layers a chat interface on top of Chromium without redesigning the underlying primitives. Tabs are still just URLs. Bookmarks are still just metadata. History is a flat list sorted by time, not by relevance or association.</p>
-    <p>Bolting a chatbot onto Chrome doesn't make it a <span class="kw" data-kw="memex">Memex</span> any more than bolting a calculator onto a typewriter makes it a computer. The problem isn't the UI &mdash; it's the data model.</p>
+    <p>Bolting a chatbot onto Chrome doesn't make it a <span class="kw" data-kw="memex" data-group="1">Memex</span> any more than bolting a calculator onto a typewriter makes it a computer. The problem isn't the UI &mdash; it's the data model.</p>
 
     <h2>What's missing</h2>
-    <p>Hierarchical context: Profile for role, TabGroup for project, Tab for the immediate object. Each level maintains its own <span class="kw" data-kw="embedding">embedding</span> space, its own memory, its own intent model. When you switch tabs, the context switches with you &mdash; not because you told the AI, but because it understands the topology.</p>
-    <p>Extracted intent in a shared memory layer searchable by meaning, not keyword. The browser should remember that you were researching <span class="kw" data-kw="sqlite-vec">sqlite-vec</span> for the <span class="kw" data-kw="embedding">embeddings</span> pipeline two weeks ago, and surface that context when you open a related article today.</p>
+    <p>Hierarchical context: Profile for role, TabGroup for project, Tab for the immediate object. Each level maintains its own <span class="kw" data-kw="embedding" data-group="2">embedding</span> space, its own memory, its own intent model. When you switch tabs, the context switches with you &mdash; not because you told the AI, but because it understands the topology.</p>
+    <p>Extracted intent in a shared memory layer searchable by meaning, not keyword. The browser should remember that you were researching <span class="kw" data-kw="sqlite-vec" data-group="2">sqlite-vec</span> for the <span class="kw" data-kw="embedding" data-group="2">embeddings</span> pipeline two weeks ago, and surface that context when you open a related article today.</p>
 
     <blockquote>"I don't want to chat with my tabs. I want my browser to understand what I'm working on and anticipate what comes next."<br>&mdash; top comment, 127 upvotes</blockquote>
 
     <h2>The primitives that matter</h2>
-    <p>A true <span class="kw" data-kw="memex">Memex</span> browser needs three things: a per-tab extraction pipeline that turns page content into structured facts, a <span class="kw" data-kw="vector database">vector database</span> that maps those facts to your personal knowledge graph, and an intent model that predicts what you need before you ask.</p>
+    <p>A true <span class="kw" data-kw="memex" data-group="1">Memex</span> browser needs three things: a per-tab extraction pipeline that turns page content into structured facts, a <span class="kw" data-kw="vector database" data-group="2">vector database</span> that maps those facts to your personal knowledge graph, and an intent model that predicts what you need before you ask.</p>
     <p>The question isn't whether AI browsers win &mdash; it's which primitives they commit to. Get the data model right, and the interface follows. Get it wrong, and you're just building another chatbot with a URL bar.</p>
 
     <h2>Discussion</h2>
     <p>The thread quickly converges on the observation that most AI browsers optimize for prompt engineering rather than knowledge engineering. Several commenters point to academic work on associative memory systems and semantic trails &mdash; exactly what Bush envisioned.</p>
-    <p>One recurring question: can a browser really hold long-term memory across sessions without becoming a privacy nightmare? The consensus seems to be that local-first, user-owned storage is non-negotiable.</p>
+    <p>One recurring question: can a browser really hold long-term memory across sessions without becoming a <span class="kw" data-kw="privacy" data-group="3">privacy</span> nightmare? The consensus seems to be that <span class="kw" data-kw="local-first" data-group="3">local-first</span>, user-owned storage is non-negotiable.</p>
   </article>
 </div>
 
@@ -384,17 +392,41 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
   </div>
 </div>
 
-<!-- Overlay: Bottom-right Recommendation (hidden until scroll triggers) -->
-<div class="overlay o-reco" id="reco-widget">
-  <div class="gl">
-    <div class="reco-head"><span class="reco-t">次に読むなら</span><span class="reco-src" id="reco-src-label">HN</span></div>
-    <div class="reco-thumb" id="reco-thumb">sqlite-vec: fast vector<br>search in the browser</div>
-    <div class="reco-body">
-      <div class="reco-hl" id="reco-hl">sqlite-vec: vector search in 200 LOC</div>
-      <div class="reco-why" id="reco-why">先週 EmbeddingGemma + sqlite-vec を検討 &mdash; 今の記事と直結</div>
-      <div class="reco-btns">
-        <button class="reco-btn" id="reco-later">後で</button>
-        <button class="reco-btn pri" id="reco-open">開く</button>
+<!-- Recommendation card stack (bottom-right) -->
+<div class="reco-stack" id="reco-stack">
+  <!-- Card 3 (bottom of stack, appears last) -->
+  <div class="reco-card" id="reco-card-3">
+    <div class="gl">
+      <div class="rc-head"><span class="rc-label">次に読むなら</span><span class="rc-src">Ink &amp; Switch</span></div>
+      <div class="rc-thumb thumb-local">Local-first software</div>
+      <div class="rc-body">
+        <div class="rc-title">Local-first software: you own your data</div>
+        <div class="rc-reason">プライバシーとローカル優先の設計思想に直結</div>
+        <button class="rc-open">開く</button>
+      </div>
+    </div>
+  </div>
+  <!-- Card 2 -->
+  <div class="reco-card" id="reco-card-2">
+    <div class="gl">
+      <div class="rc-head"><span class="rc-label">次に読むなら</span><span class="rc-src">GitHub</span></div>
+      <div class="rc-thumb thumb-vec">sqlite-vec: vector search</div>
+      <div class="rc-body">
+        <div class="rc-title">sqlite-vec: vector search in 200 LOC</div>
+        <div class="rc-reason">先週 EmbeddingGemma + sqlite-vec を検討中</div>
+        <button class="rc-open">開く</button>
+      </div>
+    </div>
+  </div>
+  <!-- Card 1 (top of stack, appears first) -->
+  <div class="reco-card" id="reco-card-1">
+    <div class="gl">
+      <div class="rc-head"><span class="rc-label">次に読むなら</span><span class="rc-src">HN</span></div>
+      <div class="rc-thumb thumb-memex">Memex Revisited</div>
+      <div class="rc-body">
+        <div class="rc-title">Memex Revisited: Bush's Vision in 2026</div>
+        <div class="rc-reason">この記事の核心概念 Memex に関連</div>
+        <button class="rc-open">開く</button>
       </div>
     </div>
   </div>
@@ -593,39 +625,15 @@ async function streamText(bubble,text,speed){
   }
 }
 
-/* ── Scroll-based keyword detection + recommendation ── */
+/* ── Scroll-based keyword detection + progressive recommendations ── */
 const kwElements=document.querySelectorAll('.kw');
-const recoWidget=$('#reco-widget');
 const viewport=$('#viewport');
+const recoCards=[
+  {el:$('#reco-card-1'), threshold:0.30, shown:false, group:'1'},
+  {el:$('#reco-card-2'), threshold:0.55, shown:false, group:'2'},
+  {el:$('#reco-card-3'), threshold:0.80, shown:false, group:'3'},
+];
 
-const recoData={
-  'vector database':{
-    thumb:'sqlite-vec: fast vector<br>search in the browser',
-    hl:'sqlite-vec: vector search in 200 LOC',
-    why:'先週 EmbeddingGemma + sqlite-vec を検討 — 今の記事と直結',
-    src:'GitHub'
-  },
-  'sqlite-vec':{
-    thumb:'sqlite-vec: fast vector<br>search in the browser',
-    hl:'sqlite-vec: vector search in 200 LOC',
-    why:'先週 EmbeddingGemma + sqlite-vec を検討 — 今の記事と直結',
-    src:'GitHub'
-  },
-  'embedding':{
-    thumb:'Embedding models<br>comparison 2025',
-    hl:'EmbeddingGemma vs Cohere: 性能比較',
-    why:'embedding パイプライン設計で検討中のモデルに関連',
-    src:'HN'
-  },
-  'memex':{
-    thumb:'Memex (Wikipedia)<br>Bush\'s original vision',
-    hl:'Memex — Wikipedia',
-    why:'この記事の核心概念。Bush の原典で理解を深める',
-    src:'Wikipedia'
-  }
-};
-
-let lastRecoKey='';
 let scrollHighlightEnabled=true;
 
 viewport.addEventListener('scroll',()=>{
@@ -633,28 +641,27 @@ viewport.addEventListener('scroll',()=>{
   const scrollPct=viewport.scrollTop/(viewport.scrollHeight-viewport.clientHeight);
   const vpRect=viewport.getBoundingClientRect();
 
-  let detectedKw='';
+  /* Highlight keywords that are in view */
   kwElements.forEach(el=>{
     const r=el.getBoundingClientRect();
     if(r.top<vpRect.bottom && r.bottom>vpRect.top){
       el.classList.add('kw-highlight','revealed');
-      detectedKw=el.dataset.kw;
     }
   });
 
-  if(scrollPct>=0.5){
-    recoWidget.classList.add('visible');
-    if(detectedKw && recoData[detectedKw] && detectedKw!==lastRecoKey){
-      lastRecoKey=detectedKw;
-      const d=recoData[detectedKw];
-      $('#reco-thumb').innerHTML=d.thumb;
-      $('#reco-hl').textContent=d.hl;
-      $('#reco-why').textContent=d.why;
-      $('#reco-src-label').textContent=d.src;
+  /* Show recommendation cards progressively */
+  recoCards.forEach(card=>{
+    if(!card.shown && scrollPct>=card.threshold){
+      card.shown=true;
+      card.el.classList.add('visible');
+      /* Also highlight all keywords in this group */
+      kwElements.forEach(el=>{
+        if(el.dataset.group===card.group){
+          el.classList.add('kw-highlight','revealed');
+        }
+      });
     }
-  } else {
-    recoWidget.classList.remove('visible');
-  }
+  });
 });
 
 /* ── Tab opening animation ── */
@@ -741,6 +748,14 @@ function hideStep(){
   stepEl.classList.remove('visible');
 }
 
+/* Reset recommendation cards */
+function resetRecoCards(){
+  recoCards.forEach(card=>{
+    card.shown=false;
+    card.el.classList.remove('visible');
+  });
+}
+
 /* ══════════ Demo sequence ══════════ */
 const demoBtn=$('#demo-btn');
 demoBtn.onclick=()=>{void(async()=>{
@@ -752,9 +767,8 @@ demoBtn.onclick=()=>{void(async()=>{
   $$('.mode-tab')[0].click();
   $$('.mode-btn')[0].click();
   removeAutoTabs();
-  recoWidget.classList.remove('visible');
+  resetRecoCards();
   kwElements.forEach(el=>el.classList.remove('kw-highlight','revealed'));
-  lastRecoKey='';
   viewport.scrollTo({top:0});
   await slp(500);
 
@@ -802,15 +816,20 @@ demoBtn.onclick=()=>{void(async()=>{
   await slp(5000);
   hideStep();
 
-  /* Step 5: Scroll to trigger keyword detection + recommendation */
-  await showStep('Step 5/8 — スクロール: キーワード検出');
+  /* Step 5: Scroll progressively to trigger 3 recommendation cards */
+  await showStep('Step 5/8 — スクロール: レコメンド Card 1');
   scrollHighlightEnabled=true;
-  viewport.scrollTo({top:350,behavior:'smooth'});
-  await slp(1500);
-  viewport.scrollTo({top:600,behavior:'smooth'});
-  await slp(1500);
-  await showStep('Step 5/8 — 50%到達: レコメンド表示');
-  viewport.scrollTo({top:viewport.scrollHeight*0.6,behavior:'smooth'});
+  /* Scroll to ~30% to trigger Card 1 (Memex) */
+  const maxScroll=viewport.scrollHeight-viewport.clientHeight;
+  viewport.scrollTo({top:maxScroll*0.32,behavior:'smooth'});
+  await slp(2000);
+
+  await showStep('Step 5/8 — 55%到達: レコメンド Card 2');
+  viewport.scrollTo({top:maxScroll*0.57,behavior:'smooth'});
+  await slp(2000);
+
+  await showStep('Step 5/8 — 80%到達: レコメンド Card 3');
+  viewport.scrollTo({top:maxScroll*0.83,behavior:'smooth'});
   await slp(2000);
   hideStep();
 
