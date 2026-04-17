@@ -24,7 +24,7 @@ input{font:inherit;border:none;outline:none}
 /* ═══ Article page ═══ */
 .page{
   min-height:100vh;padding:max(44px,calc(env(safe-area-inset-top) + 8px)) 16px 100px;
-  padding-right:56px;/* room for the right bar */
+  padding-right:50px;/* room for the right bar */
   max-width:640px;margin:0 auto;font-size:14px;line-height:1.72;color:#2a2a31;
 }
 .page h1{font-size:18px;line-height:1.3;margin:0 0 3px;color:#111;font-weight:700}
@@ -37,22 +37,26 @@ input{font:inherit;border:none;outline:none}
 .r-bar{
   position:fixed;top:0;right:0;bottom:0;width:44px;z-index:40;
   display:flex;flex-direction:column;align-items:center;
-  padding:max(10px,env(safe-area-inset-top)) 0 max(10px,env(safe-area-inset-bottom));
+  padding:max(6px,env(safe-area-inset-top)) 0 max(6px,env(safe-area-inset-bottom));
   background:var(--gl);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
   border-left:1px solid var(--bdr);
 }
-.r-bar-top,.r-bar-mid,.r-bar-bot{display:flex;flex-direction:column;align-items:center}
-.r-bar-top{flex:0 0 auto}
-.r-bar-mid{flex:1 1 auto;justify-content:space-evenly}
-.r-bar-bot{flex:0 0 auto}
-.r-sep{width:24px;height:1px;background:var(--bdr);margin:4px 0;flex-shrink:0}
+.r-bar-top,.r-bar-bot{display:flex;flex-direction:column;align-items:center;flex:0 0 auto}
+.r-bar-mid{
+  flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.r-bar-mid-group{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  background:rgba(255,255,255,.03);border-radius:10px;padding:4px;
+}
+.r-sep{width:24px;height:0;border-top:0.5px dotted var(--bdr);margin:4px 0;flex-shrink:0}
 
 .rbtn{
-  width:36px;height:36px;display:grid;place-items:center;border-radius:7px;
+  width:32px;height:32px;display:grid;place-items:center;border-radius:7px;
   transition:background .12s,transform .1s;-webkit-user-select:none;user-select:none;
   position:relative;flex-shrink:0;
 }
-.rbtn svg{width:20px;height:20px;stroke:var(--sub);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s,fill .15s}
+.rbtn svg{width:17px;height:17px;stroke:var(--sub);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s,fill .15s}
 .rbtn:active{transform:scale(.85);background:rgba(255,255,255,.08)}
 .rbtn.on svg{stroke:var(--acb);fill:var(--acs)}
 .rbtn.on-nofill svg{stroke:var(--acb);fill:none}
@@ -204,21 +208,23 @@ input{font:inherit;border:none;outline:none}
 
   <!-- Mid: 5 action icons -->
   <div class="r-bar-mid">
-    <button class="rbtn" id="btn-like">
-      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-    </button>
-    <button class="rbtn" id="btn-save">
-      <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-    </button>
-    <button class="rbtn" id="btn-remind">
-      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-    </button>
-    <button class="rbtn" id="btn-rss">
-      <svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5"/><path d="M4 4a16 16 0 0 1 16 16"/><path d="M4 11a9 9 0 0 1 9 9"/></svg>
-    </button>
-    <button class="rbtn" id="btn-memory" data-flyout="fly-memory">
-      <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-    </button>
+    <div class="r-bar-mid-group">
+      <button class="rbtn" id="btn-like">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <button class="rbtn" id="btn-save">
+        <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      </button>
+      <button class="rbtn" id="btn-remind">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </button>
+      <button class="rbtn" id="btn-rss">
+        <svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5"/><path d="M4 4a16 16 0 0 1 16 16"/><path d="M4 11a9 9 0 0 1 9 9"/></svg>
+      </button>
+      <button class="rbtn" id="btn-memory" data-flyout="fly-memory">
+        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+      </button>
+    </div>
   </div>
 
   <div class="r-sep"></div>
