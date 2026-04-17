@@ -59,6 +59,17 @@ input{font:inherit;border:none;outline:none}
 .rbtn.pop svg{animation:pop .3s ease}
 @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.35)}70%{transform:scale(.92)}100%{transform:scale(1.05)}}
 
+/* ═══ Badge on Next button ═══ */
+.next-badge{
+  position:absolute;top:-2px;right:-2px;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--ac);color:#fff;
+  font-size:8px;font-weight:700;line-height:14px;text-align:center;
+  pointer-events:none;
+  transform:scale(0);transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+.next-badge.show{transform:scale(1)}
+
 /* ═══ Flyout panels ═══ */
 .flyout{
   position:fixed;top:0;bottom:0;right:44px;width:220px;z-index:35;
@@ -228,6 +239,7 @@ input{font:inherit;border:none;outline:none}
   <div class="r-bar-bot">
     <button class="rbtn" id="btn-next" data-flyout="fly-next">
       <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      <span class="next-badge" id="next-badge"></span>
     </button>
   </div>
 </div>
@@ -302,7 +314,7 @@ AI Browser
     </div>
     <div class="fly-sub">あなたの記憶に基づく推薦</div>
   </div>
-  <div class="fly-section">
+  <div class="fly-section reco-card" id="reco-card-1">
     <div class="reco-thumb">sqlite-vec: vector DB<br>in 200 LOC</div>
     <div class="reco-hl">sqlite-vec: fast vector search in browser</div>
     <div class="reco-why">先週 EmbeddingGemma + sqlite-vec を検討していた関連記事</div>
@@ -311,8 +323,8 @@ AI Browser
       <button class="reco-btn pri">開く</button>
     </div>
   </div>
-  <div class="r-sep" style="width:100%;margin:8px 0"></div>
-  <div class="fly-section">
+  <div class="r-sep reco-card-sep" id="reco-sep-2" style="width:100%;margin:8px 0;display:none"></div>
+  <div class="fly-section reco-card" id="reco-card-2" style="display:none">
     <div class="reco-thumb" style="background:linear-gradient(135deg,#1e3a5f,#0f172a)">Embedding Models<br>Comparison 2026</div>
     <div class="reco-hl">Embedding model benchmarks: 最新比較</div>
     <div class="reco-why">Vector DB の検討に直結する内容</div>
@@ -393,6 +405,55 @@ $$('.rbtn[data-flyout]').forEach(btn=>{
   btn.addEventListener('click',()=>openFlyout(btn.dataset.flyout));
 });
 
+/* ── Badge & scroll-based recommendation count ── */
+let recoCount=0;
+const badge=$('#next-badge');
+const recoCard1=$('#reco-card-1');
+const recoCard2=$('#reco-card-2');
+const recoSep2=$('#reco-sep-2');
+
+function setRecoCount(n){
+  if(n===recoCount)return;
+  recoCount=n;
+  if(n===0){
+    badge.classList.remove('show');
+    badge.textContent='';
+    recoCard1.style.display='none';
+    recoSep2.style.display='none';
+    recoCard2.style.display='none';
+  } else if(n>=1){
+    badge.textContent=String(n);
+    badge.classList.add('show');
+    recoCard1.style.display='';
+    if(n>=2){
+      recoSep2.style.display='';
+      recoCard2.style.display='';
+    } else {
+      recoSep2.style.display='none';
+      recoCard2.style.display='none';
+    }
+  }
+}
+
+// Initially hidden
+setRecoCount(0);
+
+// Scroll listener
+window.addEventListener('scroll',()=>{
+  if(demoRunning)return; // don't interfere with demo
+  const scrollTop=window.scrollY||document.documentElement.scrollTop;
+  const docHeight=document.documentElement.scrollHeight-document.documentElement.clientHeight;
+  if(docHeight<=0)return;
+  const pct=scrollTop/docHeight;
+  if(pct>=0.7){
+    setRecoCount(2);
+  } else if(pct>=0.4){
+    setRecoCount(1);
+  } else {
+    setRecoCount(0);
+  }
+});
+
 /* ── Chat bar — inline response popover ── */
 const chatInput=$('#chat-input');
 const chatResponse=$('#chat-response');
@@ -443,6 +504,8 @@ $('#demo-btn').addEventListener('click',()=>{void(async()=>{
   closeFlyout();
   hideChatResponse();
   chatInput.value='';
+  setRecoCount(0);
+  window.scrollTo({top:0,behavior:'instant'});
   await slp(400);
 
   // 1. Tap heart
@@ -463,15 +526,26 @@ $('#demo-btn').addEventListener('click',()=>{void(async()=>{
   closeFlyout();
   await slp(500);
 
-  // 5. Open 次へ flyout
+  // 5. Scroll to 45% — triggers badge "1"
+  const docHeight=document.documentElement.scrollHeight-document.documentElement.clientHeight;
+  window.scrollTo({top:docHeight*0.45,behavior:'smooth'});
+  setRecoCount(1);
+  await slp(1200);
+
+  // 6. Scroll to 75% — triggers badge "2"
+  window.scrollTo({top:docHeight*0.75,behavior:'smooth'});
+  setRecoCount(2);
+  await slp(1200);
+
+  // 7. Open 次へ flyout (now shows 2 cards)
   openFlyout('fly-next');
   await slp(2200);
 
-  // 6. Close
+  // 8. Close
   closeFlyout();
   await slp(500);
 
-  // 7. Type in chat box and show inline response
+  // 9. Type in chat box and show inline response
   const text='この記事の要点は？';
   chatInput.value='';
   for(let i=0;i<text.length;i++){
