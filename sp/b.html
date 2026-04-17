@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zeed — SP Pattern B</title>
+<style>
+:root{--gl:rgba(22,22,28,.88);--bdr:rgba(60,60,70,.45);--ac:#5b21b6;--acb:#a78bfa;--acs:rgba(91,33,182,.25);--tx:#e8e8e8;--sub:#9e9ea8;--fnt:#6b6b73}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;background:#fafafa;color:#1a1a1a;overscroll-behavior:none}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+/* ═══ Tag label ═══ */
+.tag{position:fixed;top:max(8px,env(safe-area-inset-top));left:6px;z-index:25;
+  background:var(--gl);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--bdr);border-radius:6px;padding:4px 8px;
+  font-size:9px;font-weight:600;color:var(--acb);letter-spacing:.04em;
+}
+
+/* ═══ Page ═══ */
+.page{min-height:100vh;padding:48px 18px 80px;padding-right:56px;max-width:640px;margin:0 auto;font-size:15px;line-height:1.75;color:#2a2a31}
+.page h1{font-size:20px;line-height:1.3;margin:0 0 4px;color:#111;font-weight:700}
+.page .meta{font-size:10px;color:#aaa;margin-bottom:16px}
+.page p{margin:0 0 12px}
+.page h2{font-size:15px;margin:20px 0 6px;color:#111;font-weight:600}
+.page .img-ph{width:100%;height:100px;border-radius:6px;margin:12px 0;background:linear-gradient(135deg,#eee,#ddd)}
+
+/* ═══ Glass ═══ */
+.gl{background:var(--gl);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);border:1px solid var(--bdr);box-shadow:0 3px 12px rgba(0,0,0,.35);color:var(--tx);font-size:11px}
+
+/* ═══ Right: Hub bar (wider, icons + micro-labels) ═══ */
+.o-hub{
+  position:fixed;top:50%;right:6px;transform:translateY(-50%);z-index:20;
+}
+.o-hub .gl{
+  padding:6px 2px;border-radius:12px;
+  display:flex;flex-direction:column;gap:0;
+  width:44px;
+}
+.hbtn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:40px;min-height:42px;border-radius:8px;padding:4px 0 3px;
+  transition:background .12s,transform .1s;-webkit-user-select:none;user-select:none;
+  gap:1px;
+}
+.hbtn svg{width:16px;height:16px;stroke:var(--sub);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s,fill .15s}
+.hbtn .hlbl{font-size:8px;color:var(--sub);font-weight:500;line-height:1;margin-top:1px;transition:color .15s;white-space:nowrap}
+.hbtn:active{transform:scale(.85);background:rgba(255,255,255,.08)}
+.hbtn.on svg{stroke:var(--acb);fill:var(--acs);animation:pop .3s ease}
+.hbtn.on .hlbl{color:var(--acb)}
+@keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.35)}70%{transform:scale(.92)}100%{transform:scale(1.05)}}
+
+/* ═══ Bottom side-peek ═══ */
+.side-peek{
+  position:fixed;bottom:max(48px,calc(env(safe-area-inset-bottom) + 44px));z-index:20;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+
+/* Left: kioku */
+.sp-left{left:0;transform:translateX(calc(-100% + 28px))}
+.sp-left.open{transform:translateX(0)}
+.sp-left .sp-wrap{display:flex;flex-direction:row}
+.sp-left .sp-body{
+  border-radius:0 10px 10px 0;padding:8px 10px;width:180px;
+}
+.sp-left .sp-tab{
+  writing-mode:vertical-rl;text-orientation:mixed;
+  padding:8px 5px;border-radius:0 6px 6px 0;
+  font-size:9px;font-weight:600;color:var(--sub);letter-spacing:.06em;
+  cursor:pointer;display:flex;align-items:center;
+  -webkit-user-select:none;user-select:none;
+}
+
+/* Right: tsugi-e */
+.sp-right{right:0;transform:translateX(calc(100% - 28px))}
+.sp-right.open{transform:translateX(0)}
+.sp-right .sp-wrap{display:flex;flex-direction:row-reverse}
+.sp-right .sp-body{
+  border-radius:10px 0 0 10px;padding:0;overflow:hidden;width:190px;
+}
+.sp-right .sp-tab{
+  writing-mode:vertical-rl;text-orientation:mixed;
+  padding:8px 5px;border-radius:6px 0 0 6px;
+  font-size:9px;font-weight:600;color:var(--sub);letter-spacing:.06em;
+  cursor:pointer;display:flex;align-items:center;
+  -webkit-user-select:none;user-select:none;
+}
+
+/* Kioku content */
+.mind-h{font-size:9px;font-weight:600;color:var(--acb);margin-bottom:2px;letter-spacing:.04em}
+.mind-sub{font-size:9px;color:var(--sub);margin-bottom:5px}
+.mind-tree{
+  font-family:"SF Mono",Menlo,monospace;font-size:8.5px;line-height:1.5;color:var(--sub);
+  background:rgba(15,15,18,.5);border-radius:5px;padding:6px;white-space:pre;overflow-x:auto;
+}
+
+/* Recommendation content */
+.reco-head{padding:6px 8px 4px;display:flex;align-items:center;justify-content:space-between}
+.reco-t{font-size:9px;font-weight:600;color:var(--acb);letter-spacing:.04em}
+.reco-src{font-size:8px;color:var(--sub)}
+.reco-thumb{
+  width:100%;height:48px;background:linear-gradient(135deg,var(--ac),#1e1b4b);
+  display:grid;place-items:center;color:rgba(255,255,255,.85);font-size:10px;font-weight:600;line-height:1.3;text-align:center;padding:0 8px;
+}
+.reco-body{padding:6px 8px 8px}
+.reco-hl{font-size:10.5px;font-weight:600;line-height:1.3;margin-bottom:2px}
+.reco-why{font-size:9px;color:var(--sub);line-height:1.4}
+.reco-btns{display:flex;gap:4px;margin-top:5px}
+.reco-btn{
+  flex:1;padding:5px;border-radius:5px;font-size:9px;text-align:center;
+  border:1px solid rgba(60,60,70,.4);background:rgba(26,26,31,.7);color:var(--tx);
+}
+.reco-btn.pri{border-color:var(--ac);background:var(--ac);color:#fff}
+
+/* ═══ FAB ═══ */
+.fab{
+  position:fixed;bottom:max(10px,env(safe-area-inset-bottom));
+  left:50%;transform:translateX(-50%);z-index:30;
+  background:var(--ac);color:#fff;
+  padding:7px 18px;border-radius:999px;font-size:12px;font-weight:600;
+  box-shadow:0 3px 14px rgba(91,33,182,.4);
+}
+.fab:active{transform:translateX(-50%) scale(.95)}
+.fab:disabled{background:#444;box-shadow:none}
+</style>
+</head>
+<body>
+
+<!-- Tag label -->
+<div class="tag">Pattern B &middot; hub bar</div>
+
+<article class="page">
+  <h1>The Memex We Didn't Get — And the Browser That Might Finally Deliver It</h1>
+  <div class="meta">news.ycombinator.com &middot; 287 pts &middot; 42 comments</div>
+  <p>Vannevar Bush described the Memex in 1945 — a personal knowledge system that would augment human memory. Eighty years later, browsers still treat knowledge as a pile of tabs and bookmarks, and AI browsers treat context as a chat history. Neither is the Memex.</p>
+  <div class="img-ph"></div>
+  <h2>Why current AI browsers fall short</h2>
+  <p>The recent wave of AI browsers — Comet, Atlas, Dia — layers a chat interface on top of Chromium without redesigning the underlying primitives. Tabs are still just URLs. Bookmarks are still just metadata.</p>
+  <h2>What's missing</h2>
+  <p>Hierarchical context: Profile for role, TabGroup for project, Tab for the immediate object. Extracted intent in a shared memory layer searchable by meaning.</p>
+  <p>The question isn't whether AI browsers win — it's which primitives they commit to.</p>
+  <h2>Discussion</h2>
+  <p>"I don't want to chat with my tabs. I want my browser to understand what I'm working on." — top comment</p>
+</article>
+
+<!-- Right: Hub bar (icons + micro-labels) -->
+<div class="o-hub"><div class="gl">
+
+  <!-- Like -->
+  <button class="hbtn" id="hl" title="Like">
+    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span class="hlbl">いいね</span>
+  </button>
+
+  <!-- Save -->
+  <button class="hbtn" id="hb" title="Save">
+    <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+    <span class="hlbl">保存</span>
+  </button>
+
+  <!-- Remind -->
+  <button class="hbtn" id="hr" title="Remind">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6"/><path d="M22 6l-3-3"/></svg>
+    <span class="hlbl">あとで</span>
+  </button>
+
+  <!-- RSS -->
+  <button class="hbtn" id="hs" title="RSS">
+    <svg viewBox="0 0 24 24"><circle cx="5" cy="19" r="2"/><path d="M4 11a8 8 0 0 1 8 8"/><path d="M4 4a16 16 0 0 1 16 16"/></svg>
+    <span class="hlbl">RSS</span>
+  </button>
+
+  <!-- AI -->
+  <button class="hbtn" id="ha" title="AI">
+    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span class="hlbl">AI</span>
+  </button>
+
+  <!-- Share -->
+  <button class="hbtn" id="hx" title="Share">
+    <svg viewBox="0 0 24 24"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+    <span class="hlbl">共有</span>
+  </button>
+
+</div></div>
+
+<!-- Left bottom: kioku (slide right) -->
+<div class="side-peek sp-left gl" id="pl">
+  <div class="sp-wrap">
+    <div class="sp-body">
+      <div class="mind-h">二人で同じ記憶</div>
+      <div class="mind-sub">12 件の意図・決定</div>
+      <div class="mind-tree">Memex
+├ extract→embed ✓
+├ Vector DB (1.5b)
+├ Profile/TG/Tab
+└ 記憶=ユーザーのもの</div>
+    </div>
+    <div class="sp-tab" id="pl-tab">記憶</div>
+  </div>
+</div>
+
+<!-- Right bottom: tsugi-e (slide left) -->
+<div class="side-peek sp-right gl" id="pr">
+  <div class="sp-wrap">
+    <div class="sp-body">
+      <div class="reco-head"><span class="reco-t">次に読むなら</span><span class="reco-src">HN</span></div>
+      <div class="reco-thumb">sqlite-vec: vector DB<br>in 200 LOC</div>
+      <div class="reco-body">
+        <div class="reco-hl">sqlite-vec: fast vector search in browser</div>
+        <div class="reco-why">先週 EmbeddingGemma + sqlite-vec を検討していた</div>
+        <div class="reco-btns">
+          <button class="reco-btn">後で</button>
+          <button class="reco-btn pri">開く</button>
+        </div>
+      </div>
+    </div>
+    <div class="sp-tab" id="pr-tab">次へ</div>
+  </div>
+</div>
+
+<button class="fab" id="fab">&#9654; デモ再生</button>
+
+<script>
+document.querySelectorAll('.hbtn').forEach(b=>{b.onclick=()=>{if(!b.classList.contains('on'))b.classList.add('on')}});
+
+document.getElementById('pl-tab').onclick=()=>document.getElementById('pl').classList.toggle('open');
+document.getElementById('pr-tab').onclick=()=>document.getElementById('pr').classList.toggle('open');
+
+const fab=document.getElementById('fab'),slp=ms=>new Promise(r=>setTimeout(r,ms));
+fab.onclick=()=>{void(async()=>{
+  fab.disabled=true;fab.textContent='再生中…';
+  await slp(400);document.getElementById('hl').click();await slp(500);
+  document.getElementById('hb').click();await slp(500);
+  document.getElementById('hr').click();await slp(600);
+  document.getElementById('hs').click();await slp(500);
+  document.getElementById('ha').click();await slp(500);
+  document.getElementById('hx').click();await slp(800);
+  document.getElementById('pl').classList.add('open');await slp(1800);
+  document.getElementById('pr').classList.add('open');await slp(2000);
+  window.scrollTo({top:200,behavior:'smooth'});await slp(1200);
+  window.scrollTo({top:0,behavior:'smooth'});await slp(800);
+  document.getElementById('pl').classList.remove('open');
+  document.getElementById('pr').classList.remove('open');await slp(400);
+  fab.disabled=false;fab.textContent='\u25b6 デモ再生';
+})()};
+</script>
+</body>
+</html>

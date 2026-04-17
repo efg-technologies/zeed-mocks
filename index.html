@@ -5,36 +5,54 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Zeed — UI Demo</title>
 <style>
-:root{--base:#0f0f12;--el1:#1a1a1f;--border:#2a2a31;--accent:#5b21b6;--text:#e8e8e8;--sub:#9e9ea8}
+:root{--base:#0f0f12;--el1:#1a1a1f;--bdr:#2a2a31;--ac:#5b21b6;--tx:#e8e8e8;--sub:#9e9ea8}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:var(--base);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
-h1{font-size:28px;margin:0 0 6px}
-.sub{font-size:14px;color:var(--sub);margin-bottom:32px}
-.cards{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;max-width:640px;width:100%}
-.card{flex:1 1 260px;max-width:300px;background:var(--el1);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;transition:transform .12s,border-color .12s}
-.card:hover{transform:translateY(-2px);border-color:var(--accent)}
-.card-title{font-size:16px;font-weight:600}
-.card-desc{font-size:13px;color:var(--sub);line-height:1.5}
-.tag{font-size:11px;color:var(--accent);background:rgba(91,33,182,.12);padding:3px 8px;border-radius:999px;align-self:flex-start}
-footer{margin-top:40px;font-size:11px;color:var(--sub)}
-footer a{color:var(--accent)}
+body{margin:0;min-height:100vh;background:var(--base);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+h1{font-size:26px;margin:0 0 4px}
+.sub{font-size:13px;color:var(--sub);margin-bottom:28px}
+.section{font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin:20px 0 8px;width:100%;max-width:680px}
+.cards{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:680px;width:100%}
+.card{flex:1 1 200px;max-width:220px;background:var(--el1);border:1px solid var(--bdr);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;transition:transform .12s,border-color .12s}
+.card:hover{transform:translateY(-2px);border-color:var(--ac)}
+.card-t{font-size:14px;font-weight:600}
+.card-d{font-size:11.5px;color:var(--sub);line-height:1.5}
+.tag{font-size:10px;color:var(--ac);background:rgba(91,33,182,.12);padding:2px 7px;border-radius:999px;align-self:flex-start}
+footer{margin-top:32px;font-size:10px;color:var(--sub)}
+footer a{color:var(--ac)}
 </style>
 </head>
 <body>
 <h1>Zeed UI Demo</h1>
 <p class="sub">人と考え、実行する AI ブラウザ</p>
+
+<div class="section">📱 SP (スマートフォン)</div>
 <div class="cards">
-  <a class="card" href="sp/">
-    <span class="tag">📱 SP</span>
-    <span class="card-title">スマートフォン版</span>
-    <span class="card-desc">フル画面サイドバー + overlay bottom-sheet。▶ ボタンでデモ自動再生。</span>
+  <a class="card" href="sp/a.html">
+    <span class="tag">SP-A</span>
+    <span class="card-t">5-icon bar</span>
+    <span class="card-d">react 3 + act 2 をセパレータで分割。ツールチップ付き。</span>
   </a>
-  <a class="card" href="pc/">
-    <span class="tag">🖥 PC</span>
-    <span class="card-title">デスクトップ版</span>
-    <span class="card-desc">fake ページ + 380px サイドバー + overlay widget。▶ ボタンで統合デモ再生。</span>
+  <a class="card" href="sp/b.html">
+    <span class="tag">SP-B</span>
+    <span class="card-t">Hub bar</span>
+    <span class="card-d">6 アイコン + マイクロラベル。幅広の一体型コマンドバー。</span>
+  </a>
+  <a class="card" href="sp/">
+    <span class="tag">SP-v6</span>
+    <span class="card-t">3-icon (前版)</span>
+    <span class="card-d">like / save / remind のみ。比較用に残存。</span>
   </a>
 </div>
+
+<div class="section">🖥 PC (デスクトップ)</div>
+<div class="cards">
+  <a class="card" href="pc/">
+    <span class="tag">PC</span>
+    <span class="card-t">統合デモ</span>
+    <span class="card-d">記事 + 4 隅 overlay + 380px サイドバー。チャット + Mission Control。</span>
+  </a>
+</div>
+
 <footer>vanilla HTML, no API — <a href="https://github.com/efg-technologies/zeed-mocks">source</a></footer>
 </body>
 </html>
