@@ -3,144 +3,180 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Zeed — SP Pattern A</title>
+<title>Zeed — SP Right-Edge Bar</title>
 <style>
 :root{--gl:rgba(22,22,28,.88);--bdr:rgba(60,60,70,.45);--ac:#5b21b6;--acb:#a78bfa;--acs:rgba(91,33,182,.25);--tx:#e8e8e8;--sub:#9e9ea8;--fnt:#6b6b73}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;background:#fafafa;color:#1a1a1a;overscroll-behavior:none}
+html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Hiragino Sans",sans-serif;background:#fafafa;color:#1a1a1a;overscroll-behavior:none}
 button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input{font:inherit;border:none;outline:none}
 
-/* ═══ Tag label ═══ */
+/* ═══ Demo tag label (top-left) ═══ */
 .tag-label{
-  position:fixed;top:max(6px,env(safe-area-inset-top));left:6px;z-index:30;
+  position:fixed;top:max(6px,env(safe-area-inset-top));left:6px;z-index:60;
   background:var(--gl);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   border:1px solid var(--bdr);border-radius:6px;
   padding:3px 8px;font-size:9px;font-weight:600;color:var(--acb);letter-spacing:.03em;
+  cursor:pointer;-webkit-user-select:none;user-select:none;
 }
+.tag-label svg{width:8px;height:8px;stroke:var(--acb);fill:none;stroke-width:2;vertical-align:-1px;margin-right:3px}
 
-/* ═══ Page ═══ */
-.page{min-height:100vh;padding:44px 16px 80px;padding-right:54px;max-width:640px;margin:0 auto;font-size:14px;line-height:1.72;color:#2a2a31}
+/* ═══ Article page ═══ */
+.page{
+  min-height:100vh;padding:max(44px,calc(env(safe-area-inset-top) + 8px)) 16px 100px;
+  padding-right:56px;/* room for the right bar */
+  max-width:640px;margin:0 auto;font-size:14px;line-height:1.72;color:#2a2a31;
+}
 .page h1{font-size:18px;line-height:1.3;margin:0 0 3px;color:#111;font-weight:700}
 .page .meta{font-size:9.5px;color:#aaa;margin-bottom:14px}
 .page p{margin:0 0 10px}
 .page h2{font-size:14px;margin:18px 0 5px;color:#111;font-weight:600}
 .page .img-ph{width:100%;height:90px;border-radius:6px;margin:10px 0;background:linear-gradient(135deg,#eee,#ddd)}
 
-/* ═══ Glass base ═══ */
-.gl{background:var(--gl);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);border:1px solid var(--bdr);box-shadow:0 3px 12px rgba(0,0,0,.35);color:var(--tx);font-size:11px}
+/* ═══ Right-edge fixed bar ═══ */
+.r-bar{
+  position:fixed;top:0;right:0;bottom:0;width:44px;z-index:40;
+  display:flex;flex-direction:column;align-items:center;
+  padding:max(10px,env(safe-area-inset-top)) 0 max(10px,env(safe-area-inset-bottom));
+  background:var(--gl);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
+  border-left:1px solid var(--bdr);
+}
+.r-bar-top,.r-bar-mid,.r-bar-bot{display:flex;flex-direction:column;align-items:center}
+.r-bar-top{flex:0 0 auto}
+.r-bar-mid{flex:1 1 auto;justify-content:space-evenly}
+.r-bar-bot{flex:0 0 auto}
+.r-sep{width:24px;height:1px;background:var(--bdr);margin:4px 0;flex-shrink:0}
 
-/* ═══ Right action bar ═══ */
-.o-act{
-  position:fixed;top:50%;right:6px;transform:translateY(-50%);z-index:20;
-}
-.o-act .gl{
-  padding:5px;border-radius:10px;
-  display:flex;flex-direction:column;gap:1px;
-}
-.act-sep{
-  width:22px;height:1px;margin:3px auto;
-  background:var(--bdr);flex-shrink:0;
-}
-.abtn{
+.rbtn{
   width:36px;height:36px;display:grid;place-items:center;border-radius:7px;
   transition:background .12s,transform .1s;-webkit-user-select:none;user-select:none;
-  position:relative;
+  position:relative;flex-shrink:0;
 }
-.abtn svg{width:17px;height:17px;stroke:var(--sub);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s,fill .15s}
-.abtn:active{transform:scale(.85);background:rgba(255,255,255,.08)}
-.abtn.on svg{stroke:var(--acb);fill:var(--acs);animation:pop .3s ease}
+.rbtn svg{width:20px;height:20px;stroke:var(--sub);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s,fill .15s}
+.rbtn:active{transform:scale(.85);background:rgba(255,255,255,.08)}
+.rbtn.on svg{stroke:var(--acb);fill:var(--acs)}
+.rbtn.on-nofill svg{stroke:var(--acb);fill:none}
+.rbtn.pop svg{animation:pop .3s ease}
 @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.35)}70%{transform:scale(.92)}100%{transform:scale(1.05)}}
 
-/* ═══ Tooltip ═══ */
-.abtn .tip{
-  position:absolute;right:calc(100% + 6px);top:50%;transform:translateY(-50%) scale(.8);
-  background:var(--gl);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border:1px solid var(--bdr);border-radius:5px;
-  padding:3px 7px;font-size:9px;font-weight:600;color:var(--acb);
-  white-space:nowrap;pointer-events:none;
-  opacity:0;transition:opacity .15s,transform .15s;
+/* ═══ Flyout panels ═══ */
+.flyout{
+  position:fixed;top:0;bottom:0;right:44px;width:220px;z-index:35;
+  background:var(--gl);backdrop-filter:blur(22px) saturate(1.3);-webkit-backdrop-filter:blur(22px) saturate(1.3);
+  border-left:1px solid var(--bdr);
+  color:var(--tx);font-size:11px;
+  transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto;overscroll-behavior:contain;
+  padding:max(14px,calc(env(safe-area-inset-top) + 6px)) 12px 20px;
 }
-.abtn.show-tip .tip{opacity:1;transform:translateY(-50%) scale(1)}
+.flyout.open{transform:translateX(0)}
+.flyout-backdrop{
+  position:fixed;inset:0;z-index:34;background:rgba(0,0,0,.15);
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.flyout-backdrop.show{opacity:1;pointer-events:auto}
 
-/* ═══ Bottom side-peek widgets ═══ */
-.side-peek{
-  position:fixed;bottom:max(48px,calc(env(safe-area-inset-bottom) + 44px));z-index:20;
-  transition:transform .3s cubic-bezier(.4,0,.2,1);
-}
+/* Flyout typography */
+.fly-h{font-size:11px;font-weight:700;color:var(--acb);margin-bottom:6px;letter-spacing:.04em;display:flex;align-items:center;gap:5px}
+.fly-h svg{width:14px;height:14px;stroke:var(--acb);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.fly-sub{font-size:9px;color:var(--sub);margin-bottom:8px}
+.fly-section{margin-bottom:12px}
 
-/* Left: 記憶 */
-.sp-left{left:0;transform:translateX(calc(-100% + 28px))}
-.sp-left.open{transform:translateX(0)}
-.sp-left .sp-wrap{display:flex;flex-direction:row}
-.sp-left .sp-body{
-  border-radius:0 10px 10px 0;padding:8px 10px;width:180px;
+/* AI Structure flyout */
+.struct-tag{
+  display:inline-block;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:500;
+  background:rgba(167,139,250,.12);color:var(--acb);border:1px solid rgba(167,139,250,.18);
+  margin:0 3px 4px 0;
 }
-.sp-left .sp-tab{
-  writing-mode:vertical-rl;text-orientation:mixed;
-  padding:8px 5px;border-radius:0 6px 6px 0;
-  font-size:9px;font-weight:600;color:var(--sub);letter-spacing:.06em;
-  cursor:pointer;display:flex;align-items:center;
-  -webkit-user-select:none;user-select:none;
+.struct-item{
+  padding:5px 0;border-bottom:1px solid rgba(60,60,70,.25);font-size:10px;color:var(--tx);line-height:1.4;
 }
+.struct-item:last-child{border-bottom:none}
+.struct-label{font-size:8px;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
 
-/* Right: 次へ */
-.sp-right{right:0;transform:translateX(calc(100% - 28px))}
-.sp-right.open{transform:translateX(0)}
-.sp-right .sp-wrap{display:flex;flex-direction:row-reverse}
-.sp-right .sp-body{
-  border-radius:10px 0 0 10px;padding:0;overflow:hidden;width:190px;
-}
-.sp-right .sp-tab{
-  writing-mode:vertical-rl;text-orientation:mixed;
-  padding:8px 5px;border-radius:6px 0 0 6px;
-  font-size:9px;font-weight:600;color:var(--sub);letter-spacing:.06em;
-  cursor:pointer;display:flex;align-items:center;
-  -webkit-user-select:none;user-select:none;
-}
-
-/* 記憶の中身 */
-.mind-h{font-size:9px;font-weight:600;color:var(--acb);margin-bottom:2px;letter-spacing:.04em}
-.mind-sub{font-size:9px;color:var(--sub);margin-bottom:5px}
+/* Memory flyout */
 .mind-tree{
   font-family:"SF Mono",Menlo,monospace;font-size:8.5px;line-height:1.5;color:var(--sub);
   background:rgba(15,15,18,.5);border-radius:5px;padding:6px;white-space:pre;overflow-x:auto;
 }
 
-/* 推薦の中身 */
-.reco-head{padding:6px 8px 4px;display:flex;align-items:center;justify-content:space-between}
-.reco-t{font-size:9px;font-weight:600;color:var(--acb);letter-spacing:.04em}
-.reco-src{font-size:8px;color:var(--sub)}
+/* Recommendation flyout */
 .reco-thumb{
-  width:100%;height:48px;background:linear-gradient(135deg,var(--ac),#1e1b4b);
+  width:100%;height:52px;border-radius:6px;margin-bottom:6px;
+  background:linear-gradient(135deg,var(--ac),#1e1b4b);
   display:grid;place-items:center;color:rgba(255,255,255,.85);font-size:10px;font-weight:600;line-height:1.3;text-align:center;padding:0 8px;
 }
-.reco-body{padding:6px 8px 8px}
 .reco-hl{font-size:10.5px;font-weight:600;line-height:1.3;margin-bottom:2px}
-.reco-why{font-size:9px;color:var(--sub);line-height:1.4}
-.reco-btns{display:flex;gap:4px;margin-top:5px}
+.reco-why{font-size:9px;color:var(--sub);line-height:1.4;margin-bottom:6px}
+.reco-btns{display:flex;gap:4px}
 .reco-btn{
   flex:1;padding:5px;border-radius:5px;font-size:9px;text-align:center;
   border:1px solid rgba(60,60,70,.4);background:rgba(26,26,31,.7);color:var(--tx);
 }
 .reco-btn.pri{border-color:var(--ac);background:var(--ac);color:#fff}
 
-/* ═══ FAB ═══ */
-.fab{
-  position:fixed;bottom:max(10px,env(safe-area-inset-bottom));
-  left:50%;transform:translateX(-50%);z-index:30;
-  background:var(--ac);color:#fff;
-  padding:7px 18px;border-radius:999px;font-size:12px;font-weight:600;
-  box-shadow:0 3px 14px rgba(91,33,182,.4);
+/* ═══ Bottom chat bar ═══ */
+.chat-bar{
+  position:fixed;bottom:max(8px,env(safe-area-inset-bottom));
+  left:8px;right:52px;z-index:50;
+  display:flex;align-items:center;gap:6px;
+  background:var(--gl);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
+  border:1px solid var(--bdr);border-radius:12px;
+  padding:6px 6px 6px 12px;
+  box-shadow:0 4px 16px rgba(0,0,0,.3);
 }
-.fab:active{transform:translateX(-50%) scale(.95)}
-.fab:disabled{background:#444;box-shadow:none}
+.chat-bar input{
+  flex:1;background:transparent;color:var(--tx);font-size:12px;
+  min-width:0;
+}
+.chat-bar input::placeholder{color:var(--fnt);font-size:11px}
+.chat-send{
+  width:30px;height:30px;border-radius:8px;background:var(--ac);
+  display:grid;place-items:center;flex-shrink:0;
+  transition:transform .1s;
+}
+.chat-send:active{transform:scale(.9)}
+.chat-send svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chat-label{
+  position:absolute;top:-7px;left:10px;
+  font-size:7px;font-weight:600;color:var(--acb);letter-spacing:.04em;
+  background:var(--gl);padding:1px 5px;border-radius:3px;border:1px solid var(--bdr);
+}
+
+/* ═══ Chat expanded overlay ═══ */
+.chat-overlay{
+  position:fixed;inset:0;z-index:55;
+  background:var(--gl);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  display:flex;flex-direction:column;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));
+}
+.chat-overlay.open{transform:translateY(0)}
+.chat-ov-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.chat-ov-title{font-size:13px;font-weight:700;color:var(--acb)}
+.chat-ov-close{width:28px;height:28px;display:grid;place-items:center;border-radius:6px;background:rgba(255,255,255,.06)}
+.chat-ov-close svg{width:16px;height:16px;stroke:var(--sub);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chat-ov-body{flex:1;overflow-y:auto;font-size:11px;color:var(--sub);display:flex;align-items:center;justify-content:center}
+.chat-ov-input{
+  display:flex;gap:6px;align-items:center;padding:8px 0 0;border-top:1px solid var(--bdr);margin-top:8px;
+}
+.chat-ov-input input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;color:var(--tx);font-size:12px}
+.chat-ov-input input::placeholder{color:var(--fnt)}
+
+/* ═══ Typing animation for demo ═══ */
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.typing-cursor{animation:blink .6s step-end infinite;color:var(--acb)}
 </style>
 </head>
 <body>
 
-<!-- Tag label -->
-<div class="tag-label">Pattern A &middot; 5-icon bar</div>
+<!-- Demo tag label (top-left) -->
+<div class="tag-label" id="demo-btn">
+  <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+  Demo
+</div>
 
+<!-- ═══ Article content ═══ -->
 <article class="page">
   <h1>The Memex We Didn't Get — And the Browser That Might Finally Deliver It</h1>
   <div class="meta">news.ycombinator.com &middot; 287 pts &middot; 42 comments</div>
@@ -155,98 +191,308 @@ button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
   <p>"I don't want to chat with my tabs. I want my browser to understand what I'm working on." — top comment</p>
 </article>
 
-<!-- Right: 5-icon action bar (2 groups) -->
-<div class="o-act"><div class="gl">
-  <!-- Group 1: react -->
-  <button class="abtn" id="al" data-tip="いいね"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span class="tip">いいね</span></button>
-  <button class="abtn" id="ab" data-tip="保存"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span class="tip">保存</span></button>
-  <button class="abtn" id="ar" data-tip="リマインド"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6"/><path d="M22 6l-3-3"/></svg><span class="tip">リマインド</span></button>
-  <!-- Separator -->
-  <div class="act-sep"></div>
-  <!-- Group 2: act -->
-  <button class="abtn" id="ag" data-tip="RSS 登録"><svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5"/><path d="M4 4a16 16 0 0 1 16 16"/><path d="M4 11a9 9 0 0 1 9 9"/></svg><span class="tip">RSS 登録</span></button>
-  <button class="abtn" id="ac" data-tip="AI に聞く"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="tip">AI に聞く</span></button>
-</div></div>
+<!-- ═══ Right-edge fixed bar ═══ -->
+<div class="r-bar">
+  <!-- Top: AI Structure -->
+  <div class="r-bar-top">
+    <button class="rbtn" id="btn-struct" data-flyout="fly-struct">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    </button>
+  </div>
 
-<!-- Left bottom: 記憶 (side-peek) -->
-<div class="side-peek sp-left gl" id="pl">
-  <div class="sp-wrap">
-    <div class="sp-body">
-      <div class="mind-h">二人で同じ記憶</div>
-      <div class="mind-sub">12 件の意図・決定</div>
-      <div class="mind-tree">Memex
+  <div class="r-sep"></div>
+
+  <!-- Mid: 5 action icons -->
+  <div class="r-bar-mid">
+    <button class="rbtn" id="btn-like">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </button>
+    <button class="rbtn" id="btn-save">
+      <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+    </button>
+    <button class="rbtn" id="btn-remind">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    </button>
+    <button class="rbtn" id="btn-rss">
+      <svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5"/><path d="M4 4a16 16 0 0 1 16 16"/><path d="M4 11a9 9 0 0 1 9 9"/></svg>
+    </button>
+    <button class="rbtn" id="btn-memory" data-flyout="fly-memory">
+      <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+    </button>
+  </div>
+
+  <div class="r-sep"></div>
+
+  <!-- Bot: Next -->
+  <div class="r-bar-bot">
+    <button class="rbtn" id="btn-next" data-flyout="fly-next">
+      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ═══ Flyout backdrop ═══ -->
+<div class="flyout-backdrop" id="fly-backdrop"></div>
+
+<!-- ═══ Flyout: AI Structure ═══ -->
+<div class="flyout" id="fly-struct">
+  <div class="fly-section">
+    <div class="fly-h">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      AI構造
+    </div>
+    <div class="fly-sub">ページ分析</div>
+  </div>
+  <div class="fly-section">
+    <div class="struct-label">Key Topics</div>
+    <div><span class="struct-tag">Memex</span><span class="struct-tag">AI Browser</span><span class="struct-tag">Knowledge Mgmt</span><span class="struct-tag">Vector DB</span></div>
+  </div>
+  <div class="fly-section">
+    <div class="struct-label">Entities</div>
+    <div class="struct-item">Vannevar Bush — 1945 Memex 提唱者</div>
+    <div class="struct-item">Comet / Atlas / Dia — 競合AIブラウザ</div>
+    <div class="struct-item">Chromium — ベースエンジン</div>
+  </div>
+  <div class="fly-section">
+    <div class="struct-label">Structure</div>
+    <div class="struct-item">1. 導入: Memex の歴史</div>
+    <div class="struct-item">2. 問題提起: 現状のAIブラウザの限界</div>
+    <div class="struct-item">3. 提案: 階層的コンテキスト</div>
+    <div class="struct-item">4. 議論: ユーザーの声</div>
+  </div>
+  <div class="fly-section">
+    <div class="struct-label">Zeed Relevance</div>
+    <div style="font-size:9.5px;color:var(--acb);line-height:1.4">この記事は Zeed の中核コンセプト（Profile/TG/Tab 階層記憶）と直接関連しています</div>
+  </div>
+</div>
+
+<!-- ═══ Flyout: Memory ═══ -->
+<div class="flyout" id="fly-memory">
+  <div class="fly-section">
+    <div class="fly-h">
+      <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+      記憶
+    </div>
+    <div class="fly-sub">二人で同じ記憶 &middot; 12 件の意図・決定</div>
+  </div>
+  <div class="fly-section">
+    <div class="mind-tree">Memex
 ├ extract→embed ✓
 ├ Vector DB (1.5b)
 ├ Profile/TG/Tab
-└ 記憶=ユーザーのもの</div>
-    </div>
-    <div class="sp-tab" id="pl-tab">記憶</div>
+└ 記憶=ユーザーのもの
+
+AI Browser
+├ Zeed concept ✓
+├ sidebar vs article
+├ CC×MCP layer
+└ 3層の問題構造</div>
+  </div>
+  <div class="fly-section">
+    <div class="struct-label">Recent Decisions</div>
+    <div class="struct-item">sidebar-first → article-first に方向転換</div>
+    <div class="struct-item">EmbeddingGemma + sqlite-vec を検討中</div>
   </div>
 </div>
 
-<!-- Right bottom: 次へ (side-peek) -->
-<div class="side-peek sp-right gl" id="pr">
-  <div class="sp-wrap">
-    <div class="sp-body">
-      <div class="reco-head"><span class="reco-t">次に読むなら</span><span class="reco-src">HN</span></div>
-      <div class="reco-thumb">sqlite-vec: vector DB<br>in 200 LOC</div>
-      <div class="reco-body">
-        <div class="reco-hl">sqlite-vec: fast vector search in browser</div>
-        <div class="reco-why">先週 EmbeddingGemma + sqlite-vec を検討していた</div>
-        <div class="reco-btns">
-          <button class="reco-btn">後で</button>
-          <button class="reco-btn pri">開く</button>
-        </div>
-      </div>
+<!-- ═══ Flyout: Next ═══ -->
+<div class="flyout" id="fly-next">
+  <div class="fly-section">
+    <div class="fly-h">
+      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      次に読むなら
     </div>
-    <div class="sp-tab" id="pr-tab">次へ</div>
+    <div class="fly-sub">あなたの記憶に基づく推薦</div>
+  </div>
+  <div class="fly-section">
+    <div class="reco-thumb">sqlite-vec: vector DB<br>in 200 LOC</div>
+    <div class="reco-hl">sqlite-vec: fast vector search in browser</div>
+    <div class="reco-why">先週 EmbeddingGemma + sqlite-vec を検討していた関連記事</div>
+    <div class="reco-btns">
+      <button class="reco-btn">後で</button>
+      <button class="reco-btn pri">開く</button>
+    </div>
+  </div>
+  <div class="r-sep" style="width:100%;margin:8px 0"></div>
+  <div class="fly-section">
+    <div class="reco-thumb" style="background:linear-gradient(135deg,#1e3a5f,#0f172a)">Embedding Models<br>Comparison 2026</div>
+    <div class="reco-hl">Embedding model benchmarks: 最新比較</div>
+    <div class="reco-why">Vector DB の検討に直結する内容</div>
+    <div class="reco-btns">
+      <button class="reco-btn">後で</button>
+      <button class="reco-btn pri">開く</button>
+    </div>
   </div>
 </div>
 
-<button class="fab" id="fab">&#9654; デモ再生</button>
+<!-- ═══ Bottom chat bar ═══ -->
+<div class="chat-bar" id="chat-bar">
+  <span class="chat-label">Zeed AI</span>
+  <input type="text" id="chat-input" placeholder="AIに聞く..." readonly>
+  <button class="chat-send" id="chat-send-btn">
+    <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+  </button>
+</div>
+
+<!-- ═══ Chat overlay ═══ -->
+<div class="chat-overlay" id="chat-overlay">
+  <div class="chat-ov-head">
+    <span class="chat-ov-title">Zeed AI</span>
+    <button class="chat-ov-close" id="chat-ov-close">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="chat-ov-body">
+    <div style="text-align:center">
+      <svg viewBox="0 0 24 24" style="width:32px;height:32px;stroke:var(--fnt);fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;margin-bottom:6px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <div style="font-size:10px;color:var(--fnt)">ページについて質問できます</div>
+    </div>
+  </div>
+  <div class="chat-ov-input">
+    <input type="text" id="chat-ov-input-field" placeholder="この記事について聞く...">
+    <button class="chat-send">
+      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
 
 <script>
-/* ── Icon tap: toggle on + show tooltip briefly ── */
-document.querySelectorAll('.abtn').forEach(b=>{
-  b.onclick=()=>{
-    if(b.classList.contains('on'))return;
-    b.classList.add('on');
-    b.classList.add('show-tip');
-    setTimeout(()=>b.classList.remove('show-tip'),1100);
-  };
+/* ── Helpers ── */
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+const slp=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ── Flyout management ── */
+let activeFlyout=null;
+const backdrop=$('#fly-backdrop');
+
+function openFlyout(id){
+  if(activeFlyout===id){closeFlyout();return;}
+  closeFlyout();
+  const el=$('#'+id);
+  if(!el)return;
+  el.classList.add('open');
+  backdrop.classList.add('show');
+  activeFlyout=id;
+  // highlight the triggering button
+  $$('.rbtn[data-flyout]').forEach(b=>{
+    b.classList.toggle('on-nofill',b.dataset.flyout===id);
+  });
+}
+
+function closeFlyout(){
+  if(!activeFlyout)return;
+  const el=$('#'+activeFlyout);
+  if(el)el.classList.remove('open');
+  backdrop.classList.remove('show');
+  activeFlyout=null;
+  $$('.rbtn[data-flyout]').forEach(b=>b.classList.remove('on-nofill'));
+}
+
+backdrop.addEventListener('click',closeFlyout);
+
+/* ── Right bar button handlers ── */
+// Toggle actions (like, save, remind, rss) — toggle on/off with pop
+['btn-like','btn-save','btn-remind','btn-rss'].forEach(id=>{
+  const btn=$('#'+id);
+  btn.addEventListener('click',()=>{
+    closeFlyout();
+    btn.classList.toggle('on');
+    btn.classList.add('pop');
+    setTimeout(()=>btn.classList.remove('pop'),300);
+  });
 });
 
-/* ── Side-peek toggles ── */
-document.getElementById('pl-tab').onclick=()=>document.getElementById('pl').classList.toggle('open');
-document.getElementById('pr-tab').onclick=()=>document.getElementById('pr').classList.toggle('open');
+// Flyout buttons
+$$('.rbtn[data-flyout]').forEach(btn=>{
+  btn.addEventListener('click',()=>openFlyout(btn.dataset.flyout));
+});
 
-/* ── Demo FAB ── */
-const fab=document.getElementById('fab'),slp=ms=>new Promise(r=>setTimeout(r,ms));
-fab.onclick=()=>{void(async()=>{
-  fab.disabled=true;fab.textContent='再生中…';
-  // Reset all icons
-  document.querySelectorAll('.abtn').forEach(b=>{b.classList.remove('on','show-tip')});
-  document.getElementById('pl').classList.remove('open');
-  document.getElementById('pr').classList.remove('open');
+/* ── Chat bar ── */
+$('#chat-bar').addEventListener('click',()=>{
+  $('#chat-overlay').classList.add('open');
+  setTimeout(()=>$('#chat-ov-input-field').focus(),350);
+});
+$('#chat-ov-close').addEventListener('click',(e)=>{
+  e.stopPropagation();
+  $('#chat-overlay').classList.remove('open');
+});
+
+/* ── Demo auto-play ── */
+let demoRunning=false;
+$('#demo-btn').addEventListener('click',()=>{void(async()=>{
+  if(demoRunning)return;
+  demoRunning=true;
+  const tag=$('#demo-btn');
+  tag.innerHTML='再生中...';
+
+  // Reset everything
+  ['btn-like','btn-save','btn-remind','btn-rss'].forEach(id=>$('#'+id).classList.remove('on','pop'));
+  closeFlyout();
+  $('#chat-overlay').classList.remove('open');
+  $('#chat-ov-input-field').value='';
+  $('#chat-input').value='';
   await slp(400);
-  // Group 1: react
-  document.getElementById('al').click();await slp(700);
-  document.getElementById('ab').click();await slp(700);
-  document.getElementById('ar').click();await slp(900);
-  // Group 2: act
-  document.getElementById('ag').click();await slp(700);
-  document.getElementById('ac').click();await slp(1000);
-  // Side-peeks
-  document.getElementById('pl').classList.add('open');await slp(1800);
-  document.getElementById('pr').classList.add('open');await slp(2000);
-  // Scroll demo
-  window.scrollTo({top:200,behavior:'smooth'});await slp(1200);
-  window.scrollTo({top:0,behavior:'smooth'});await slp(800);
-  // Close side-peeks
-  document.getElementById('pl').classList.remove('open');
-  document.getElementById('pr').classList.remove('open');await slp(400);
-  fab.disabled=false;fab.textContent='\u25b6 デモ再生';
-})()};
+
+  // 1. Tap heart
+  const like=$('#btn-like');
+  like.classList.add('on');like.classList.add('pop');
+  await slp(600);like.classList.remove('pop');
+
+  // 2. Tap bookmark
+  const save=$('#btn-save');
+  save.classList.add('on');save.classList.add('pop');
+  await slp(800);save.classList.remove('pop');
+
+  // 3. Open AI構造 flyout
+  openFlyout('fly-struct');
+  await slp(2200);
+
+  // 4. Close
+  closeFlyout();
+  await slp(500);
+
+  // 5. Open 記憶 flyout
+  openFlyout('fly-memory');
+  await slp(2200);
+
+  // 6. Close
+  closeFlyout();
+  await slp(500);
+
+  // 7. Open 次へ flyout
+  openFlyout('fly-next');
+  await slp(2200);
+
+  // 8. Close
+  closeFlyout();
+  await slp(500);
+
+  // 9. Type in chat box — simulate typing in the bar then open overlay
+  const chatInput=$('#chat-input');
+  const text='この記事の要点は？';
+  chatInput.value='';
+  for(let i=0;i<text.length;i++){
+    chatInput.value=text.slice(0,i+1);
+    await slp(80);
+  }
+  await slp(600);
+
+  // Open chat overlay with the typed text
+  $('#chat-overlay').classList.add('open');
+  const ovField=$('#chat-ov-input-field');
+  ovField.value=text;
+  await slp(1800);
+
+  // Close chat overlay
+  $('#chat-overlay').classList.remove('open');
+  await slp(500);
+  chatInput.value='';
+
+  // Done
+  tag.innerHTML='<svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg> Demo';
+  demoRunning=false;
+})()});
 </script>
 </body>
 </html>
