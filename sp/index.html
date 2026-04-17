@@ -5,196 +5,185 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Zeed — SP Demo</title>
 <style>
-:root{--base:#0f0f12;--el1:rgba(26,26,31,.85);--el2:#25252a;--el3:#34343c;--bdr:rgba(91,33,182,.3);--ac:#5b21b6;--acb:#a78bfa;--tx:#e8e8e8;--sub:#9e9ea8;--fnt:#6b6b73}
+:root{--base:#0f0f12;--gl:rgba(22,22,28,.88);--el2:#25252a;--el3:#34343c;--bdr:rgba(60,60,70,.5);--ac:#5b21b6;--acb:#a78bfa;--acs:rgba(91,33,182,.25);--tx:#e8e8e8;--sub:#9e9ea8;--fnt:#6b6b73}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;background:#fafafa;color:#1a1a1a;overscroll-behavior:none}
 button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
 
-/* ═══ Article (メインコンテンツ) ═══ */
-.page{
-  min-height:100vh;padding:60px 20px 120px;max-width:640px;margin:0 auto;
-  font-size:15px;line-height:1.8;color:#2a2a31;
-}
-.page h1{font-size:22px;line-height:1.3;margin:0 0 8px;color:#111}
-.page .meta{font-size:11px;color:#888;margin-bottom:20px}
-.page p{margin:0 0 16px}
-.page h2{font-size:17px;margin:28px 0 10px;color:#111}
-.page .img-placeholder{
-  width:100%;height:140px;border-radius:10px;margin:16px 0;
-  background:linear-gradient(135deg,#e4e4e7,#d4d4d8);
+/* ═══ Article ═══ */
+.page{min-height:100vh;padding:56px 20px 100px;max-width:620px;margin:0 auto;font-size:15px;line-height:1.8;color:#2a2a31}
+.page h1{font-size:21px;line-height:1.3;margin:0 0 6px;color:#111;font-weight:700}
+.page .meta{font-size:11px;color:#999;margin-bottom:18px;letter-spacing:.01em}
+.page p{margin:0 0 14px}
+.page h2{font-size:16px;margin:24px 0 8px;color:#111;font-weight:600}
+.page .img-ph{width:100%;height:130px;border-radius:8px;margin:14px 0;background:linear-gradient(135deg,#e8e8eb,#d8d8dc)}
+
+/* ═══ Glass ═══ */
+.gl{
+  background:var(--gl);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
+  border:1px solid var(--bdr);border-radius:10px;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);color:var(--tx);font-size:12px;
 }
 
-/* ═══ Glass panel (共通) ═══ */
-.glass{
-  background:var(--el1);
-  backdrop-filter:blur(16px) saturate(1.2);
-  -webkit-backdrop-filter:blur(16px) saturate(1.2);
-  border:1px solid var(--bdr);
-  border-radius:12px;
-  box-shadow:0 6px 20px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.04) inset;
-  color:var(--tx);font-size:12px;
-}
+/* ═══ 左上: RSS ═══ */
+.o-rss{position:fixed;top:max(10px,env(safe-area-inset-top));left:8px;z-index:20}
+.o-rss .gl{padding:6px 11px;display:flex;align-items:center;gap:7px}
+.rss-dot{width:7px;height:7px;border-radius:999px;background:#ef4444;flex-shrink:0}
+.rss-lbl{font-weight:600;font-size:11.5px;letter-spacing:.01em}
+.rss-n{font-size:10px;color:var(--sub)}
 
-/* ═══ 左上: RSS 登録 ═══ */
-.o-rss{
-  position:fixed;top:max(12px,env(safe-area-inset-top));left:10px;z-index:20;
-}
-.o-rss .glass{
-  padding:7px 12px;display:flex;align-items:center;gap:8px;
-}
-.rss-dot{
-  width:16px;height:16px;border-radius:4px;
-  background:linear-gradient(135deg,#f59e0b,#ef4444);
-  display:grid;place-items:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;
-}
-.rss-label{font-weight:600;font-size:12px}
-.rss-sub{font-size:10px;color:var(--sub)}
-
-/* ═══ 右上: Like / Bookmark / Remind ═══ */
-.o-act{
-  position:fixed;top:max(12px,env(safe-area-inset-top));right:10px;z-index:20;
-}
-.o-act .glass{padding:5px 6px;display:flex;gap:2px}
+/* ═══ 右上: Actions ═══ */
+.o-act{position:fixed;top:max(10px,env(safe-area-inset-top));right:8px;z-index:20}
+.o-act .gl{padding:4px 5px;display:flex;gap:1px}
 .abtn{
-  width:40px;height:40px;display:grid;place-items:center;border-radius:8px;
-  color:var(--sub);font-size:20px;transition:background .12s,transform .1s;
+  width:38px;height:38px;display:grid;place-items:center;border-radius:7px;
+  transition:background .12s,transform .1s;-webkit-user-select:none;user-select:none;
+}
+.abtn svg{width:18px;height:18px;stroke:var(--sub);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s,fill .15s}
+.abtn:active{transform:scale(.85);background:var(--el2)}
+.abtn.on svg{stroke:var(--acb);fill:var(--acs);animation:pop .3s ease}
+@keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.35)}70%{transform:scale(.92)}100%{transform:scale(1.05)}}
+
+/* ═══ Bottom peek tabs (collapsed) ═══ */
+.peek{
+  position:fixed;z-index:20;
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
+.peek-tab{
+  background:var(--gl);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
+  border:1px solid var(--bdr);color:var(--sub);
+  padding:6px 12px;font-size:10px;font-weight:600;letter-spacing:.04em;
+  cursor:pointer;display:flex;align-items:center;gap:5px;
   -webkit-user-select:none;user-select:none;
 }
-.abtn:active{transform:scale(.85);background:var(--el2)}
-.abtn.on{color:var(--acb);animation:pop .35s ease}
-@keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.4)}70%{transform:scale(.9)}100%{transform:scale(1.1)}}
-
-/* ═══ 左下: Mindmap (二人で同じ記憶) ═══ */
-.o-mind{
-  position:fixed;bottom:max(14px,env(safe-area-inset-bottom));left:10px;z-index:20;
-  max-width:calc(50vw - 14px);
+.peek-body{
+  background:var(--gl);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
+  border:1px solid var(--bdr);color:var(--tx);font-size:12px;
 }
-.o-mind .glass{padding:10px 12px}
-.mind-h{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--acb);margin-bottom:4px}
-.mind-sub{font-size:10px;color:var(--sub);margin-bottom:8px}
+.peek .arrow{font-size:8px;transition:transform .3s}
+.peek.open .arrow{transform:rotate(180deg)}
+
+/* 左下: 記憶 */
+.o-mind{left:8px;bottom:0}
+.o-mind .peek-tab{border-radius:8px 8px 0 0}
+.o-mind .peek-body{
+  border-radius:0 10px 0 0;padding:10px 12px;
+  max-width:calc(55vw - 12px);
+  transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
+.o-mind.open .peek-body{transform:translateY(0)}
+
+.mind-h{font-size:10px;font-weight:600;color:var(--acb);margin-bottom:3px;letter-spacing:.04em}
+.mind-sub{font-size:10px;color:var(--sub);margin-bottom:6px}
 .mind-tree{
-  font-family:monospace;font-size:10px;line-height:1.6;color:var(--sub);
-  background:rgba(15,15,18,.5);border-radius:6px;padding:8px;
-  white-space:pre;overflow-x:auto;
+  font-family:"SF Mono",Menlo,monospace;font-size:9.5px;line-height:1.6;color:var(--sub);
+  background:rgba(15,15,18,.5);border-radius:6px;padding:8px;white-space:pre;overflow-x:auto;
 }
-.mind-foot{font-size:9px;color:var(--fnt);margin-top:6px;display:flex;justify-content:space-between}
+.mind-foot{font-size:9px;color:var(--fnt);margin-top:5px}
 
-/* ═══ 右下: 次に読むなら (推薦) ═══ */
-.o-reco{
-  position:fixed;bottom:max(14px,env(safe-area-inset-bottom));right:10px;z-index:20;
-  max-width:calc(50vw - 14px);
+/* 右下: 次へ */
+.o-reco{right:8px;bottom:0}
+.o-reco .peek-tab{border-radius:8px 8px 0 0}
+.o-reco .peek-body{
+  border-radius:10px 0 0 0;padding:0;overflow:hidden;
+  max-width:calc(55vw - 12px);
+  transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
 }
-.o-reco .glass{padding:0;overflow:hidden}
-.reco-head{padding:8px 10px 6px;display:flex;align-items:center;justify-content:space-between}
-.reco-t{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--acb)}
+.o-reco.open .peek-body{transform:translateY(0)}
+
+.reco-head{padding:8px 10px 5px;display:flex;align-items:center;justify-content:space-between}
+.reco-t{font-size:10px;font-weight:600;color:var(--acb);letter-spacing:.04em}
 .reco-src{font-size:9px;color:var(--sub)}
 .reco-thumb{
-  width:100%;height:80px;
-  background:linear-gradient(135deg,var(--ac),#1e1b4b);
-  display:grid;place-items:center;color:#fff;font-size:12px;font-weight:600;
+  width:100%;height:64px;background:linear-gradient(135deg,var(--ac),#1e1b4b);
+  display:grid;place-items:center;color:rgba(255,255,255,.9);font-size:11px;font-weight:600;line-height:1.3;text-align:center;padding:0 12px;
 }
 .reco-body{padding:8px 10px 10px}
-.reco-hl{font-size:12px;font-weight:600;line-height:1.3;margin-bottom:3px}
+.reco-hl{font-size:11.5px;font-weight:600;line-height:1.3;margin-bottom:3px}
 .reco-why{font-size:10px;color:var(--sub);line-height:1.4}
-.reco-btns{display:flex;gap:5px;margin-top:8px}
+.reco-btns{display:flex;gap:5px;margin-top:7px}
 .reco-btn{
   flex:1;padding:6px;border-radius:6px;font-size:10px;text-align:center;
-  border:1px solid var(--el2);background:rgba(26,26,31,.7);color:var(--tx);
+  border:1px solid var(--el3);background:rgba(26,26,31,.7);color:var(--tx);
 }
 .reco-btn.pri{border-color:var(--ac);background:var(--ac);color:#fff}
 
-/* ═══ Demo FAB ═══ */
+/* ═══ Demo ═══ */
 .fab{
-  position:fixed;bottom:max(80px,calc(env(safe-area-inset-bottom) + 80px));
+  position:fixed;bottom:max(52px,calc(env(safe-area-inset-bottom) + 48px));
   left:50%;transform:translateX(-50%);z-index:30;
   background:var(--ac);color:#fff;
-  padding:10px 24px;border-radius:999px;
-  font-size:14px;font-weight:600;
-  box-shadow:0 4px 20px rgba(91,33,182,.5);
-  display:flex;align-items:center;gap:6px;
+  padding:8px 20px;border-radius:999px;font-size:13px;font-weight:600;
+  box-shadow:0 4px 16px rgba(91,33,182,.45);
+  display:flex;align-items:center;gap:5px;letter-spacing:.01em;
 }
 .fab:active{transform:translateX(-50%) scale(.95)}
 .fab:disabled{background:var(--el3);box-shadow:none}
 
-/* ═══ Info bar ═══ */
 .info{
-  position:fixed;bottom:max(6px,env(safe-area-inset-bottom));
-  left:50%;transform:translateX(-50%);z-index:10;
-  font-size:10px;color:var(--sub);
-  background:var(--el1);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  padding:4px 10px;border-radius:999px;border:1px solid rgba(91,33,182,.2);
-  pointer-events:none;white-space:nowrap;
+  position:fixed;bottom:max(4px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:10;
+  font-size:9px;color:var(--fnt);background:var(--gl);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  padding:3px 8px;border-radius:999px;border:1px solid rgba(60,60,70,.3);pointer-events:none;white-space:nowrap;
 }
 </style>
 </head>
 <body>
 
-<!-- ═══ ARTICLE (メインコンテンツ — ユーザーが読む) ═══ -->
+<!-- ═══ ARTICLE ═══ -->
 <article class="page">
   <h1>The Memex We Didn't Get — And the Browser That Might Finally Deliver It</h1>
-  <div class="meta">news.ycombinator.com · HN front page · ★ 287 points</div>
+  <div class="meta">news.ycombinator.com · 287 points · 42 comments</div>
   <p>Vannevar Bush described the Memex in 1945 — a personal knowledge system that would augment human memory. Eighty years later, browsers still treat knowledge as a pile of tabs and bookmarks, and AI browsers treat context as a chat history. Neither is the Memex.</p>
-  <div class="img-placeholder"></div>
+  <div class="img-ph"></div>
   <h2>Why current AI browsers fall short</h2>
-  <p>The recent wave of AI browsers — Comet, Atlas, Dia — layers a chat interface on top of Chromium without redesigning the underlying primitives. Tabs are still just URLs. Bookmarks are still just metadata. The "memory" lives in the vendor's side, scoped to one account, and evaporates when you switch models.</p>
+  <p>The recent wave of AI browsers — Comet, Atlas, Dia — layers a chat interface on top of Chromium without redesigning the underlying primitives. Tabs are still just URLs. Bookmarks are still just metadata. The "memory" lives on the vendor's side, scoped to one account, and evaporates when you switch models.</p>
   <h2>What's missing, concretely</h2>
-  <p>The fix is hierarchical context. A Profile for role, a TabGroup for project, a Tab for the immediate object. Extracted intent lives in a shared memory layer that's searchable by meaning rather than keyword.</p>
+  <p>The fix is hierarchical context. A Profile for role, a TabGroup for project, a Tab for the immediate object. Extracted intent lives in a shared memory layer searchable by meaning rather than keyword.</p>
   <p>The question isn't whether AI browsers win — it's which primitives they commit to.</p>
-  <h2>Discussion (42 comments)</h2>
-  <p>Most commenters agree that chat-as-memory is fundamentally broken. Several mention Mem0 and LangMem as promising server-side approaches, but note that browser-native implementations are missing...</p>
+  <h2>Discussion</h2>
+  <p>Most commenters agree that chat-as-memory is fundamentally broken. Several mention Mem0 and LangMem as promising server-side approaches, but note that browser-native implementations are missing entirely.</p>
+  <p>"I don't want to chat with my tabs. I want my browser to understand what I'm working on." — top comment, 94 points</p>
 </article>
 
-<!-- ═══ OVERLAYS (四隅 — ページの上にフロート) ═══ -->
+<!-- ═══ OVERLAYS ═══ -->
 
-<!-- 左上: RSS 登録 -->
-<div class="o-rss">
-  <div class="glass">
-    <div class="rss-dot">⊕</div>
-    <div>
-      <div class="rss-label">RSS 登録</div>
-      <div class="rss-sub">news.ycombinator.com — 3 件</div>
-    </div>
-  </div>
-</div>
+<!-- 左上: RSS -->
+<div class="o-rss"><div class="gl"><div class="rss-dot"></div><div><span class="rss-lbl">RSS 登録</span><br><span class="rss-n">news.ycombinator.com — 3 件</span></div></div></div>
 
-<!-- 右上: Like / Bookmark / Remind -->
-<div class="o-act">
-  <div class="glass">
-    <button class="abtn" id="a-like" title="いいね">🤍</button>
-    <button class="abtn" id="a-save" title="ブックマーク">🔖</button>
-    <button class="abtn" id="a-remind" title="リマインド">⏰</button>
-  </div>
-</div>
+<!-- 右上: Actions -->
+<div class="o-act"><div class="gl">
+  <button class="abtn" id="al" title="Like"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+  <button class="abtn" id="ab" title="Bookmark"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
+  <button class="abtn" id="ar" title="Remind"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3L2 6"/><path d="M22 6l-3-3"/></svg></button>
+</div></div>
 
-<!-- 左下: Mindmap (二人で同じ記憶) -->
-<div class="o-mind">
-  <div class="glass">
+<!-- 左下: 記憶 (peek) -->
+<div class="peek o-mind" id="pm">
+  <div class="peek-tab" id="pm-tab">記憶 <span class="arrow">▲</span></div>
+  <div class="peek-body">
     <div class="mind-h">二人で同じ記憶</div>
-    <div class="mind-sub">このプロジェクトで 12 個の決定</div>
+    <div class="mind-sub">このプロジェクトで 12 件の意図・決定</div>
     <div class="mind-tree">Memex
-├─ 記憶レイヤー
-│  ├ extract→embed ✓
-│  └ Vector DB (Phase 1.5b)
-├─ 階層 context
-│  ├ Profile / TabGroup / Tab
-│  └ signal として添える
-└─ Zeed の差分
-   └ 記憶はユーザーのもの</div>
-    <div class="mind-foot"><span>更新: 2 分前</span></div>
+├ 記憶レイヤー
+│ ├ extract → embed ✓
+│ └ Vector DB (1.5b)
+├ 階層 context
+│ └ Profile / TG / Tab
+└ Zeed の差分
+  └ 記憶はユーザーのもの</div>
+    <div class="mind-foot">更新 2分前</div>
   </div>
 </div>
 
-<!-- 右下: 次に読むなら (推薦) -->
-<div class="o-reco">
-  <div class="glass">
-    <div class="reco-head">
-      <span class="reco-t">次に読むなら</span>
-      <span class="reco-src">RSS · HN</span>
-    </div>
+<!-- 右下: 次へ (peek) -->
+<div class="peek o-reco" id="pr">
+  <div class="peek-tab" id="pr-tab">次に読むなら <span class="arrow">▲</span></div>
+  <div class="peek-body">
+    <div class="reco-head"><span class="reco-t">推薦</span><span class="reco-src">RSS · HN</span></div>
     <div class="reco-thumb">Show HN: A vector DB<br>in 200 LOC</div>
     <div class="reco-body">
-      <div class="reco-hl">sqlite-vec: simple, fast vector search inside your browser</div>
-      <div class="reco-why">先週 "EmbeddingGemma + sqlite-vec" について考えていた。これは実装例。</div>
+      <div class="reco-hl">sqlite-vec: fast vector search inside your browser</div>
+      <div class="reco-why">先週 "EmbeddingGemma + sqlite-vec" を検討していた。これは実装例。</div>
       <div class="reco-btns">
         <button class="reco-btn">後で</button>
         <button class="reco-btn pri">開く</button>
@@ -203,51 +192,54 @@ button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
   </div>
 </div>
 
-<!-- Demo -->
 <button class="fab" id="fab">▶ デモ再生</button>
-<div class="info">Overlay mock · 4 widgets (RSS / Actions / Mindmap / Recommend)</div>
+<div class="info">Overlay mock · RSS / Actions / Memory / Recommend</div>
 
 <script>
-/* ─ Like / Save / Remind toggles ─ */
-function toggle(id,onIcon){
-  const el=document.getElementById(id);
-  el.onclick=()=>{
-    if(el.classList.contains('on'))return;
-    el.classList.add('on');el.textContent=onIcon;
-  };
-}
-toggle('a-like','❤️');
-toggle('a-save','📌');
-toggle('a-remind','✅');
+/* Actions */
+document.querySelectorAll('.abtn').forEach(b=>{
+  b.onclick=()=>{if(!b.classList.contains('on')){b.classList.add('on')}};
+});
 
-/* ─ Demo ─ */
+/* Peek toggle */
+function setupPeek(id,tabId){
+  const el=document.getElementById(id),tab=document.getElementById(tabId);
+  tab.onclick=()=>el.classList.toggle('open');
+}
+setupPeek('pm','pm-tab');
+setupPeek('pr','pr-tab');
+
+/* Demo */
 const fab=document.getElementById('fab');
 fab.onclick=()=>{void demo()};
-function slp(ms){return new Promise(r=>setTimeout(r,ms))}
+const slp=ms=>new Promise(r=>setTimeout(r,ms));
 
 async function demo(){
   fab.disabled=true;fab.textContent='再生中…';
 
   // 1. Like
-  await slp(500);
-  document.getElementById('a-like').click();
-  await slp(800);
+  await slp(500);document.getElementById('al').click();await slp(700);
 
   // 2. Bookmark
-  document.getElementById('a-save').click();
-  await slp(1200);
+  document.getElementById('ab').click();await slp(900);
 
-  // 3. Scroll down to show mindmap is context-aware
-  window.scrollTo({top:300,behavior:'smooth'});
-  await slp(1500);
+  // 3. Open memory peek
+  document.getElementById('pm').classList.add('open');await slp(2000);
 
-  // 4. Scroll back up
-  window.scrollTo({top:0,behavior:'smooth'});
-  await slp(1000);
+  // 4. Open recommend peek
+  document.getElementById('pr').classList.add('open');await slp(2000);
 
-  // 5. Remind
-  document.getElementById('a-remind').click();
-  await slp(1000);
+  // 5. Scroll to show context
+  window.scrollTo({top:250,behavior:'smooth'});await slp(1500);
+  window.scrollTo({top:0,behavior:'smooth'});await slp(1000);
+
+  // 6. Remind
+  document.getElementById('ar').click();await slp(800);
+
+  // 7. Close peeks
+  document.getElementById('pm').classList.remove('open');
+  document.getElementById('pr').classList.remove('open');
+  await slp(500);
 
   fab.disabled=false;fab.textContent='▶ デモ再生';
 }
