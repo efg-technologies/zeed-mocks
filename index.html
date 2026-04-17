@@ -12,7 +12,7 @@ h1{font-size:26px;margin:0 0 4px}
 .sub{font-size:13px;color:var(--sub);margin-bottom:28px}
 .section{font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin:20px 0 8px;width:100%;max-width:680px}
 .cards{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:680px;width:100%}
-.card{flex:1 1 200px;max-width:220px;background:var(--el1);border:1px solid var(--bdr);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;transition:transform .12s,border-color .12s}
+.card{flex:1 1 280px;max-width:320px;background:var(--el1);border:1px solid var(--bdr);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;transition:transform .12s,border-color .12s}
 .card:hover{transform:translateY(-2px);border-color:var(--ac)}
 .card-t{font-size:14px;font-weight:600}
 .card-d{font-size:11.5px;color:var(--sub);line-height:1.5}
@@ -25,31 +25,21 @@ footer a{color:var(--ac)}
 <h1>Zeed UI Demo</h1>
 <p class="sub">人と考え、実行する AI ブラウザ</p>
 
-<div class="section">📱 SP (スマートフォン)</div>
+<div class="section">SP</div>
 <div class="cards">
   <a class="card" href="sp/a.html">
-    <span class="tag">SP-A</span>
-    <span class="card-t">5-icon bar</span>
-    <span class="card-d">react 3 + act 2 をセパレータで分割。ツールチップ付き。</span>
-  </a>
-  <a class="card" href="sp/b.html">
-    <span class="tag">SP-B</span>
-    <span class="card-t">Hub bar</span>
-    <span class="card-d">6 アイコン + マイクロラベル。幅広の一体型コマンドバー。</span>
-  </a>
-  <a class="card" href="sp/">
-    <span class="tag">SP-v6</span>
-    <span class="card-t">3-icon (前版)</span>
-    <span class="card-d">like / save / remind のみ。比較用に残存。</span>
+    <span class="tag">SP</span>
+    <span class="card-t">Right-edge bar + Insight</span>
+    <span class="card-d">右端6アイコン固定バー。Insight統合フライアウト。インラインチャット応答。スクロール連動バッジ。</span>
   </a>
 </div>
 
-<div class="section">🖥 PC (デスクトップ)</div>
+<div class="section">PC</div>
 <div class="cards">
   <a class="card" href="pc/">
     <span class="tag">PC</span>
-    <span class="card-t">統合デモ</span>
-    <span class="card-d">記事 + 4 隅 overlay + 380px サイドバー。チャット + Mission Control。</span>
+    <span class="card-t">Vertical tabs + Context Map</span>
+    <span class="card-d">縦タブ + 右サイドバー (Chat / Memory / Context Map)。スクロール連動キーワード検出で最大3記事推薦。Auto デモ付き。</span>
   </a>
 </div>
 
