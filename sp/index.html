@@ -5,484 +5,252 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Zeed — SP Demo</title>
 <style>
-:root{--base:#0f0f12;--el1:#1a1a1f;--el2:#25252a;--el3:#34343c;--bdr:#2a2a31;--ac:#5b21b6;--acb:#a78bfa;--acs:#6d28d9;--tx:#e8e8e8;--sub:#9e9ea8;--fnt:#6b6b73;--ok:#86efac;--wrn:#fbbf24;--err:#fca5a5}
+:root{--base:#0f0f12;--el1:rgba(26,26,31,.85);--el2:#25252a;--el3:#34343c;--bdr:rgba(91,33,182,.3);--ac:#5b21b6;--acb:#a78bfa;--tx:#e8e8e8;--sub:#9e9ea8;--fnt:#6b6b73}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;background:var(--base);color:var(--tx);overscroll-behavior:none}
+html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;background:#fafafa;color:#1a1a1a;overscroll-behavior:none}
 button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
-textarea{font:inherit}
 
-.shell{display:flex;flex-direction:column;height:100dvh}
-
-/* ─ Header ─ */
-.hdr{display:flex;align-items:center;gap:6px;padding:10px 14px;background:var(--el1);border-bottom:1px solid var(--bdr);flex-shrink:0}
-.hdr .logo{font-weight:700;font-size:15px;color:var(--acb)}
-.chip{font-size:11px;color:var(--sub);background:var(--el2);padding:3px 8px;border-radius:999px}
-.chip.hi{background:var(--ac);color:#fff}
-.hdr .sp{flex:1}
-
-/* ─ Tabs ─ */
-.tabs{display:flex;gap:2px;padding:6px 12px 0;background:var(--el1);flex-shrink:0}
-.tabs button{flex:1;padding:9px 0;font-size:13px;font-weight:500;color:var(--sub);border-radius:8px 8px 0 0;border-bottom:2px solid transparent;background:transparent}
-.tabs button.on{color:var(--tx);background:var(--base);border-bottom-color:var(--acb)}
-.bdg{display:inline-block;margin-left:4px;background:var(--ac);color:#fff;font-size:10px;padding:1px 6px;border-radius:999px}
-
-/* ─ Body ─ */
-.body{flex:1;overflow-y:auto;padding:10px 12px;min-height:0}
-.pn{display:none}.pn.on{display:block}
-
-/* ─ Cards ─ */
-.cd{background:var(--el1);border:1px solid var(--bdr);border-radius:12px;padding:12px;margin-bottom:10px}
-.cd-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.cd-t{font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.06em}
-.cd-a{font-size:11px;color:var(--acb)}
-
-/* Tab info */
-.tab-row{display:flex;gap:8px;align-items:flex-start}
-.fav{width:18px;height:18px;border-radius:4px;background:var(--el3);display:grid;place-items:center;font-size:10px;color:var(--sub);flex-shrink:0}
-.tab-title{font-size:14px;line-height:1.3}
-.tab-url{font-size:11px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-/* ═══ TikTok-style quick actions ═══ */
-.quick-actions{
-  display:flex;justify-content:space-around;
-  padding:10px 4px;margin:10px 0;
-  background:var(--el1);border:1px solid var(--bdr);border-radius:14px;
+/* ═══ Article (メインコンテンツ) ═══ */
+.page{
+  min-height:100vh;padding:60px 20px 120px;max-width:640px;margin:0 auto;
+  font-size:15px;line-height:1.8;color:#2a2a31;
 }
-.qa{
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-  width:64px;padding:8px 0;border-radius:12px;
-  transition:background .12s,transform .1s;
+.page h1{font-size:22px;line-height:1.3;margin:0 0 8px;color:#111}
+.page .meta{font-size:11px;color:#888;margin-bottom:20px}
+.page p{margin:0 0 16px}
+.page h2{font-size:17px;margin:28px 0 10px;color:#111}
+.page .img-placeholder{
+  width:100%;height:140px;border-radius:10px;margin:16px 0;
+  background:linear-gradient(135deg,#e4e4e7,#d4d4d8);
+}
+
+/* ═══ Glass panel (共通) ═══ */
+.glass{
+  background:var(--el1);
+  backdrop-filter:blur(16px) saturate(1.2);
+  -webkit-backdrop-filter:blur(16px) saturate(1.2);
+  border:1px solid var(--bdr);
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.04) inset;
+  color:var(--tx);font-size:12px;
+}
+
+/* ═══ 左上: RSS 登録 ═══ */
+.o-rss{
+  position:fixed;top:max(12px,env(safe-area-inset-top));left:10px;z-index:20;
+}
+.o-rss .glass{
+  padding:7px 12px;display:flex;align-items:center;gap:8px;
+}
+.rss-dot{
+  width:16px;height:16px;border-radius:4px;
+  background:linear-gradient(135deg,#f59e0b,#ef4444);
+  display:grid;place-items:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.rss-label{font-weight:600;font-size:12px}
+.rss-sub{font-size:10px;color:var(--sub)}
+
+/* ═══ 右上: Like / Bookmark / Remind ═══ */
+.o-act{
+  position:fixed;top:max(12px,env(safe-area-inset-top));right:10px;z-index:20;
+}
+.o-act .glass{padding:5px 6px;display:flex;gap:2px}
+.abtn{
+  width:40px;height:40px;display:grid;place-items:center;border-radius:8px;
+  color:var(--sub);font-size:20px;transition:background .12s,transform .1s;
   -webkit-user-select:none;user-select:none;
 }
-.qa:active{transform:scale(.9);background:var(--el2)}
-.qa .icon{font-size:24px;line-height:1;transition:transform .2s}
-.qa .label{font-size:10px;color:var(--sub)}
-.qa.tapped .icon{transform:scale(1.3)}
-.qa.tapped .label{color:var(--acb)}
-.qa.liked .icon{color:#ef4444;animation:heartPop .4s ease}
-.qa.saved .icon{color:var(--wrn);animation:heartPop .4s ease}
-.qa.reminded .icon{color:var(--ok);animation:heartPop .4s ease}
-.qa.rssed .icon{color:var(--acb);animation:heartPop .4s ease}
-@keyframes heartPop{0%{transform:scale(1)}30%{transform:scale(1.5)}60%{transform:scale(.9)}100%{transform:scale(1.15)}}
+.abtn:active{transform:scale(.85);background:var(--el2)}
+.abtn.on{color:var(--acb);animation:pop .35s ease}
+@keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.4)}70%{transform:scale(.9)}100%{transform:scale(1.1)}}
 
-/* ═══ "次に読むなら" horizontal scroll ═══ */
-.reco-strip{
-  display:flex;gap:10px;overflow-x:auto;padding:4px 0 8px;
-  scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch;
+/* ═══ 左下: Mindmap (二人で同じ記憶) ═══ */
+.o-mind{
+  position:fixed;bottom:max(14px,env(safe-area-inset-bottom));left:10px;z-index:20;
+  max-width:calc(50vw - 14px);
 }
-.reco-strip::-webkit-scrollbar{display:none}
-.reco-card{
-  flex:0 0 220px;scroll-snap-align:start;
-  background:var(--el2);border:1px solid var(--bdr);border-radius:12px;
-  padding:12px;display:flex;flex-direction:column;gap:6px;
+.o-mind .glass{padding:10px 12px}
+.mind-h{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--acb);margin-bottom:4px}
+.mind-sub{font-size:10px;color:var(--sub);margin-bottom:8px}
+.mind-tree{
+  font-family:monospace;font-size:10px;line-height:1.6;color:var(--sub);
+  background:rgba(15,15,18,.5);border-radius:6px;padding:8px;
+  white-space:pre;overflow-x:auto;
 }
-.reco-src{font-size:9px;font-weight:600;text-transform:uppercase;color:var(--sub);letter-spacing:.04em}
-.reco-title{font-size:13px;font-weight:500;line-height:1.3;color:var(--tx)}
-.reco-reason{font-size:10.5px;color:var(--fnt);line-height:1.4}
-.reco-open{
-  font-size:11px;color:var(--acb);background:rgba(91,33,182,.12);
-  padding:5px 10px;border-radius:8px;text-align:center;margin-top:auto;
+.mind-foot{font-size:9px;color:var(--fnt);margin-top:6px;display:flex;justify-content:space-between}
+
+/* ═══ 右下: 次に読むなら (推薦) ═══ */
+.o-reco{
+  position:fixed;bottom:max(14px,env(safe-area-inset-bottom));right:10px;z-index:20;
+  max-width:calc(50vw - 14px);
 }
-
-/* ─ Signals row (mini) ─ */
-.sigs{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
-.sig{font-size:11px;padding:4px 9px;border-radius:999px;background:var(--el2);color:var(--sub)}
-.sig.k{background:rgba(91,33,182,.18);color:var(--acb)}
-.sig.n{background:rgba(134,239,172,.12);color:var(--ok)}
-
-/* ─ Facts ─ */
-.fact{padding:8px 0;border-top:1px solid var(--bdr);font-size:12.5px;line-height:1.5}
-.fact:first-child{border-top:none;padding-top:4px}
-.knd{display:inline-block;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:4px;background:var(--el2);color:var(--sub);margin-right:6px;vertical-align:1px}
-.knd.d{background:rgba(134,239,172,.15);color:var(--ok)}
-.knd.f{background:rgba(167,139,250,.15);color:var(--acb)}
-.knd.i{background:rgba(251,191,36,.15);color:var(--wrn)}
-.src{margin-top:3px;font-size:10px;color:var(--fnt)}
-.cite{display:inline-block;margin-left:3px;background:var(--el3);color:var(--acb);font-size:10px;padding:1px 6px;border-radius:999px;vertical-align:1px}
-
-/* ─ Runs ─ */
-.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
-.stp{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.4}
-.dot{width:8px;height:8px;border-radius:999px;margin-top:5px;flex-shrink:0;background:var(--el3)}
-.stp.done .dot{background:var(--ok)}
-.stp.run .dot{background:var(--wrn);animation:pulse 1s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
-.stp-m{font-size:10px;color:var(--fnt)}
-
-/* ─ Chat ─ */
-.chat{display:flex;flex-direction:column;gap:6px}
-.msg{font-size:13.5px;line-height:1.5;padding:9px 13px;border-radius:12px;max-width:90%;white-space:pre-wrap;word-break:break-word}
-.msg.u{background:var(--ac);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
-.msg.a{background:var(--el2);color:var(--tx);align-self:flex-start;border-bottom-left-radius:4px}
-.typing{display:inline-flex;gap:3px}
-.typing span{width:5px;height:5px;border-radius:999px;background:var(--sub);animation:typ 1.4s infinite}
-.typing span:nth-child(2){animation-delay:.2s}
-.typing span:nth-child(3){animation-delay:.4s}
-@keyframes typ{0%,60%,100%{opacity:.3}30%{opacity:1}}
-
-/* ─ Composer ─ */
-.comp{flex-shrink:0;padding:8px 12px;padding-bottom:max(8px,env(safe-area-inset-bottom));background:var(--el1);border-top:1px solid var(--bdr)}
-.comp textarea{width:100%;background:var(--base);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;color:var(--tx);font-size:14px;resize:none;min-height:52px;max-height:120px}
-.comp textarea:focus{outline:2px solid var(--ac);outline-offset:-1px}
-.comp-bar{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
-.modes{display:flex;gap:4px}
-.modes button{font-size:12px;padding:6px 11px;border-radius:6px;color:var(--sub);background:var(--el2)}
-.modes button.on{background:var(--ac);color:#fff}
-.send-btn{background:var(--ac);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600}
-
-/* ─ Overlay sheet ─ */
-.ov-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;display:none}
-.ov-bg.show{display:block}
-.ov-sheet{
-  position:fixed;bottom:0;left:0;right:0;
-  background:var(--el1);border-top:1px solid var(--bdr);border-radius:14px 14px 0 0;
-  transform:translateY(100%);transition:transform .3s ease;
-  max-height:55vh;overflow-y:auto;z-index:100;
-  padding:16px 14px;padding-bottom:max(14px,env(safe-area-inset-bottom));
+.o-reco .glass{padding:0;overflow:hidden}
+.reco-head{padding:8px 10px 6px;display:flex;align-items:center;justify-content:space-between}
+.reco-t{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--acb)}
+.reco-src{font-size:9px;color:var(--sub)}
+.reco-thumb{
+  width:100%;height:80px;
+  background:linear-gradient(135deg,var(--ac),#1e1b4b);
+  display:grid;place-items:center;color:#fff;font-size:12px;font-weight:600;
 }
-.ov-sheet.show{transform:translateY(0)}
-.ov-handle{width:36px;height:4px;border-radius:999px;background:var(--el3);margin:0 auto 12px;cursor:pointer}
-.ov-title{font-size:13px;font-weight:600;margin-bottom:10px;color:var(--acb)}
-.wgt{background:var(--el2);border-radius:10px;padding:10px 12px;margin-bottom:8px}
-.wgt-h{font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;margin-bottom:6px}
-.wgt-item{font-size:12.5px;line-height:1.5;margin-bottom:4px}
-.wgt-lnk{color:var(--acb);font-size:12px;display:inline-block;margin-top:4px}
+.reco-body{padding:8px 10px 10px}
+.reco-hl{font-size:12px;font-weight:600;line-height:1.3;margin-bottom:3px}
+.reco-why{font-size:10px;color:var(--sub);line-height:1.4}
+.reco-btns{display:flex;gap:5px;margin-top:8px}
+.reco-btn{
+  flex:1;padding:6px;border-radius:6px;font-size:10px;text-align:center;
+  border:1px solid var(--el2);background:rgba(26,26,31,.7);color:var(--tx);
+}
+.reco-btn.pri{border-color:var(--ac);background:var(--ac);color:#fff}
 
-/* ─ Demo FAB ─ */
+/* ═══ Demo FAB ═══ */
 .fab{
-  position:fixed;bottom:max(80px,calc(env(safe-area-inset-bottom) + 80px));right:14px;z-index:50;
+  position:fixed;bottom:max(80px,calc(env(safe-area-inset-bottom) + 80px));
+  left:50%;transform:translateX(-50%);z-index:30;
   background:var(--ac);color:#fff;
-  width:56px;height:56px;border-radius:999px;
-  display:grid;place-items:center;
-  font-size:22px;font-weight:700;
+  padding:10px 24px;border-radius:999px;
+  font-size:14px;font-weight:600;
   box-shadow:0 4px 20px rgba(91,33,182,.5);
-  transition:transform .15s;
+  display:flex;align-items:center;gap:6px;
 }
-.fab:active{transform:scale(.9)}
+.fab:active{transform:translateX(-50%) scale(.95)}
 .fab:disabled{background:var(--el3);box-shadow:none}
+
+/* ═══ Info bar ═══ */
+.info{
+  position:fixed;bottom:max(6px,env(safe-area-inset-bottom));
+  left:50%;transform:translateX(-50%);z-index:10;
+  font-size:10px;color:var(--sub);
+  background:var(--el1);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  padding:4px 10px;border-radius:999px;border:1px solid rgba(91,33,182,.2);
+  pointer-events:none;white-space:nowrap;
+}
 </style>
 </head>
 <body>
-<div class="shell">
 
-  <!-- Header -->
-  <div class="hdr">
-    <span class="logo">Zeed</span>
-    <span class="chip">仕事</span>
-    <span style="color:var(--fnt)">›</span>
-    <span class="chip hi">Memory 設計</span>
-    <span class="sp"></span>
-    <button style="font-size:18px" id="ov-btn">🔔</button>
-  </div>
+<!-- ═══ ARTICLE (メインコンテンツ — ユーザーが読む) ═══ -->
+<article class="page">
+  <h1>The Memex We Didn't Get — And the Browser That Might Finally Deliver It</h1>
+  <div class="meta">news.ycombinator.com · HN front page · ★ 287 points</div>
+  <p>Vannevar Bush described the Memex in 1945 — a personal knowledge system that would augment human memory. Eighty years later, browsers still treat knowledge as a pile of tabs and bookmarks, and AI browsers treat context as a chat history. Neither is the Memex.</p>
+  <div class="img-placeholder"></div>
+  <h2>Why current AI browsers fall short</h2>
+  <p>The recent wave of AI browsers — Comet, Atlas, Dia — layers a chat interface on top of Chromium without redesigning the underlying primitives. Tabs are still just URLs. Bookmarks are still just metadata. The "memory" lives in the vendor's side, scoped to one account, and evaporates when you switch models.</p>
+  <h2>What's missing, concretely</h2>
+  <p>The fix is hierarchical context. A Profile for role, a TabGroup for project, a Tab for the immediate object. Extracted intent lives in a shared memory layer that's searchable by meaning rather than keyword.</p>
+  <p>The question isn't whether AI browsers win — it's which primitives they commit to.</p>
+  <h2>Discussion (42 comments)</h2>
+  <p>Most commenters agree that chat-as-memory is fundamentally broken. Several mention Mem0 and LangMem as promising server-side approaches, but note that browser-native implementations are missing...</p>
+</article>
 
-  <!-- Tabs -->
-  <div class="tabs">
-    <button class="on" data-p="now">Now</button>
-    <button data-p="memory">Memory <span class="bdg" id="mb">5</span></button>
-    <button data-p="runs">Runs <span class="bdg" id="rb">1</span></button>
-  </div>
+<!-- ═══ OVERLAYS (四隅 — ページの上にフロート) ═══ -->
 
-  <!-- Body -->
-  <div class="body" id="body">
-
-    <!-- ═══ NOW ═══ -->
-    <div class="pn on" data-p="now">
-
-      <!-- Current tab -->
-      <div class="cd">
-        <div class="tab-row">
-          <div class="fav">a</div>
-          <div style="min-width:0;flex:1">
-            <div class="tab-title">Mem0: Building Production-Ready AI Agents with Scalable Long-Term Memory</div>
-            <div class="tab-url">arxiv.org/abs/2504.19413</div>
-          </div>
-        </div>
-        <div class="sigs">
-          <span class="sig k">📎 3件似た検討</span>
-          <span class="sig n">+ 新規</span>
-        </div>
-      </div>
-
-      <!-- ★ TikTok-style quick actions ★ -->
-      <div class="quick-actions">
-        <button class="qa" id="qa-like">
-          <span class="icon">🤍</span>
-          <span class="label">いいね</span>
-        </button>
-        <button class="qa" id="qa-save">
-          <span class="icon">🔖</span>
-          <span class="label">保存</span>
-        </button>
-        <button class="qa" id="qa-remind">
-          <span class="icon">⏰</span>
-          <span class="label">リマインド</span>
-        </button>
-        <button class="qa" id="qa-rss">
-          <span class="icon">📡</span>
-          <span class="label">RSS 登録</span>
-        </button>
-      </div>
-
-      <!-- ★ "次に読むなら" recommendations ★ -->
-      <div class="cd" style="padding:12px 8px">
-        <div class="cd-h" style="padding:0 4px"><span class="cd-t">次に読むなら</span><span class="cd-a">もっと</span></div>
-        <div class="reco-strip">
-          <div class="reco-card">
-            <span class="reco-src">RSS · Hacker News</span>
-            <span class="reco-title">Show HN: A vector DB in 200 LOC</span>
-            <span class="reco-reason">先週 "EmbeddingGemma + sqlite-vec" を検討していた。これは実装例。</span>
-            <span class="reco-open">開く →</span>
-          </div>
-          <div class="reco-card">
-            <span class="reco-src">RSS · arxiv</span>
-            <span class="reco-title">A-Mem: Agentic Memory for LLM Agents (NeurIPS 2025)</span>
-            <span class="reco-reason">TabGroup の Finding「entity tag + Zettelkasten 風 link」に直結。</span>
-            <span class="reco-open">開く →</span>
-          </div>
-          <div class="reco-card">
-            <span class="reco-src">Bookmark · 未読</span>
-            <span class="reco-title">LightRAG: Simple and Fast Retrieval-Augmented Generation</span>
-            <span class="reco-reason">記憶設計の Decision「sparse + dense hybrid」の参考文献。</span>
-            <span class="reco-open">開く →</span>
-          </div>
-          <div class="reco-card">
-            <span class="reco-src">AI 推薦</span>
-            <span class="reco-title">Ebbinghaus 的 Decay を LLM 記憶に適用する実験</span>
-            <span class="reco-reason">concept.md の「priority_score + decay」に関連。</span>
-            <span class="reco-open">開く →</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- TabGroup context -->
-      <div class="cd">
-        <div class="cd-h"><span class="cd-t">TabGroup の文脈</span></div>
-        <div class="fact"><span class="knd d">Decision</span><span>extract-before-embed 採用。Mem0 / A-Mem 根拠あり</span><div class="src">4/12<span class="cite">A-Mem</span></div></div>
-        <div class="fact"><span class="knd f">Finding</span><span>embedding 全件投入は記憶を汚す</span><div class="src">4/13</div></div>
-        <div class="fact"><span class="knd i">Intent</span><span>Phase 1.5b で EmbeddingGemma を browser に置く</span><div class="src">4/15</div></div>
-      </div>
-
-      <!-- Chat (injected by JS) -->
-      <div id="chat-cd" class="cd" style="display:none">
-        <div class="cd-h"><span class="cd-t">Chat</span></div>
-        <div class="chat" id="cl"></div>
-      </div>
-    </div>
-
-    <!-- ═══ MEMORY ═══ -->
-    <div class="pn" data-p="memory">
-      <div class="cd">
-        <div class="cd-h"><span class="cd-t">最近の Facts</span></div>
-        <div class="fact"><span class="knd d">Decision</span><span>Native sidebar に PR 単位で移行</span><div class="src">4/17</div></div>
-        <div class="fact"><span class="knd f">Finding</span><span>SidePanelWebUIView は Mojo ShowUI() を待つ</span><div class="src">4/17</div></div>
-        <div class="fact"><span class="knd i">Intent</span><span>PR-3: SimpleURLLoader で API key を browser process 内に閉じる</span><div class="src">4/17</div></div>
-      </div>
-      <div class="cd">
-        <div class="cd-h"><span class="cd-t">いいね した記事</span></div>
-        <div class="fact"><span class="knd">❤️</span><span>Mem0: Building Production-Ready AI Agents</span><div class="src">いま · arxiv.org</div></div>
-      </div>
-    </div>
-
-    <!-- ═══ RUNS ═══ -->
-    <div class="pn" data-p="runs">
-      <div class="cd">
-        <div class="cd-h"><span class="cd-t">Mission Control</span></div>
-        <div style="font-size:12px;color:var(--sub);margin-bottom:6px">
-          <span id="rl">Mem0 / A-Mem の差分整理</span> ·
-          <span id="rs" style="font-weight:600;color:var(--wrn)">running</span> ·
-          <span id="rc">3/5</span>
-        </div>
-        <ol class="steps" id="st">
-          <li class="stp done"><span class="dot"></span><div><div>read_page (Mem0 abstract)</div><div class="stp-m">12s</div></div></li>
-          <li class="stp done"><span class="dot"></span><div><div>spawn_research_agent (A-Mem)</div><div class="stp-m">28s</div></div></li>
-          <li class="stp run"><span class="dot"></span><div><div>extract: 比較表ドラフト作成中</div><div class="stp-m">8s</div></div></li>
-          <li class="stp"><span class="dot"></span><div><div>consolidate → 記憶層</div><div class="stp-m">queued</div></div></li>
-          <li class="stp"><span class="dot"></span><div><div>done → 要約返却</div><div class="stp-m">queued</div></div></li>
-        </ol>
-      </div>
-    </div>
-  </div>
-
-  <!-- Composer -->
-  <div class="comp">
-    <textarea id="inp" placeholder="このタブグループの文脈で質問する" rows="2"></textarea>
-    <div class="comp-bar">
-      <div class="modes">
-        <button class="on" data-m="ask">Ask</button>
-        <button data-m="run">Run</button>
-        <button data-m="auto">Auto</button>
-      </div>
-      <button class="send-btn" id="send">Send</button>
+<!-- 左上: RSS 登録 -->
+<div class="o-rss">
+  <div class="glass">
+    <div class="rss-dot">⊕</div>
+    <div>
+      <div class="rss-label">RSS 登録</div>
+      <div class="rss-sub">news.ycombinator.com — 3 件</div>
     </div>
   </div>
 </div>
 
-<!-- Overlay sheet -->
-<div class="ov-bg" id="ovbg"></div>
-<div class="ov-sheet" id="ovs">
-  <div class="ov-handle" id="ovc"></div>
-  <div class="ov-title">🔔 Signal — 外側の文脈</div>
-  <div class="wgt">
-    <div class="wgt-h">RSS · Hacker News</div>
-    <div class="wgt-item"><strong style="color:var(--acb)">Show HN: A vector DB in 200 LOC</strong></div>
-    <div class="wgt-item">sqlite-vec: simple, fast vector search in browser</div>
-    <div class="wgt-item" style="font-size:11px;color:var(--fnt)">先週 "EmbeddingGemma + sqlite-vec" を検討。これは実装例。</div>
-    <span class="wgt-lnk">開く →</span>
+<!-- 右上: Like / Bookmark / Remind -->
+<div class="o-act">
+  <div class="glass">
+    <button class="abtn" id="a-like" title="いいね">🤍</button>
+    <button class="abtn" id="a-save" title="ブックマーク">🔖</button>
+    <button class="abtn" id="a-remind" title="リマインド">⏰</button>
   </div>
-  <div class="wgt">
-    <div class="wgt-h">📧 Email</div>
-    <div class="wgt-item">@nakamori「memory 設計の relations 案、来週レビューしたい」</div>
-    <div class="wgt-item" style="font-size:11px;color:var(--fnt)">3h ago</div>
+</div>
+
+<!-- 左下: Mindmap (二人で同じ記憶) -->
+<div class="o-mind">
+  <div class="glass">
+    <div class="mind-h">二人で同じ記憶</div>
+    <div class="mind-sub">このプロジェクトで 12 個の決定</div>
+    <div class="mind-tree">Memex
+├─ 記憶レイヤー
+│  ├ extract→embed ✓
+│  └ Vector DB (Phase 1.5b)
+├─ 階層 context
+│  ├ Profile / TabGroup / Tab
+│  └ signal として添える
+└─ Zeed の差分
+   └ 記憶はユーザーのもの</div>
+    <div class="mind-foot"><span>更新: 2 分前</span></div>
   </div>
-  <div class="wgt">
-    <div class="wgt-h">📌 Bookmark · 未読</div>
-    <div class="wgt-item">A-Mem follow-up — NeurIPS 2025</div>
-    <span class="wgt-lnk">開く →</span>
-  </div>
-  <div class="wgt">
-    <div class="wgt-h">🧠 Mindmap</div>
-    <div class="wgt-item" style="color:var(--fnt);font-size:11px;font-family:monospace;line-height:1.6">
-      Mem0 ─── extract → embed<br>
-      ├── Zeed Phase 1.5a ✓<br>
-      └── Phase 1.5b (EmbeddingGemma)<br>
-      A-Mem ─── entity link<br>
-      └── Phase 1.5c (sqlite-vec + graph)
+</div>
+
+<!-- 右下: 次に読むなら (推薦) -->
+<div class="o-reco">
+  <div class="glass">
+    <div class="reco-head">
+      <span class="reco-t">次に読むなら</span>
+      <span class="reco-src">RSS · HN</span>
+    </div>
+    <div class="reco-thumb">Show HN: A vector DB<br>in 200 LOC</div>
+    <div class="reco-body">
+      <div class="reco-hl">sqlite-vec: simple, fast vector search inside your browser</div>
+      <div class="reco-why">先週 "EmbeddingGemma + sqlite-vec" について考えていた。これは実装例。</div>
+      <div class="reco-btns">
+        <button class="reco-btn">後で</button>
+        <button class="reco-btn pri">開く</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Demo FAB -->
-<button class="fab" id="demo">▶</button>
+<!-- Demo -->
+<button class="fab" id="fab">▶ デモ再生</button>
+<div class="info">Overlay mock · 4 widgets (RSS / Actions / Mindmap / Recommend)</div>
 
 <script>
-/* Tabs */
-document.querySelectorAll('.tabs button').forEach(t=>{
-  t.onclick=()=>{
-    document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b===t));
-    document.querySelectorAll('.pn').forEach(p=>p.classList.toggle('on',p.dataset.p===t.dataset.p));
-  };
-});
-function showTab(n){document.querySelector(`.tabs [data-p="${n}"]`).click()}
-
-/* Modes */
-let mode='ask';
-document.querySelectorAll('.modes button').forEach(b=>{
-  b.onclick=()=>{document.querySelectorAll('.modes button').forEach(x=>x.classList.toggle('on',x===b));mode=b.dataset.m};
-});
-function setMode(m){document.querySelector(`.modes [data-m="${m}"]`).click()}
-
-/* Overlay */
-const ovbg=document.getElementById('ovbg'),ovs=document.getElementById('ovs');
-function openOv(){ovbg.classList.add('show');ovs.classList.add('show')}
-function closeOv(){ovbg.classList.remove('show');ovs.classList.remove('show')}
-document.getElementById('ov-btn').onclick=openOv;
-document.getElementById('ovc').onclick=closeOv;
-ovbg.onclick=closeOv;
-
-/* ═══ TikTok quick-actions ═══ */
-function setupQA(id,cls,filledIcon){
+/* ─ Like / Save / Remind toggles ─ */
+function toggle(id,onIcon){
   const el=document.getElementById(id);
   el.onclick=()=>{
-    if(el.classList.contains(cls))return;
-    el.classList.add('tapped',cls);
-    el.querySelector('.icon').textContent=filledIcon;
-    // subtle label update
-    setTimeout(()=>el.classList.remove('tapped'),400);
+    if(el.classList.contains('on'))return;
+    el.classList.add('on');el.textContent=onIcon;
   };
 }
-setupQA('qa-like','liked','❤️');
-setupQA('qa-save','saved','📌');
-setupQA('qa-remind','reminded','✅');
-setupQA('qa-rss','rssed','📡');
+toggle('a-like','❤️');
+toggle('a-save','📌');
+toggle('a-remind','✅');
 
-/* Chat */
-const chatCd=document.getElementById('chat-cd'),cl=document.getElementById('cl');
-function showChat(){chatCd.style.display='';showTab('now')}
-function addMsg(r,txt,typ){
-  showChat();const d=document.createElement('div');d.className=`msg ${r}`;
-  if(typ)d.innerHTML='<span class="typing"><span></span><span></span><span></span></span>';
-  else d.innerHTML=rich(txt);cl.appendChild(d);d.scrollIntoView({block:'nearest'});return d;
-}
-function rich(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/【cite:([^】]+)】/g,'<span class="cite">$1</span>')}
-async function stream(el,txt){el.innerHTML='';const h=rich(txt);for(let i=0;i<h.length;i+=4){el.innerHTML+=h.slice(i,i+4);el.scrollIntoView({block:'nearest'});await slp(10+Math.random()*12)}}
+/* ─ Demo ─ */
+const fab=document.getElementById('fab');
+fab.onclick=()=>{void demo()};
 function slp(ms){return new Promise(r=>setTimeout(r,ms))}
 
-/* Send */
-const inp=document.getElementById('inp'),send=document.getElementById('send');
-send.onclick=doSend;
-inp.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend()}};
-async function doSend(){
-  const t=inp.value.trim();if(!t)return;inp.value='';
-  if(mode==='run'||mode==='auto'){startRun(t);return}
-  addMsg('u',t);const ph=addMsg('a','',true);
-  await stream(ph,fakeReply(t));
-}
-function fakeReply(q){
-  const l=q.toLowerCase();
-  if(l.includes('mem0')||l.includes('差分'))return 'Mem0 は extract→consolidate の 2-phase。【cite:Mem0】\n\nA-Mem は entity tag + link。【cite:A-Mem】\n\nTabGroup の Decision は Mem0 寄り。A-Mem link を後段で重ねるのが現実解。';
-  if(l.includes('rss')||l.includes('signal'))return 'HN に sqlite-vec 実装例が。今の TabGroup の設計に直結。開きますか?';
-  return 'TabGroup「Memory 設計」のスコープで読みます。何を知りたいですか?';
-}
+async function demo(){
+  fab.disabled=true;fab.textContent='再生中…';
 
-/* Run */
-function startRun(prompt){
-  showTab('runs');
-  document.getElementById('rl').textContent=prompt.slice(0,40)+(prompt.length>40?'…':'');
-  document.getElementById('rs').textContent='running';document.getElementById('rs').style.color='var(--wrn)';
-  const ns=['read_page','search_memory','spawn_research_agent','extract: ドラフト','done: 要約返却'];
-  const el=document.getElementById('st');el.innerHTML='';
-  ns.forEach(n=>{const li=document.createElement('li');li.className='stp';li.innerHTML=`<span class="dot"></span><div><div>${n.replace(/</g,'&lt;')}</div><div class="stp-m">queued</div></div>`;el.appendChild(li)});
-  document.getElementById('rc').textContent=`0/${ns.length}`;
-  let i=0;(function tick(){
-    el.querySelectorAll('.stp').forEach((li,idx)=>{li.classList.remove('run','done');if(idx<i)li.classList.add('done');else if(idx===i)li.classList.add('run')});
-    document.getElementById('rc').textContent=`${i}/${ns.length}`;
-    if(i<ns.length){i++;setTimeout(tick,1200+Math.random()*500)}
-    else{document.getElementById('rs').textContent='done';document.getElementById('rs').style.color='var(--ok)';
-      document.getElementById('mb').textContent=String(+document.getElementById('mb').textContent+2)}
-  })();
-}
+  // 1. Like
+  await slp(500);
+  document.getElementById('a-like').click();
+  await slp(800);
 
-/* ═══ DEMO ═══ */
-const fab=document.getElementById('demo');
-fab.onclick=()=>{void runDemo()};
-async function runDemo(){
-  fab.disabled=true;fab.textContent='…';
+  // 2. Bookmark
+  document.getElementById('a-save').click();
+  await slp(1200);
 
-  // 1. Like the page (TikTok gesture)
-  await slp(400);
-  document.getElementById('qa-like').click();
-  await slp(600);
-  document.getElementById('qa-save').click();
+  // 3. Scroll down to show mindmap is context-aware
+  window.scrollTo({top:300,behavior:'smooth'});
+  await slp(1500);
+
+  // 4. Scroll back up
+  window.scrollTo({top:0,behavior:'smooth'});
   await slp(1000);
 
-  // 2. Open overlay signals
-  openOv();await slp(2500);closeOv();await slp(500);
+  // 5. Remind
+  document.getElementById('a-remind').click();
+  await slp(1000);
 
-  // 3. Ask in chat
-  showTab('now');setMode('ask');
-  await typeIn('Mem0 と A-Mem の差分は?');
-  await slp(300);send.click();await slp(3000);
-
-  // 4. Run mode
-  setMode('run');
-  await typeIn('比較を Decision として記憶に書く');
-  await slp(300);send.click();await slp(7000);
-
-  // 5. Memory
-  showTab('memory');await slp(2000);
-
-  // 6. Back + RSS subscribe
-  showTab('now');setMode('ask');
-  await slp(600);
-  document.getElementById('qa-rss').click();
-  await slp(800);
-  document.getElementById('qa-remind').click();
-  await slp(800);
-
-  fab.disabled=false;fab.textContent='▶';
+  fab.disabled=false;fab.textContent='▶ デモ再生';
 }
-async function typeIn(t){inp.focus();inp.value='';for(const c of t){inp.value+=c;await slp(22+Math.random()*18)}}
 </script>
 </body>
 </html>
