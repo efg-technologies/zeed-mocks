@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Zeed — SP Context Map</title>
 <style>
-:root{--gl:rgba(22,22,28,.88);--bdr:rgba(60,60,70,.45);--ac:#5b21b6;--acb:#a78bfa;--acs:rgba(91,33,182,.25);--tx:#e8e8e8;--sub:#9e9ea8;--fnt:#6b6b73}
+:root{--gl:rgba(22,22,28,.88);--bdr:rgba(60,60,70,.45);--ac:#5b21b6;--acb:#a78bfa;--acs:rgba(91,33,182,.25);--tx:#e8e8e8;--sub:#9e9ea8;--fnt:#6b6b73;--red:#ef4444;--amber:#f59e0b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Hiragino Sans",sans-serif;background:#fafafa;color:#1a1a1a;overscroll-behavior:none}
 button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
@@ -70,6 +70,16 @@ input{font:inherit;border:none;outline:none}
 }
 .next-badge.show{transform:scale(1)}
 
+/* Tasks badge — always visible */
+.tasks-badge{
+  position:absolute;top:-2px;right:-2px;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--ac);color:#fff;
+  font-size:8px;font-weight:700;line-height:14px;text-align:center;
+  pointer-events:none;
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+
 /* Flyout panels */
 .flyout{
   position:fixed;top:0;bottom:0;right:44px;width:220px;z-index:35;
@@ -119,6 +129,47 @@ input{font:inherit;border:none;outline:none}
   border:1px solid rgba(60,60,70,.4);background:rgba(26,26,31,.7);color:var(--tx);
 }
 .reco-btn.pri{border-color:var(--ac);background:var(--ac);color:#fff}
+
+/* Tasks flyout */
+.task-item{
+  padding:6px 0;border-bottom:1px solid rgba(60,60,70,.25);
+}
+.task-item:last-child{border-bottom:none}
+.task-row{display:flex;align-items:flex-start;gap:6px}
+.task-check{
+  width:12px;height:12px;border-radius:50%;border:1.5px solid var(--sub);
+  flex-shrink:0;cursor:pointer;margin-top:1px;
+  display:grid;place-items:center;transition:background .15s,border-color .15s;
+}
+.task-check.checked{background:var(--acb);border-color:var(--acb)}
+.task-check.checked::after{
+  content:'';display:block;width:5px;height:3px;
+  border-left:1.5px solid #fff;border-bottom:1.5px solid #fff;
+  transform:rotate(-45deg) translateY(-0.5px);
+}
+.task-title{font-size:10px;color:var(--tx);line-height:1.3;flex:1}
+.task-title.done{text-decoration:line-through;opacity:.4}
+.task-meta{display:flex;align-items:center;gap:4px;margin-top:2px;padding-left:18px}
+.task-priority{
+  font-size:7px;font-weight:600;padding:1px 4px;border-radius:3px;
+  text-transform:uppercase;letter-spacing:.03em;
+}
+.task-priority.high{background:rgba(239,68,68,.15);color:var(--red)}
+.task-priority.medium{background:rgba(245,158,11,.15);color:var(--amber)}
+.task-priority.low{background:rgba(107,107,115,.15);color:#6b6b73}
+.task-due{font-size:8px;color:var(--sub)}
+.task-tg{
+  font-size:8px;padding:1px 5px;border-radius:3px;
+  background:var(--acs);color:var(--acb);font-weight:500;
+}
+.task-add-btn{
+  display:flex;align-items:center;gap:4px;
+  margin-top:8px;padding:5px 8px;border-radius:5px;
+  font-size:9px;color:var(--acb);
+  background:rgba(91,33,182,.12);border:1px solid rgba(167,139,250,.15);
+  cursor:pointer;transition:background .15s;
+}
+.task-add-btn:active{background:rgba(91,33,182,.25)}
 
 /* Bottom chat bar */
 .chat-bar{
@@ -322,6 +373,10 @@ input{font:inherit;border:none;outline:none}
     <button class="rbtn" id="btn-rss">
       <svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5"/><path d="M4 4a16 16 0 0 1 16 16"/><path d="M4 11a9 9 0 0 1 9 9"/></svg>
     </button>
+    <button class="rbtn" id="btn-tasks" data-flyout="fly-tasks">
+      <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span class="tasks-badge" id="tasks-badge">6</span>
+    </button>
   </div>
   <div class="r-sep"></div>
   <div class="r-bar-bot">
@@ -370,6 +425,23 @@ input{font:inherit;border:none;outline:none}
     <div class="struct-label">Zeed Relevance</div>
     <div style="font-size:9.5px;color:var(--acb);line-height:1.4">Selected nodes ground Zeed AI answers to this context</div>
   </div>
+</div>
+
+<!-- Flyout: Tasks -->
+<div class="flyout" id="fly-tasks">
+  <div class="fly-section">
+    <div class="fly-h">
+      <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Tasks
+    </div>
+    <div class="fly-sub" id="tasks-subtitle">6 件のタスク</div>
+  </div>
+
+  <div class="fly-section" id="task-list">
+    <!-- Tasks are rendered by JS -->
+  </div>
+
+  <button class="task-add-btn" id="task-add-btn">+ タスク追加</button>
 </div>
 
 <!-- Flyout: Next -->
@@ -452,6 +524,67 @@ const $$=s=>document.querySelectorAll(s);
 const slp=ms=>new Promise(r=>setTimeout(r,ms));
 
 /* =============================================
+   Tasks Data
+   ============================================= */
+const tasksData=[
+  {id:0, title:'sqlite-vec のベンチマーク実行', priority:'high', due:'Today', tg:'Memory 設計', done:false},
+  {id:1, title:'Context Map のノード選択 UI を仕様化', priority:'medium', due:'Today', tg:'Memory 設計', done:false},
+  {id:2, title:'EmbeddingGemma のモデルサイズ比較', priority:'medium', due:'Tomorrow', tg:'Memory 設計', done:false},
+  {id:3, title:'freee 月次決算の確認', priority:'high', due:'Apr 20', tg:'経理', done:false},
+  {id:4, title:'GDPR 対応: 物理消去フローの設計', priority:'high', due:'Apr 21', tg:'法務', done:false},
+  {id:5, title:'ブログ記事: Zeed の Context Map 解説', priority:'low', due:'Apr 23', tg:'発信', done:false},
+];
+
+function incompleteTaskCount(){return tasksData.filter(t=>!t.done).length}
+
+function updateTasksBadge(){
+  const c=incompleteTaskCount();
+  const badge=$('#tasks-badge');
+  badge.textContent=c>0?String(c):'';
+  badge.style.transform=c>0?'scale(1)':'scale(0)';
+  $('#tasks-subtitle').textContent=c+' 件のタスク';
+}
+
+function renderTaskList(){
+  const list=$('#task-list');
+  list.innerHTML=tasksData.map(t=>{
+    const prioClass=t.priority;
+    const prioLabel=t.priority==='high'?'High':t.priority==='medium'?'Medium':'Low';
+    return `<div class="task-item" data-task-id="${t.id}">
+      <div class="task-row">
+        <div class="task-check${t.done?' checked':''}" data-task-id="${t.id}"></div>
+        <div class="task-title${t.done?' done':''}">${t.title}</div>
+      </div>
+      <div class="task-meta">
+        <span class="task-priority ${prioClass}">${prioLabel}</span>
+        <span class="task-due">${t.due}</span>
+        <span class="task-tg">${t.tg}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Attach click handlers to checkboxes
+  list.querySelectorAll('.task-check').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const id=parseInt(el.dataset.taskId);
+      toggleTask(id);
+    });
+  });
+}
+
+function toggleTask(id){
+  const t=tasksData.find(t=>t.id===id);
+  if(!t)return;
+  t.done=!t.done;
+  renderTaskList();
+  updateTasksBadge();
+}
+
+// Initial render
+renderTaskList();
+updateTasksBadge();
+
+/* =============================================
    Graph Node & Edge Data
    ============================================= */
 const nodes=[
@@ -507,17 +640,14 @@ function toggleNode(id){
 /* =============================================
    Physics engine (from map/a.html model)
    ============================================= */
-/* These constants mirror map/a.html: REPEL / d^2, attraction to target length, damping, center gravity */
 function runPhysics(W,H,iterations,repelK,targetLen,attractK,dampK,centerK){
   for(let iter=0;iter<iterations;iter++){
     const alpha=1-iter/iterations;
-    // Center gravity
     for(let i=0;i<nodes.length;i++){
       const n=nodes[i];
       n.vx-=n.x*centerK;
       n.vy-=n.y*centerK;
     }
-    // Repulsion (all pairs)
     for(let i=0;i<nodes.length;i++){
       const a=nodes[i];
       for(let j=i+1;j<nodes.length;j++){
@@ -530,7 +660,6 @@ function runPhysics(W,H,iterations,repelK,targetLen,attractK,dampK,centerK){
         a.vx+=fx;a.vy+=fy;b.vx-=fx;b.vy-=fy;
       }
     }
-    // Attraction along edges
     edges.forEach(e=>{
       const a=nodes[e.source],b=nodes[e.target];
       let dx=b.x-a.x, dy=b.y-a.y;
@@ -539,7 +668,6 @@ function runPhysics(W,H,iterations,repelK,targetLen,attractK,dampK,centerK){
       const fx=dx/d*f, fy=dy/d*f;
       a.vx+=fx;a.vy+=fy;b.vx-=fx;b.vy-=fy;
     });
-    // Damping + integrate
     nodes.forEach(n=>{
       if(n._pinned)return;
       n.vx*=dampK;n.vy*=dampK;
@@ -574,12 +702,9 @@ function initCompactGraph(){
   compactCtx=compactCanvas.getContext('2d');
   compactCtx.scale(dpr,dpr);
 
-  // Layout: scatter then run 150 iterations with compact params
   scatterPositions(compactW,compactH);
-  // Reduced repel (600 vs 1800), shorter target (50 vs 120), same physics model
   runPhysics(compactW,compactH,150, 600,50, 0.0006, 0.88, 0.001);
 
-  // Clamp to visible bounds
   const pad=16;
   nodes.forEach(n=>{
     n.x=Math.max(-compactW/2+pad,Math.min(compactW/2-pad,n.x));
@@ -593,7 +718,6 @@ function drawCompactGraph(){
   const cx=compactW/2, cy=compactH/2;
   ctx.clearRect(0,0,compactW,compactH);
 
-  // Edges
   edges.forEach(e=>{
     const a=nodes[e.source],b=nodes[e.target];
     ctx.beginPath();
@@ -604,31 +728,26 @@ function drawCompactGraph(){
     ctx.stroke();
   });
 
-  // Nodes
   nodes.forEach(n=>{
     const sx=n.x+cx, sy=n.y+cy;
     const col=TYPE_COLOR[n.type];
     const glow=TYPE_GLOW[n.type];
-    const r=3+n.imp*2; // compact radius
+    const r=3+n.imp*2;
 
     if(n.selected){
-      // Glow
       const grad=ctx.createRadialGradient(sx,sy,r*.4,sx,sy,r*2.5);
       grad.addColorStop(0,glow);
       grad.addColorStop(1,'rgba(0,0,0,0)');
       ctx.beginPath();ctx.arc(sx,sy,r*2.5,0,Math.PI*2);
       ctx.fillStyle=grad;ctx.fill();
-      // Solid fill
       ctx.beginPath();ctx.arc(sx,sy,r,0,Math.PI*2);
       ctx.fillStyle=col;ctx.fill();
     } else {
-      // Outline only
       ctx.beginPath();ctx.arc(sx,sy,r,0,Math.PI*2);
       ctx.strokeStyle=col;ctx.lineWidth=1;
       ctx.globalAlpha=0.5;ctx.stroke();ctx.globalAlpha=1;
     }
 
-    // Labels: 7px, only imp>=4 or selected
     if(n.imp>=4||n.selected){
       ctx.font=`${n.selected?'600':'400'} 7px -apple-system,sans-serif`;
       ctx.textAlign='center';
@@ -655,7 +774,6 @@ function renderCompactGraph(){
   initCompactGraph();
   drawCompactGraph();
 
-  // Tap handler
   const handler=e=>{
     const rect=compactCanvas.getBoundingClientRect();
     let px,py;
@@ -666,7 +784,6 @@ function renderCompactGraph(){
       px=e.clientX-rect.left;
       py=e.clientY-rect.top;
     }
-    // Scale for DPR
     px=px*(compactW/rect.width);
     py=py*(compactH/rect.height);
     const hit=compactHitTest(px,py);
@@ -729,7 +846,6 @@ function drawFullScreenGraph(){
   const hasSel=fsSelected>=0;
   const neighborSet=hasSel?adj[fsSelected]:null;
 
-  // Edges
   edges.forEach(e=>{
     const a=nodes[e.source],b=nodes[e.target];
     const [x1,y1]=fsToScreen(a.x,a.y);
@@ -745,7 +861,6 @@ function drawFullScreenGraph(){
     fsCtx.stroke();
   });
 
-  // Nodes
   nodes.forEach(n=>{
     const [sx,sy]=fsToScreen(n.x,n.y);
     const r=fsNodeRadius(n)*fsZoom;
@@ -755,7 +870,6 @@ function drawFullScreenGraph(){
     const col=TYPE_COLOR[n.type];
     const glow=TYPE_GLOW[n.type];
 
-    // Selection glow (persistent selection via n.selected)
     if(n.selected){
       const grad=fsCtx.createRadialGradient(sx,sy,r*.5,sx,sy,r*2.5);
       grad.addColorStop(0,glow);
@@ -764,7 +878,6 @@ function drawFullScreenGraph(){
       fsCtx.fillStyle=grad;fsCtx.fill();
     }
 
-    // Focus highlight (tap-selected for detail)
     if(isActive){
       const grad=fsCtx.createRadialGradient(sx,sy,r*.5,sx,sy,r*3);
       grad.addColorStop(0,'rgba(91,33,182,.4)');grad.addColorStop(1,'transparent');
@@ -779,7 +892,6 @@ function drawFullScreenGraph(){
     } else {
       fsCtx.fillStyle=dimmed?'rgba(255,255,255,.06)':col;
       fsCtx.globalAlpha=dimmed?.3:.6;fsCtx.fill();fsCtx.globalAlpha=1;
-      // Outline for unselected
       fsCtx.strokeStyle=col;fsCtx.lineWidth=1.2;
       fsCtx.globalAlpha=dimmed?.15:.4;fsCtx.stroke();fsCtx.globalAlpha=1;
     }
@@ -789,7 +901,6 @@ function drawFullScreenGraph(){
       fsCtx.lineWidth=isActive?2:1;fsCtx.stroke();
     }
 
-    // Labels
     const showLabel=n.imp>=4||isActive||isNeighbor||n.selected||(fsZoom>1.2&&n.imp>=3);
     if(showLabel){
       fsCtx.font=`${n.selected||isActive?'600':'400'} ${Math.round(11*Math.max(fsZoom,.8))}px -apple-system,sans-serif`;
@@ -800,9 +911,7 @@ function drawFullScreenGraph(){
   });
 }
 
-/* Full-screen physics tick (continuous) */
 function fsTick(){
-  // Same constants as map/a.html
   const REPEL=1800, ATTRACT=0.0004, DAMP=0.88, CENTER=0.0005;
   for(let i=0;i<nodes.length;i++){
     const a=nodes[i];
@@ -850,16 +959,13 @@ function initFullScreenGraph(){
   fsCtx=fsCanvas.getContext('2d');
   fsCtx.scale(dpr,dpr);
 
-  // Scatter positions for full-screen space, then settle a bit
   scatterPositions(fsW,fsH);
-  // Run a few static iterations to get initial layout, then animate
   runPhysics(fsW,fsH,80, 1800,120, 0.0004, 0.88, 0.0005);
 
   fsZoom=1;fsPanX=0;fsPanY=0;
   fsSelected=-1;fsDragging=-1;
   hideFsDetail();
 
-  // Start animation loop
   if(fsAnimId)cancelAnimationFrame(fsAnimId);
   fsLoop();
 }
@@ -880,7 +986,6 @@ function setupFsPointerEvents(){
         const [wx,wy]=fsToWorld(sx,sy);
         fsDragOX=nodes[hit].x-wx;fsDragOY=nodes[hit].y-wy;
         nodes[hit].vx=0;nodes[hit].vy=0;
-        // Show detail
         fsSelected=hit;
         showFsDetail(hit);
       } else {
@@ -923,12 +1028,10 @@ function setupFsPointerEvents(){
   });
 
   const upHandler=e=>{
-    // Tap-to-toggle selection (if didn't drag much)
     if(fsDragging>=0&&fsPointers.has(e.pointerId)){
       const start=fsPointers.get(e.pointerId);
       const dx=Math.abs(e.clientX-start.x), dy=Math.abs(e.clientY-start.y);
       if(dx<6&&dy<6){
-        // It was a tap, toggle selection
         toggleNode(fsDragging);
         drawFullScreenGraph();
       }
@@ -960,7 +1063,6 @@ function closeFullScreen(){
   const overlay=$('#graph-fullscreen');
   overlay.classList.remove('open');
   if(fsAnimId){cancelAnimationFrame(fsAnimId);fsAnimId=null;}
-  // Re-render compact graph to reflect selections
   renderCompactGraph();
 }
 
@@ -987,6 +1089,10 @@ function openFlyout(id){
   });
   if(id==='fly-insight'){
     requestAnimationFrame(renderCompactGraph);
+  }
+  if(id==='fly-tasks'){
+    renderTaskList();
+    updateTasksBadge();
   }
 }
 
@@ -1090,6 +1196,12 @@ function deselectAll(){
   updateSelCounters();
 }
 
+function resetTasks(){
+  tasksData.forEach(t=>t.done=false);
+  renderTaskList();
+  updateTasksBadge();
+}
+
 $('#demo-btn').addEventListener('click',()=>{void(async()=>{
   if(demoRunning)return;
   demoRunning=true;
@@ -1102,6 +1214,7 @@ $('#demo-btn').addEventListener('click',()=>{void(async()=>{
   chatInput.value='';
   setRecoCount(0);
   deselectAll();
+  resetTasks();
   window.scrollTo({top:0,behavior:'instant'});
   await slp(400);
 
@@ -1147,26 +1260,38 @@ $('#demo-btn').addEventListener('click',()=>{void(async()=>{
   closeFlyout();
   await slp(500);
 
-  // 9. Scroll to 45% -- triggers badge "1"
+  // 9. Open Tasks flyout
+  openFlyout('fly-tasks');
+  await slp(1200);
+
+  // 10. Check first task
+  toggleTask(0);
+  await slp(800);
+
+  // 11. Close Tasks flyout
+  closeFlyout();
+  await slp(500);
+
+  // 12. Scroll to 45% -- triggers badge "1"
   const docHeight=document.documentElement.scrollHeight-document.documentElement.clientHeight;
   window.scrollTo({top:docHeight*0.45,behavior:'smooth'});
   setRecoCount(1);
   await slp(1200);
 
-  // 10. Scroll to 75% -- triggers badge "2"
+  // 13. Scroll to 75% -- triggers badge "2"
   window.scrollTo({top:docHeight*0.75,behavior:'smooth'});
   setRecoCount(2);
   await slp(1200);
 
-  // 11. Open Next flyout
+  // 14. Open Next flyout
   openFlyout('fly-next');
   await slp(2200);
 
-  // 12. Close
+  // 15. Close
   closeFlyout();
   await slp(500);
 
-  // 13. Type in chat box and show response
+  // 16. Type in chat box and show response
   const text='What are the key points?';
   chatInput.value='';
   for(let i=0;i<text.length;i++){
