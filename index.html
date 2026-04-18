@@ -12,7 +12,7 @@ h1{font-size:26px;margin:0 0 4px}
 .sub{font-size:13px;color:var(--sub);margin-bottom:28px}
 .section{font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin:20px 0 8px;width:100%;max-width:680px}
 .cards{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:680px;width:100%}
-.card{flex:1 1 200px;max-width:320px;background:var(--el1);border:1px solid var(--bdr);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;transition:transform .12s,border-color .12s}
+.card{flex:1 1 280px;max-width:320px;background:var(--el1);border:1px solid var(--bdr);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;transition:transform .12s,border-color .12s}
 .card:hover{transform:translateY(-2px);border-color:var(--ac)}
 .card-t{font-size:14px;font-weight:600}
 .card-d{font-size:11.5px;color:var(--sub);line-height:1.5}
@@ -25,26 +25,12 @@ footer a{color:var(--ac)}
 <h1>Zeed UI Demo</h1>
 <p class="sub">人と考え、実行する AI ブラウザ</p>
 
-<div class="section">Context Map</div>
-<div class="cards">
-  <a class="card" href="map/a.html">
-    <span class="tag">Map-A</span>
-    <span class="card-t">Force-directed graph</span>
-    <span class="card-d">ノードが引力/斥力で自然配置。ドラッグ・ズーム・タップで探索。知識の地形が見える。</span>
-  </a>
-  <a class="card" href="map/b.html">
-    <span class="tag">Map-B</span>
-    <span class="card-t">Radial focus graph</span>
-    <span class="card-d">タップしたノードが中心に。同心円で関連概念が展開。パンくずで戻れる。</span>
-  </a>
-</div>
-
 <div class="section">SP</div>
 <div class="cards">
   <a class="card" href="sp/a.html">
     <span class="tag">SP</span>
-    <span class="card-t">Right-edge bar + Insight</span>
-    <span class="card-d">右端36pxバー。Insight統合フライアウト。インラインチャット応答。スクロール連動バッジ。</span>
+    <span class="card-t">Right-edge bar + Context Map</span>
+    <span class="card-d">右端36pxバー。Insight内にforce-directedグラフ統合。ノード選択でgrounding。全画面展開可。</span>
   </a>
 </div>
 
@@ -53,7 +39,7 @@ footer a{color:var(--ac)}
   <a class="card" href="pc/">
     <span class="tag">PC</span>
     <span class="card-t">Vertical tabs + Context Map</span>
-    <span class="card-d">縦タブ + サイドバー (Chat / Memory / Map)。スクロール連動で最大3記事推薦。</span>
+    <span class="card-d">縦タブ + サイドバー Map タブにforce graph。ノード選択でLLM grounding。スクロール連動で最大3記事推薦（下→上）。</span>
   </a>
 </div>
 
