@@ -129,13 +129,17 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 .abtn.rss-btn.on svg{fill:none;stroke:var(--acb)}
 @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.35)}70%{transform:scale(.92)}100%{transform:scale(1.05)}}
 
-/* --- Bottom-right: Recommendation (hidden until scroll) --- */
-.o-reco{bottom:20px;right:calc(var(--sidebar-w) + 16px);width:260px;
+/* --- Bottom-right: Recommendation stack (bottom-to-top) --- */
+.o-reco-stack{
+  bottom:20px;right:calc(var(--sidebar-w) + 16px);width:260px;
+  display:flex;flex-direction:column-reverse;gap:10px;
+}
+.reco-card{
   opacity:0;transform:translateY(16px);pointer-events:none;
   transition:opacity .5s ease,transform .5s ease;
 }
-.o-reco.visible{opacity:1;transform:translateY(0);pointer-events:auto}
-.o-reco .gl{border-radius:12px;overflow:hidden;padding:0}
+.reco-card.visible{opacity:1;transform:translateY(0);pointer-events:auto}
+.reco-card .gl{border-radius:12px;overflow:hidden;padding:0}
 .reco-head{padding:10px 12px 6px;display:flex;align-items:center;justify-content:space-between}
 .reco-t{font-size:11px;font-weight:600;color:var(--acb);letter-spacing:.04em}
 .reco-src{font-size:9px;color:var(--sub)}
@@ -231,6 +235,19 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 .map-sub{font-size:10px;color:var(--sub)}
 .map-canvas-wrap{flex:1;position:relative;min-height:0;border-radius:8px;overflow:hidden;background:var(--base)}
 .map-canvas-wrap canvas{display:block;width:100%;height:100%}
+.map-detail-card{
+  position:relative;margin-top:8px;flex-shrink:0;
+  background:rgba(22,22,28,.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.08);border-radius:10px;
+  padding:10px 12px;font-size:11px;line-height:1.45;
+  display:none;
+}
+.map-detail-card.open{display:block}
+.map-detail-card .md-label{font-size:13px;font-weight:600;margin-bottom:4px}
+.map-detail-card .md-badge{display:inline-block;font-size:9px;padding:2px 6px;border-radius:4px;font-weight:500;margin-bottom:6px}
+.map-detail-card .md-conn-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;font-size:11px;color:#ccc}
+.map-detail-card .md-conn-row .bar-bg{flex:1;height:3px;background:rgba(255,255,255,.08);border-radius:2px;max-width:60px}
+.map-detail-card .md-conn-row .bar{height:100%;border-radius:2px}
 .map-footer{flex-shrink:0;padding:8px 0 0;display:flex;align-items:center;justify-content:space-between}
 .map-sel-count{font-size:11px;color:var(--acb);font-weight:600}
 .map-footer-btns{display:flex;gap:6px}
@@ -301,19 +318,6 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 .viewport::-webkit-scrollbar-track,.sb-body::-webkit-scrollbar-track{background:transparent}
 .viewport::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
 .sb-body::-webkit-scrollbar-thumb{background:#2a2a31;border-radius:3px}
-
-/* tooltip */
-.graph-tooltip{
-  position:absolute;pointer-events:none;z-index:20;
-  background:rgba(15,15,18,.92);border:1px solid var(--gl-bdr);border-radius:8px;
-  padding:8px 10px;font-size:10px;line-height:1.45;color:var(--tx);
-  max-width:200px;opacity:0;transition:opacity .15s;
-  backdrop-filter:blur(8px);
-}
-.graph-tooltip.visible{opacity:1}
-.graph-tooltip .tt-label{font-weight:600;margin-bottom:2px}
-.graph-tooltip .tt-source{color:var(--sub);font-size:9px}
-.graph-tooltip .tt-type{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
 </style>
 </head>
 <body>
@@ -401,17 +405,50 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
   </div>
 </div>
 
-<!-- Overlay: Bottom-right Recommendation (hidden until scroll triggers) -->
-<div class="overlay o-reco" id="reco-widget">
-  <div class="gl">
-    <div class="reco-head"><span class="reco-t">次に読むなら</span><span class="reco-src" id="reco-src-label">HN</span></div>
-    <div class="reco-thumb" id="reco-thumb">sqlite-vec: fast vector<br>search in the browser</div>
-    <div class="reco-body">
-      <div class="reco-hl" id="reco-hl">sqlite-vec: vector search in 200 LOC</div>
-      <div class="reco-why" id="reco-why">先週 EmbeddingGemma + sqlite-vec を検討 &mdash; 今の記事と直結</div>
-      <div class="reco-btns">
-        <button class="reco-btn" id="reco-later">後で</button>
-        <button class="reco-btn pri" id="reco-open">開く</button>
+<!-- Overlay: Bottom-right Recommendation Stack (bottom-to-top) -->
+<div class="overlay o-reco-stack" id="reco-stack">
+  <!-- Card 3 (80% scroll) — appears topmost (first in DOM because column-reverse) -->
+  <div class="reco-card" id="reco-card-3" data-threshold="0.80">
+    <div class="gl">
+      <div class="reco-head"><span class="reco-t">次に読むなら</span><span class="reco-src">Wikipedia</span></div>
+      <div class="reco-thumb">Memex (Wikipedia)<br>Bush's original vision</div>
+      <div class="reco-body">
+        <div class="reco-hl">Memex — Wikipedia</div>
+        <div class="reco-why">この記事の核心概念。Bush の原典で理解を深める</div>
+        <div class="reco-btns">
+          <button class="reco-btn">後で</button>
+          <button class="reco-btn pri">開く</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Card 2 (55% scroll) — middle -->
+  <div class="reco-card" id="reco-card-2" data-threshold="0.55">
+    <div class="gl">
+      <div class="reco-head"><span class="reco-t">次に読むなら</span><span class="reco-src">HN</span></div>
+      <div class="reco-thumb">Embedding models<br>comparison 2025</div>
+      <div class="reco-body">
+        <div class="reco-hl">EmbeddingGemma vs Cohere: 性能比較</div>
+        <div class="reco-why">embedding パイプライン設計で検討中のモデルに関連</div>
+        <div class="reco-btns">
+          <button class="reco-btn">後で</button>
+          <button class="reco-btn pri">開く</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Card 1 (30% scroll) — bottom of stack (last in DOM because column-reverse) -->
+  <div class="reco-card" id="reco-card-1" data-threshold="0.30">
+    <div class="gl">
+      <div class="reco-head"><span class="reco-t">次に読むなら</span><span class="reco-src">GitHub</span></div>
+      <div class="reco-thumb">sqlite-vec: fast vector<br>search in the browser</div>
+      <div class="reco-body">
+        <div class="reco-hl">sqlite-vec: vector search in 200 LOC</div>
+        <div class="reco-why">先週 EmbeddingGemma + sqlite-vec を検討 — 今の記事と直結</div>
+        <div class="reco-btns">
+          <button class="reco-btn">後で</button>
+          <button class="reco-btn pri">開く</button>
+        </div>
       </div>
     </div>
   </div>
@@ -490,7 +527,7 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
       </div>
     </div>
 
-    <!-- Map pane (Context Map — Force Graph) -->
+    <!-- Map pane (Context Map — Force Graph from map/a.html) -->
     <div class="pane" id="pane-map">
       <div class="map-header">
         <div class="map-title">Context Map</div>
@@ -498,12 +535,8 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
       </div>
       <div class="map-canvas-wrap" id="map-canvas-wrap">
         <canvas id="graph-canvas"></canvas>
-        <div class="graph-tooltip" id="graph-tooltip">
-          <div class="tt-type"></div>
-          <div class="tt-label"></div>
-          <div class="tt-source"></div>
-        </div>
       </div>
+      <div class="map-detail-card" id="map-detail-card"></div>
       <div class="map-footer">
         <span class="map-sel-count" id="map-sel-count">Selected: 4 nodes</span>
         <div class="map-footer-btns">
@@ -547,410 +580,409 @@ const $=s=>document.querySelector(s);
 const $$=s=>document.querySelectorAll(s);
 const slp=ms=>new Promise(r=>setTimeout(r,ms));
 
-/* ══════════ Force-Directed Knowledge Graph ══════════ */
-const graphNodes = [
-  // Center cluster: Current Tab topics (purple)
-  { id:'memex',       label:'Memex',             type:'current', source:'This article — core concept',              selected:true,  x:0, y:0, vx:0, vy:0, radius:18 },
-  { id:'ai-browser',  label:'AI Browser',        type:'current', source:'This article — competitive landscape',     selected:true,  x:0, y:0, vx:0, vy:0, radius:16 },
-  { id:'vector-db',   label:'Vector Database',   type:'current', source:'This article — key primitive',             selected:true,  x:0, y:0, vx:0, vy:0, radius:16 },
-  { id:'knowledge-graph', label:'Knowledge Graph', type:'current', source:'This article — data model proposal',     selected:true,  x:0, y:0, vx:0, vy:0, radius:15 },
+/* ══════════ Force-Directed Knowledge Graph (from map/a.html, adapted) ══════════ */
 
-  // Memory ring (blue)
-  { id:'sqlite-vec',  label:'sqlite-vec research',     type:'memory', source:'Memory: 2 days ago — Decision',          selected:false, x:0, y:0, vx:0, vy:0, radius:14 },
-  { id:'embed-gemma', label:'EmbeddingGemma eval',     type:'memory', source:'Memory: 5 days ago — Finding',           selected:false, x:0, y:0, vx:0, vy:0, radius:13 },
-  { id:'ptg-design',  label:'Profile/TG/Tab design',   type:'memory', source:'Memory: 1 hour ago — Intent',            selected:false, x:0, y:0, vx:0, vy:0, radius:14 },
-  { id:'chromium147',  label:'Chromium 147 upgrade',   type:'memory', source:'Memory: 1 week ago — Decision',          selected:false, x:0, y:0, vx:0, vy:0, radius:12 },
-  { id:'local-first',  label:'Local-first storage',    type:'memory', source:'Memory: 15 min ago — Question',          selected:false, x:0, y:0, vx:0, vy:0, radius:13 },
-
-  // RSS/Web ring (green)
-  { id:'hn-localdb',  label:'HN: Local-first DB comparison', type:'web', source:'RSS — Hacker News, 2h ago',           selected:false, x:0, y:0, vx:0, vy:0, radius:13 },
-  { id:'arxiv-mem0',  label:'ArXiv: Mem0 paper',             type:'web', source:'Web — ArXiv, recommended',            selected:false, x:0, y:0, vx:0, vy:0, radius:12 },
-  { id:'gh-lancedb',  label:'GitHub: LanceDB v0.8',          type:'web', source:'RSS — GitHub Releases',               selected:false, x:0, y:0, vx:0, vy:0, radius:12 },
-  { id:'hn-memex-thread', label:'HN: Memex revival thread',  type:'web', source:'Web — Hacker News, 6h ago',           selected:false, x:0, y:0, vx:0, vy:0, radius:11 },
-];
-
-// Edges: [sourceId, targetId, strength 0-1]
-const graphEdges = [
-  // current <-> current
-  ['memex','ai-browser',0.7],
-  ['memex','knowledge-graph',0.8],
-  ['ai-browser','vector-db',0.6],
-  ['vector-db','knowledge-graph',0.9],
-
-  // current <-> memory
-  ['vector-db','sqlite-vec',0.9],
-  ['vector-db','embed-gemma',0.7],
-  ['ai-browser','ptg-design',0.8],
-  ['ai-browser','chromium147',0.4],
-  ['knowledge-graph','local-first',0.6],
-  ['memex','ptg-design',0.5],
-
-  // memory <-> memory
-  ['sqlite-vec','embed-gemma',0.7],
-  ['sqlite-vec','local-first',0.5],
-  ['ptg-design','chromium147',0.4],
-
-  // current/memory <-> web
-  ['sqlite-vec','hn-localdb',0.8],
-  ['sqlite-vec','gh-lancedb',0.7],
-  ['vector-db','gh-lancedb',0.6],
-  ['vector-db','hn-localdb',0.5],
-  ['memex','arxiv-mem0',0.6],
-  ['memex','hn-memex-thread',0.8],
-  ['knowledge-graph','arxiv-mem0',0.7],
-  ['local-first','hn-localdb',0.6],
-  ['embed-gemma','arxiv-mem0',0.4],
-];
-
-const typeColors = {
-  current: { fill:'#a78bfa', glow:'rgba(167,139,250,0.5)', dim:'rgba(167,139,250,0.3)' },
-  memory:  { fill:'#3b82f6', glow:'rgba(59,130,246,0.5)',  dim:'rgba(59,130,246,0.3)' },
-  web:     { fill:'#22c55e', glow:'rgba(34,197,94,0.5)',   dim:'rgba(34,197,94,0.3)' },
+/* --- Source type colors (purple=current page, blue=memory, green=RSS/web) --- */
+const TYPE_COLOR = {
+  current:    { fill:'#a78bfa', glow:'rgba(167,139,250,0.5)', dim:'rgba(167,139,250,0.3)' },
+  memory:     { fill:'#60a5fa', glow:'rgba(59,130,246,0.5)',  dim:'rgba(59,130,246,0.3)' },
+  web:        { fill:'#4ade80', glow:'rgba(34,197,94,0.5)',   dim:'rgba(34,197,94,0.3)' },
 };
-const typeTag = { current:'Tab', memory:'Memory', web:'RSS' };
+const TYPE_TAG = { current:'Tab', memory:'Memory', web:'RSS' };
 
-let canvas, ctx, W, H;
-let animId = null;
-let dragNode = null;
-let hoverNode = null;
-let graphVisible = false; // nodes appear during demo or when pane shown
-let nodeVisibleCount = 0; // for staggered appearance
+/* --- Node data for sidebar context --- */
+const nodes = [
+  // Current page topics (purple, auto-selected)
+  {id:0,  label:'Memex',            type:'current', imp:5, selected:true},
+  {id:1,  label:'AI Browser',       type:'current', imp:5, selected:true},
+  {id:2,  label:'vector database',  type:'current', imp:4, selected:true},
+  {id:3,  label:'knowledge graph',  type:'current', imp:4, selected:true},
+  // Memory (blue)
+  {id:4,  label:'sqlite-vec',       type:'memory',  imp:3, selected:false},
+  {id:5,  label:'EmbeddingGemma',   type:'memory',  imp:3, selected:false},
+  {id:6,  label:'Profile/TG/Tab',   type:'memory',  imp:4, selected:false},
+  {id:7,  label:'Chromium 147',     type:'memory',  imp:3, selected:false},
+  {id:8,  label:'LLM Memory',       type:'memory',  imp:4, selected:false},
+  // RSS/Web (green)
+  {id:9,  label:'HN: Local-first DB',type:'web',    imp:2, selected:false},
+  {id:10, label:'ArXiv: Mem0',       type:'web',    imp:3, selected:false},
+  {id:11, label:'GitHub: LanceDB',   type:'web',    imp:2, selected:false},
+];
 
-function initGraphPositions(){
+// Initialize physics state
+nodes.forEach(n=>{ n.x=0; n.y=0; n.vx=0; n.vy=0; });
+
+/* --- Edges: [sourceId, targetId, strength 0-1] --- */
+const edgesDef = [
+  // current <-> current
+  [0,1,.8], [0,3,.8], [1,2,.6], [2,3,.9],
+  // current <-> memory
+  [2,4,.9], [2,5,.7], [1,6,.8], [1,7,.4], [3,8,.7], [0,6,.5], [0,8,.6],
+  // memory <-> memory
+  [4,5,.7], [4,8,.4], [6,7,.4],
+  // current/memory <-> web
+  [4,9,.8], [4,11,.7], [2,11,.6], [2,9,.5],
+  [0,10,.6], [3,10,.7], [8,9,.5], [5,10,.4],
+];
+const edges = edgesDef.map(([s,t,str])=>({source:s, target:t, strength:str}));
+
+// adjacency
+const adj = nodes.map(()=>new Set());
+edges.forEach(e=>{ adj[e.source].add(e.target); adj[e.target].add(e.source); });
+
+// simulation state
+let gCanvas, gCtx, gW, gH;
+let gAnimId = null;
+let gDragging = -1, gDragOX = 0, gDragOY = 0;
+let gSelected = -1; // selected for detail card
+let gMouseDownTime = 0, gMouseDownPos = null;
+let graphVisible = false;
+let nodeVisibleCount = 0;
+
+function nodeRadius(n){ return 4 + n.imp * 4; }
+
+function initPositions(){
   const cx = 174, cy = 180;
-  // Center cluster
-  const currentNodes = graphNodes.filter(n=>n.type==='current');
+  const currentNodes = nodes.filter(n=>n.type==='current');
   currentNodes.forEach((n,i)=>{
     const a = (i / currentNodes.length) * Math.PI * 2 - Math.PI/2;
-    n.x = cx + Math.cos(a) * 45;
-    n.y = cy + Math.sin(a) * 45;
+    n.x = Math.cos(a) * 45;
+    n.y = Math.sin(a) * 45;
   });
-  // Memory ring
-  const memNodes = graphNodes.filter(n=>n.type==='memory');
+  const memNodes = nodes.filter(n=>n.type==='memory');
   memNodes.forEach((n,i)=>{
     const a = (i / memNodes.length) * Math.PI * 2 - Math.PI/3;
-    n.x = cx + Math.cos(a) * 120;
-    n.y = cy + Math.sin(a) * 120;
+    n.x = Math.cos(a) * 120;
+    n.y = Math.sin(a) * 120;
   });
-  // Web ring
-  const webNodes = graphNodes.filter(n=>n.type==='web');
+  const webNodes = nodes.filter(n=>n.type==='web');
   webNodes.forEach((n,i)=>{
     const a = (i / webNodes.length) * Math.PI * 2 + Math.PI/6;
-    n.x = cx + Math.cos(a) * 165;
-    n.y = cy + Math.sin(a) * 165;
+    n.x = Math.cos(a) * 150;
+    n.y = Math.sin(a) * 150;
   });
+  nodes.forEach(n=>{ n.vx=0; n.vy=0; });
 }
+initPositions();
 
-function resizeCanvas(){
+function resizeGraphCanvas(){
   const wrap = $('#map-canvas-wrap');
   if(!wrap) return;
   const rect = wrap.getBoundingClientRect();
-  W = rect.width;
-  H = rect.height;
-  canvas = $('#graph-canvas');
-  canvas.width = W * devicePixelRatio;
-  canvas.height = H * devicePixelRatio;
-  canvas.style.width = W + 'px';
-  canvas.style.height = H + 'px';
-  ctx = canvas.getContext('2d');
-  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  gW = rect.width;
+  gH = rect.height;
+  if(gW < 1 || gH < 1) return;
+  gCanvas = $('#graph-canvas');
+  gCanvas.width = gW * devicePixelRatio;
+  gCanvas.height = gH * devicePixelRatio;
+  gCanvas.style.width = gW + 'px';
+  gCanvas.style.height = gH + 'px';
+  gCtx = gCanvas.getContext('2d');
+  gCtx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
 }
 
-function nodeById(id){ return graphNodes.find(n=>n.id===id); }
-
-/* Force simulation */
-function simulate(){
-  const visNodes = graphNodes.slice(0, nodeVisibleCount);
-  const alpha = 0.15;
-  const repulse = 1800;
-  const attract = 0.008;
-  const damping = 0.85;
-  const centerX = W/2, centerY = H/2;
-
-  // Center gravity
-  for(const n of visNodes){
-    n.vx += (centerX - n.x) * 0.002;
-    n.vy += (centerY - n.y) * 0.002;
-  }
-
-  // Repulsion
-  for(let i=0;i<visNodes.length;i++){
-    for(let j=i+1;j<visNodes.length;j++){
-      const a = visNodes[i], b = visNodes[j];
-      let dx = b.x - a.x, dy = b.y - a.y;
-      let dist = Math.sqrt(dx*dx+dy*dy) || 1;
-      let force = repulse / (dist * dist);
-      let fx = dx/dist * force, fy = dy/dist * force;
-      a.vx -= fx * alpha; a.vy -= fy * alpha;
-      b.vx += fx * alpha; b.vy += fy * alpha;
-    }
-  }
-
-  // Edge attraction
-  for(const [sid,tid,str] of graphEdges){
-    const s = nodeById(sid), t = nodeById(tid);
-    if(!s || !t) continue;
-    if(graphNodes.indexOf(s) >= nodeVisibleCount || graphNodes.indexOf(t) >= nodeVisibleCount) continue;
-    let dx = t.x - s.x, dy = t.y - s.y;
-    let dist = Math.sqrt(dx*dx+dy*dy) || 1;
-    let target = 80 + (1-str)*60;
-    let force = (dist - target) * attract * str;
-    let fx = dx/dist * force, fy = dy/dist * force;
-    s.vx += fx; s.vy += fy;
-    t.vx -= fx; t.vy -= fy;
-  }
-
-  // Update positions
-  for(const n of visNodes){
-    if(n === dragNode) continue;
-    n.vx *= damping;
-    n.vy *= damping;
-    n.x += n.vx;
-    n.y += n.vy;
-    // Bounds
-    n.x = Math.max(n.radius+4, Math.min(W-n.radius-4, n.x));
-    n.y = Math.max(n.radius+4, Math.min(H-n.radius-4, n.y));
-  }
-}
-
-function draw(){
-  if(!ctx) return;
-  ctx.clearRect(0,0,W,H);
-
-  const visNodes = graphNodes.slice(0, nodeVisibleCount);
-  const visIds = new Set(visNodes.map(n=>n.id));
-
-  // Draw edges
-  for(const [sid,tid,str] of graphEdges){
-    if(!visIds.has(sid) || !visIds.has(tid)) continue;
-    const s = nodeById(sid), t = nodeById(tid);
-    ctx.beginPath();
-    ctx.moveTo(s.x, s.y);
-    ctx.lineTo(t.x, t.y);
-    ctx.strokeStyle = `rgba(100,100,120,${0.08 + str * 0.18})`;
-    ctx.lineWidth = 0.5 + str * 1;
-    ctx.stroke();
-  }
-
-  // Draw nodes
-  for(const n of visNodes){
-    const col = typeColors[n.type];
-    const isHover = n === hoverNode;
-
-    if(n.selected){
-      // Glow ring
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, n.radius + 5, 0, Math.PI*2);
-      const grad = ctx.createRadialGradient(n.x, n.y, n.radius, n.x, n.y, n.radius+8);
-      grad.addColorStop(0, col.glow);
-      grad.addColorStop(1, 'transparent');
-      ctx.fillStyle = grad;
-      ctx.fill();
-
-      // Solid fill
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, n.radius, 0, Math.PI*2);
-      ctx.fillStyle = col.fill;
-      ctx.fill();
-
-      // Checkmark
-      ctx.save();
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 1.8;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.beginPath();
-      ctx.moveTo(n.x - 4, n.y);
-      ctx.lineTo(n.x - 1, n.y + 3);
-      ctx.lineTo(n.x + 4, n.y - 3);
-      ctx.stroke();
-      ctx.restore();
-    } else {
-      // Outline only, dimmed
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, n.radius, 0, Math.PI*2);
-      ctx.strokeStyle = col.dim;
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-      ctx.fillStyle = 'rgba(15,15,18,0.6)';
-      ctx.fill();
-    }
-
-    // Hover ring
-    if(isHover){
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, n.radius + 3, 0, Math.PI*2);
-      ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-
-    // Label
-    ctx.save();
-    ctx.font = '600 9px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    ctx.fillStyle = n.selected ? '#e8e8e8' : 'rgba(158,158,168,0.7)';
-    // Word wrap for long labels
-    const maxW = 70;
-    const words = n.label.split(' ');
-    let lines = [];
-    let line = '';
-    for(const w of words){
-      const test = line ? line + ' ' + w : w;
-      if(ctx.measureText(test).width > maxW && line){
-        lines.push(line);
-        line = w;
-      } else {
-        line = test;
-      }
-    }
-    if(line) lines.push(line);
-    const ly = n.y + n.radius + 4;
-    lines.forEach((l,i)=>{
-      ctx.fillText(l, n.x, ly + i * 11);
-    });
-
-    // Type tag for memory/web
-    if(n.type !== 'current'){
-      const tag = typeTag[n.type];
-      ctx.font = '700 7px -apple-system, sans-serif';
-      const tw = ctx.measureText(tag).width + 6;
-      const tx = n.x - tw/2;
-      const ty = n.y - n.radius - 12;
-      ctx.fillStyle = n.type === 'memory' ? 'rgba(59,130,246,0.2)' : 'rgba(34,197,94,0.2)';
-      ctx.beginPath();
-      ctx.roundRect(tx, ty, tw, 11, 3);
-      ctx.fill();
-      ctx.fillStyle = n.type === 'memory' ? '#60a5fa' : '#4ade80';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(tag, n.x, ty + 5.5);
-    }
-    ctx.restore();
-  }
-}
+/* Physics — from map/a.html */
+const REPEL = 1800, ATTRACT = 0.0004, DAMP = 0.88, CENTER_G = 0.0005;
 
 function tick(){
+  const vis = nodes.slice(0, nodeVisibleCount);
+  const cx = gW/2, cy = gH/2;
+
+  for(let i=0;i<vis.length;i++){
+    const a = vis[i];
+    // center gravity (pull toward canvas center in world coords = 0,0)
+    a.vx -= a.x * CENTER_G;
+    a.vy -= a.y * CENTER_G;
+    for(let j=i+1;j<vis.length;j++){
+      const b = vis[j];
+      let dx = a.x - b.x, dy = a.y - b.y;
+      let d2 = dx*dx + dy*dy; if(d2<1) d2=1;
+      const f = REPEL / d2;
+      const dist = Math.sqrt(d2);
+      const fx = dx/dist*f, fy = dy/dist*f;
+      a.vx += fx; a.vy += fy;
+      b.vx -= fx; b.vy -= fy;
+    }
+  }
+
+  const visIds = new Set(vis.map(n=>n.id));
+  edges.forEach(e=>{
+    if(!visIds.has(e.source) || !visIds.has(e.target)) return;
+    const a = nodes[e.source], b = nodes[e.target];
+    let dx = b.x - a.x, dy = b.y - a.y;
+    const f = (Math.sqrt(dx*dx+dy*dy) - 120) * ATTRACT * e.strength;
+    const fx = dx*f, fy = dy*f;
+    a.vx += fx; a.vy += fy;
+    b.vx -= fx; b.vy -= fy;
+  });
+
+  vis.forEach(n=>{
+    if(n.id === gDragging) return;
+    n.vx *= DAMP; n.vy *= DAMP;
+    n.x += n.vx; n.y += n.vy;
+  });
+}
+
+/* toScreen / toWorld — no zoom, just center offset */
+function toScreen(x, y){ return [x + gW/2, y + gH/2]; }
+function toWorld(sx, sy){ return [sx - gW/2, sy - gH/2]; }
+
+function draw(){
+  if(!gCtx) return;
+  gCtx.clearRect(0,0,gW,gH);
+
+  const vis = nodes.slice(0, nodeVisibleCount);
+  const visIds = new Set(vis.map(n=>n.id));
+  const isDetailSelected = gSelected >= 0;
+  const neighborSet = isDetailSelected ? adj[gSelected] : null;
+
+  // edges
+  edges.forEach(e=>{
+    if(!visIds.has(e.source) || !visIds.has(e.target)) return;
+    const a = nodes[e.source], b = nodes[e.target];
+    const [x1,y1] = toScreen(a.x, a.y);
+    const [x2,y2] = toScreen(b.x, b.y);
+    const highlight = isDetailSelected && (e.source===gSelected || e.target===gSelected);
+    gCtx.beginPath(); gCtx.moveTo(x1,y1); gCtx.lineTo(x2,y2);
+    if(isDetailSelected && !highlight){
+      gCtx.strokeStyle = 'rgba(255,255,255,.03)'; gCtx.lineWidth = 0.5;
+    } else {
+      gCtx.strokeStyle = highlight
+        ? `rgba(167,139,250,${.3+e.strength*.5})`
+        : `rgba(255,255,255,${.04+e.strength*.1})`;
+      gCtx.lineWidth = highlight ? 1.5 : 0.8;
+    }
+    gCtx.stroke();
+  });
+
+  // nodes
+  vis.forEach(n=>{
+    const [sx,sy] = toScreen(n.x, n.y);
+    const r = nodeRadius(n);
+    const isActive = n.id === gSelected;
+    const isNeighbor = isDetailSelected && neighborSet && neighborSet.has(n.id);
+    const dimmed = isDetailSelected && !isActive && !isNeighbor;
+    const col = TYPE_COLOR[n.type];
+
+    // Selected node glow (selection = checkbox selected for LLM context)
+    if(n.selected){
+      const grad = gCtx.createRadialGradient(sx,sy,r*.5,sx,sy,r*2.5);
+      grad.addColorStop(0, col.glow);
+      grad.addColorStop(1, 'transparent');
+      gCtx.beginPath(); gCtx.arc(sx,sy,r*2.5,0,Math.PI*2);
+      gCtx.fillStyle = grad; gCtx.fill();
+    }
+
+    // Detail-selected node: extra purple glow
+    if(isActive){
+      const grad = gCtx.createRadialGradient(sx,sy,r*.5,sx,sy,r*3);
+      grad.addColorStop(0,'rgba(91,33,182,.4)'); grad.addColorStop(1,'transparent');
+      gCtx.beginPath(); gCtx.arc(sx,sy,r*3,0,Math.PI*2);
+      gCtx.fillStyle = grad; gCtx.fill();
+    }
+
+    // Node circle
+    gCtx.beginPath(); gCtx.arc(sx,sy,r,0,Math.PI*2);
+    if(n.selected){
+      // Filled
+      gCtx.fillStyle = dimmed ? 'rgba(255,255,255,.06)' : col.fill;
+      gCtx.globalAlpha = dimmed ? .3 : 1;
+      gCtx.fill();
+      gCtx.globalAlpha = 1;
+    } else {
+      // Outline only
+      gCtx.fillStyle = 'rgba(15,15,18,0.6)';
+      gCtx.fill();
+      gCtx.strokeStyle = dimmed ? 'rgba(255,255,255,.05)' : col.dim;
+      gCtx.lineWidth = 1.5;
+      gCtx.globalAlpha = dimmed ? .3 : 1;
+      gCtx.stroke();
+      gCtx.globalAlpha = 1;
+    }
+
+    // Checkmark for selected nodes
+    if(n.selected && !dimmed){
+      gCtx.save();
+      gCtx.strokeStyle = '#fff';
+      gCtx.lineWidth = 1.8;
+      gCtx.lineCap = 'round'; gCtx.lineJoin = 'round';
+      gCtx.beginPath();
+      gCtx.moveTo(sx - 4, sy);
+      gCtx.lineTo(sx - 1, sy + 3);
+      gCtx.lineTo(sx + 4, sy - 3);
+      gCtx.stroke();
+      gCtx.restore();
+    }
+
+    // Detail-selected ring
+    if(isActive){
+      gCtx.beginPath(); gCtx.arc(sx,sy,r+2,0,Math.PI*2);
+      gCtx.strokeStyle = '#5B21B6'; gCtx.lineWidth = 2; gCtx.stroke();
+    } else if(isNeighbor){
+      gCtx.beginPath(); gCtx.arc(sx,sy,r+1,0,Math.PI*2);
+      gCtx.strokeStyle = 'rgba(255,255,255,.2)'; gCtx.lineWidth = 1; gCtx.stroke();
+    }
+
+    // Labels
+    const showLabel = n.imp >= 3 || isActive || isNeighbor;
+    if(showLabel){
+      gCtx.save();
+      gCtx.font = '600 9px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+      gCtx.textAlign = 'center'; gCtx.textBaseline = 'top';
+      gCtx.fillStyle = dimmed ? 'rgba(255,255,255,.15)' : (n.selected ? '#e8e8e8' : 'rgba(158,158,168,0.7)');
+      // Word wrap
+      const maxW = 70;
+      const words = n.label.split(' ');
+      let lines = [], line = '';
+      for(const w of words){
+        const test = line ? line + ' ' + w : w;
+        if(gCtx.measureText(test).width > maxW && line){ lines.push(line); line = w; }
+        else { line = test; }
+      }
+      if(line) lines.push(line);
+      const ly = sy + r + 4;
+      lines.forEach((l,i)=>{ gCtx.fillText(l, sx, ly + i*11); });
+
+      // Type tag for memory/web
+      if(n.type !== 'current'){
+        const tag = TYPE_TAG[n.type];
+        gCtx.font = '700 7px -apple-system,sans-serif';
+        const tw = gCtx.measureText(tag).width + 6;
+        const tx = sx - tw/2;
+        const ty = sy - r - 12;
+        gCtx.fillStyle = n.type==='memory' ? 'rgba(59,130,246,0.2)' : 'rgba(34,197,94,0.2)';
+        gCtx.beginPath(); gCtx.roundRect(tx, ty, tw, 11, 3); gCtx.fill();
+        gCtx.fillStyle = n.type==='memory' ? '#60a5fa' : '#4ade80';
+        gCtx.textAlign = 'center'; gCtx.textBaseline = 'middle';
+        gCtx.fillText(tag, sx, ty + 5.5);
+      }
+      gCtx.restore();
+    }
+  });
+}
+
+function graphLoop(){
   if(!graphVisible) return;
-  simulate();
+  tick();
   draw();
-  animId = requestAnimationFrame(tick);
+  gAnimId = requestAnimationFrame(graphLoop);
 }
 
 function startGraph(){
-  resizeCanvas();
+  resizeGraphCanvas();
   graphVisible = true;
-  if(nodeVisibleCount === 0) nodeVisibleCount = graphNodes.length;
-  if(!animId) tick();
+  if(nodeVisibleCount === 0) nodeVisibleCount = nodes.length;
+  if(!gAnimId) graphLoop();
 }
 
 function stopGraph(){
   graphVisible = false;
-  if(animId){ cancelAnimationFrame(animId); animId = null; }
+  if(gAnimId){ cancelAnimationFrame(gAnimId); gAnimId = null; }
 }
 
 function updateSelCount(){
-  const n = graphNodes.filter(n=>n.selected).length;
+  const n = nodes.filter(n=>n.selected).length;
   $('#map-sel-count').textContent = 'Selected: ' + n + ' node' + (n!==1?'s':'');
 }
 
-/* Mouse/touch interaction */
-function getNodeAt(mx,my){
-  // Reverse order so top-drawn nodes are picked first
-  const visNodes = graphNodes.slice(0, nodeVisibleCount);
-  for(let i=visNodes.length-1;i>=0;i--){
-    const n = visNodes[i];
-    const dx = mx - n.x, dy = my - n.y;
-    if(dx*dx+dy*dy <= (n.radius+4)*(n.radius+4)) return n;
-  }
-  return null;
+/* --- Detail card (inside pane, not fixed to viewport) --- */
+function showDetail(id){
+  const n = nodes[id];
+  const conns = [];
+  edges.forEach(e=>{
+    if(e.source===id) conns.push({node:nodes[e.target], str:e.strength});
+    else if(e.target===id) conns.push({node:nodes[e.source], str:e.strength});
+  });
+  conns.sort((a,b)=>b.str-a.str);
+  const col = TYPE_COLOR[n.type].fill;
+  const card = $('#map-detail-card');
+  card.innerHTML = `<div class="md-label">${n.label}</div>
+    <span class="md-badge" style="background:${col}22;color:${col};border:1px solid ${col}44">${TYPE_TAG[n.type] || 'Tab'}</span>
+    <div>${conns.slice(0,5).map(c=>`<div class="md-conn-row"><span style="width:100px;flex-shrink:0">${c.node.label}</span><div class="bar-bg"><div class="bar" style="width:${c.str*100}%;background:${col}"></div></div><span style="color:#666;font-size:10px">${c.str.toFixed(1)}</span></div>`).join('')}</div>`;
+  card.classList.add('open');
 }
 
-function canvasCoords(e){
-  const rect = canvas.getBoundingClientRect();
-  const t = e.touches ? e.touches[0] || e.changedTouches[0] : e;
-  return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+function hideDetail(){
+  $('#map-detail-card').classList.remove('open');
 }
 
-let mouseDownTime = 0;
-let mouseDownPos = null;
-
-function onPointerDown(e){
-  const p = canvasCoords(e);
-  const n = getNodeAt(p.x, p.y);
-  mouseDownTime = Date.now();
-  mouseDownPos = p;
-  if(n){
-    dragNode = n;
-    e.preventDefault();
+/* --- Hit test --- */
+function hitNode(sx, sy){
+  const vis = nodes.slice(0, nodeVisibleCount);
+  for(let i=vis.length-1;i>=0;i--){
+    const [nx,ny] = toScreen(vis[i].x, vis[i].y);
+    const r = nodeRadius(vis[i]) + 6;
+    if((sx-nx)**2+(sy-ny)**2 < r*r) return vis[i].id;
   }
+  return -1;
 }
 
-function onPointerMove(e){
-  const p = canvasCoords(e);
-  if(dragNode){
-    dragNode.x = p.x;
-    dragNode.y = p.y;
-    dragNode.vx = 0;
-    dragNode.vy = 0;
-    e.preventDefault();
-  }
-  // Hover
-  const n = getNodeAt(p.x, p.y);
-  if(n !== hoverNode){
-    hoverNode = n;
-    canvas.style.cursor = n ? 'pointer' : 'default';
-    // Tooltip
-    const tt = $('#graph-tooltip');
-    if(n){
-      tt.querySelector('.tt-type').textContent = typeTag[n.type] || 'Tab';
-      tt.querySelector('.tt-type').style.color = typeColors[n.type].fill;
-      tt.querySelector('.tt-label').textContent = n.label;
-      tt.querySelector('.tt-source').textContent = n.source;
-      let tx = n.x + n.radius + 10;
-      let ty = n.y - 20;
-      if(tx + 180 > W) tx = n.x - 180 - 10;
-      if(ty < 0) ty = 4;
-      tt.style.left = tx + 'px';
-      tt.style.top = ty + 'px';
-      tt.classList.add('visible');
-    } else {
-      tt.classList.remove('visible');
-    }
-  }
-}
-
-function onPointerUp(e){
-  if(dragNode){
-    const p = canvasCoords(e);
-    const dt = Date.now() - mouseDownTime;
-    const dist = mouseDownPos ? Math.hypot(p.x - mouseDownPos.x, p.y - mouseDownPos.y) : 999;
-    // If short press and barely moved, toggle selection
-    if(dt < 300 && dist < 6){
-      dragNode.selected = !dragNode.selected;
-      updateSelCount();
-    }
-    dragNode = null;
-  }
-}
+/* --- Pointer events (drag + tap to toggle selection) --- */
+let gCanvasEventsSetup = false;
 
 function setupCanvasEvents(){
-  canvas.addEventListener('mousedown', onPointerDown);
-  canvas.addEventListener('mousemove', onPointerMove);
-  canvas.addEventListener('mouseup', onPointerUp);
-  canvas.addEventListener('mouseleave', ()=>{ dragNode=null; hoverNode=null; $('#graph-tooltip').classList.remove('visible'); canvas.style.cursor='default'; });
-  canvas.addEventListener('touchstart', onPointerDown, {passive:false});
-  canvas.addEventListener('touchmove', onPointerMove, {passive:false});
-  canvas.addEventListener('touchend', onPointerUp);
+  if(gCanvasEventsSetup) return;
+  gCanvasEventsSetup = true;
+  const c = $('#graph-canvas');
+
+  c.addEventListener('pointerdown', e=>{
+    const rect = c.getBoundingClientRect();
+    const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
+    gMouseDownTime = Date.now();
+    gMouseDownPos = {x:sx, y:sy};
+    const hit = hitNode(sx, sy);
+    if(hit >= 0){
+      gDragging = hit;
+      const [wx,wy] = toWorld(sx,sy);
+      gDragOX = nodes[hit].x - wx;
+      gDragOY = nodes[hit].y - wy;
+      e.preventDefault();
+    }
+  });
+
+  c.addEventListener('pointermove', e=>{
+    const rect = c.getBoundingClientRect();
+    const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
+    if(gDragging >= 0){
+      const [wx,wy] = toWorld(sx,sy);
+      nodes[gDragging].x = wx + gDragOX;
+      nodes[gDragging].y = wy + gDragOY;
+      nodes[gDragging].vx = 0;
+      nodes[gDragging].vy = 0;
+      e.preventDefault();
+    }
+    // cursor
+    const hit = hitNode(sx, sy);
+    c.style.cursor = hit >= 0 ? 'pointer' : 'default';
+  });
+
+  c.addEventListener('pointerup', e=>{
+    if(gDragging >= 0){
+      const rect = c.getBoundingClientRect();
+      const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
+      const dt = Date.now() - gMouseDownTime;
+      const dist = gMouseDownPos ? Math.hypot(sx - gMouseDownPos.x, sy - gMouseDownPos.y) : 999;
+      // Tap: toggle selection + show detail
+      if(dt < 300 && dist < 6){
+        const n = nodes[gDragging];
+        n.selected = !n.selected;
+        updateSelCount();
+        gSelected = n.id;
+        showDetail(n.id);
+      }
+      gDragging = -1;
+    }
+  });
+
+  c.addEventListener('pointerleave', ()=>{
+    gDragging = -1;
+    c.style.cursor = 'default';
+  });
 }
 
 // Select All / Clear
-$('#map-select-all').onclick = ()=>{ graphNodes.forEach(n=>n.selected=true); updateSelCount(); };
-$('#map-clear').onclick = ()=>{ graphNodes.forEach(n=>n.selected=false); updateSelCount(); };
-
-/* Initialize positions */
-initGraphPositions();
+$('#map-select-all').onclick = ()=>{ nodes.forEach(n=>n.selected=true); updateSelCount(); };
+$('#map-clear').onclick = ()=>{ nodes.forEach(n=>n.selected=false); updateSelCount(); };
 
 /* Action buttons toggle */
 $$('.abtn').forEach(b=>{b.onclick=()=>{b.classList.toggle('on')}});
@@ -972,10 +1004,9 @@ $$('.mode-tab').forEach(t=>{
     const pane=document.getElementById('pane-'+t.dataset.pane);
     if(pane) pane.classList.add('active');
 
-    // Start/stop graph when Map pane is shown/hidden
     if(t.dataset.pane === 'map'){
       requestAnimationFrame(()=>{
-        nodeVisibleCount = graphNodes.length;
+        nodeVisibleCount = nodes.length;
         startGraph();
         setupCanvasEvents();
         updateSelCount();
@@ -1027,68 +1058,39 @@ async function streamText(bubble,text,speed){
   }
 }
 
-/* Scroll-based keyword detection + recommendation */
+/* ══════════ Scroll-based recommendation cards (bottom-to-top) ══════════ */
 const kwElements=document.querySelectorAll('.kw');
-const recoWidget=$('#reco-widget');
 const viewport=$('#viewport');
+const recoCards = [
+  $('#reco-card-1'),
+  $('#reco-card-2'),
+  $('#reco-card-3'),
+];
+const recoThresholds = [0.30, 0.55, 0.80];
 
-const recoData={
-  'vector database':{
-    thumb:'sqlite-vec: fast vector<br>search in the browser',
-    hl:'sqlite-vec: vector search in 200 LOC',
-    why:'先週 EmbeddingGemma + sqlite-vec を検討 — 今の記事と直結',
-    src:'GitHub'
-  },
-  'sqlite-vec':{
-    thumb:'sqlite-vec: fast vector<br>search in the browser',
-    hl:'sqlite-vec: vector search in 200 LOC',
-    why:'先週 EmbeddingGemma + sqlite-vec を検討 — 今の記事と直結',
-    src:'GitHub'
-  },
-  'embedding':{
-    thumb:'Embedding models<br>comparison 2025',
-    hl:'EmbeddingGemma vs Cohere: 性能比較',
-    why:'embedding パイプライン設計で検討中のモデルに関連',
-    src:'HN'
-  },
-  'memex':{
-    thumb:'Memex (Wikipedia)<br>Bush\'s original vision',
-    hl:'Memex — Wikipedia',
-    why:'この記事の核心概念。Bush の原典で理解を深める',
-    src:'Wikipedia'
-  }
-};
-
-let lastRecoKey='';
 let scrollHighlightEnabled=true;
 
 viewport.addEventListener('scroll',()=>{
   if(!scrollHighlightEnabled) return;
-  const scrollPct=viewport.scrollTop/(viewport.scrollHeight-viewport.clientHeight);
-  const vpRect=viewport.getBoundingClientRect();
+  const scrollPct = viewport.scrollTop / (viewport.scrollHeight - viewport.clientHeight);
+  const vpRect = viewport.getBoundingClientRect();
 
-  let detectedKw='';
+  // Keyword highlighting
   kwElements.forEach(el=>{
-    const r=el.getBoundingClientRect();
-    if(r.top<vpRect.bottom && r.bottom>vpRect.top){
+    const r = el.getBoundingClientRect();
+    if(r.top < vpRect.bottom && r.bottom > vpRect.top){
       el.classList.add('kw-highlight','revealed');
-      detectedKw=el.dataset.kw;
     }
   });
 
-  if(scrollPct>=0.5){
-    recoWidget.classList.add('visible');
-    if(detectedKw && recoData[detectedKw] && detectedKw!==lastRecoKey){
-      lastRecoKey=detectedKw;
-      const d=recoData[detectedKw];
-      $('#reco-thumb').innerHTML=d.thumb;
-      $('#reco-hl').textContent=d.hl;
-      $('#reco-why').textContent=d.why;
-      $('#reco-src-label').textContent=d.src;
+  // Show/hide recommendation cards based on scroll thresholds
+  recoCards.forEach((card, i)=>{
+    if(scrollPct >= recoThresholds[i]){
+      card.classList.add('visible');
+    } else {
+      card.classList.remove('visible');
     }
-  } else {
-    recoWidget.classList.remove('visible');
-  }
+  });
 });
 
 /* Tab opening animation */
@@ -1153,7 +1155,6 @@ async function handleAsk(text){
   const msg=addChatMsg('asst','');
   await streamText(msg.querySelector('.chat-bubble'),resp,16);
 
-  /* If auto command to open links, animate tabs */
   if(text==='この記事の関連リンクを全部開いて'){
     await slp(300);
     await addAutoTab('Memex (Wikipedia)','fi-wiki','W',0);
@@ -1178,7 +1179,7 @@ function hideStep(){
 
 /* Resize observer for graph canvas */
 const mapResizeObs = new ResizeObserver(()=>{
-  if(graphVisible){ resizeCanvas(); }
+  if(graphVisible){ resizeGraphCanvas(); }
 });
 const mapWrap = $('#map-canvas-wrap');
 if(mapWrap) mapResizeObs.observe(mapWrap);
@@ -1194,14 +1195,15 @@ demoBtn.onclick=()=>{void(async()=>{
   $$('.mode-tab')[0].click();
   $$('.mode-btn')[0].click();
   removeAutoTabs();
-  recoWidget.classList.remove('visible');
+  recoCards.forEach(c=>c.classList.remove('visible'));
   kwElements.forEach(el=>el.classList.remove('kw-highlight','revealed'));
-  lastRecoKey='';
   viewport.scrollTo({top:0});
   // Reset graph selection
-  graphNodes.forEach((n,i)=>{
-    n.selected = (n.type === 'current'); // current tab topics start selected
+  nodes.forEach(n=>{
+    n.selected = (n.type === 'current');
   });
+  gSelected = -1;
+  hideDetail();
   nodeVisibleCount = 0;
   stopGraph();
   await slp(500);
@@ -1250,15 +1252,19 @@ demoBtn.onclick=()=>{void(async()=>{
   await slp(5000);
   hideStep();
 
-  /* Step 5: Scroll to trigger keyword detection + recommendation */
+  /* Step 5: Scroll to trigger keyword detection + recommendation stack */
   await showStep('Step 5/8 — スクロール: キーワード検出');
   scrollHighlightEnabled=true;
   viewport.scrollTo({top:350,behavior:'smooth'});
   await slp(1500);
-  viewport.scrollTo({top:600,behavior:'smooth'});
+  await showStep('Step 5/8 — 30%: レコメンド1枚目');
+  viewport.scrollTo({top:viewport.scrollHeight*0.35,behavior:'smooth'});
   await slp(1500);
-  await showStep('Step 5/8 — 50%到達: レコメンド表示');
+  await showStep('Step 5/8 — 55%: レコメンド2枚目');
   viewport.scrollTo({top:viewport.scrollHeight*0.6,behavior:'smooth'});
+  await slp(1500);
+  await showStep('Step 5/8 — 80%: レコメンド3枚目');
+  viewport.scrollTo({top:viewport.scrollHeight*0.85,behavior:'smooth'});
   await slp(2000);
   hideStep();
 
@@ -1270,14 +1276,15 @@ demoBtn.onclick=()=>{void(async()=>{
 
   /* Step 7: Show Map tab — Knowledge Graph with staggered nodes */
   await showStep('Step 7/8 — Context Map: Knowledge Graph');
-  // Reset positions for clean animation
-  initGraphPositions();
+  initPositions();
   nodeVisibleCount = 0;
+  gSelected = -1;
+  hideDetail();
   $$('.mode-tab')[2].click();
   await slp(300);
 
   // Stagger node appearance
-  for(let i = 0; i < graphNodes.length; i++){
+  for(let i = 0; i < nodes.length; i++){
     nodeVisibleCount = i + 1;
     updateSelCount();
     await slp(200);
@@ -1286,23 +1293,23 @@ demoBtn.onclick=()=>{void(async()=>{
   // Let physics settle
   await slp(1500);
 
-  // Demo: user deselects a node, then selects a memory node
+  // Demo: user taps nodes
   await showStep('Step 7/8 — ノード選択/解除');
   await slp(600);
   // Deselect "AI Browser"
-  const aiBrowser = nodeById('ai-browser');
-  if(aiBrowser){ aiBrowser.selected = false; updateSelCount(); }
+  const aiBrowser = nodes.find(n=>n.label==='AI Browser');
+  if(aiBrowser){ aiBrowser.selected = false; gSelected = aiBrowser.id; showDetail(aiBrowser.id); updateSelCount(); }
   await slp(800);
-  // Select "sqlite-vec research"
-  const sqliteVec = nodeById('sqlite-vec');
-  if(sqliteVec){ sqliteVec.selected = true; updateSelCount(); }
+  // Select "sqlite-vec"
+  const sqliteVec = nodes.find(n=>n.label==='sqlite-vec');
+  if(sqliteVec){ sqliteVec.selected = true; gSelected = sqliteVec.id; showDetail(sqliteVec.id); updateSelCount(); }
   await slp(800);
-  // Select "ArXiv: Mem0 paper"
-  const arxiv = nodeById('arxiv-mem0');
-  if(arxiv){ arxiv.selected = true; updateSelCount(); }
+  // Select "ArXiv: Mem0"
+  const arxiv = nodes.find(n=>n.label==='ArXiv: Mem0');
+  if(arxiv){ arxiv.selected = true; gSelected = arxiv.id; showDetail(arxiv.id); updateSelCount(); }
   await slp(800);
   // Re-select "AI Browser"
-  if(aiBrowser){ aiBrowser.selected = true; updateSelCount(); }
+  if(aiBrowser){ aiBrowser.selected = true; gSelected = aiBrowser.id; showDetail(aiBrowser.id); updateSelCount(); }
   await slp(1200);
   hideStep();
 
