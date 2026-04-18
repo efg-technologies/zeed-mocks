@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Zeed — SP Right-Edge Bar</title>
+<title>Zeed — SP Context Map</title>
 <style>
 :root{--gl:rgba(22,22,28,.88);--bdr:rgba(60,60,70,.45);--ac:#5b21b6;--acb:#a78bfa;--acs:rgba(91,33,182,.25);--tx:#e8e8e8;--sub:#9e9ea8;--fnt:#6b6b73}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Hiragino Sans",sans-serif;background:#fafafa;color:#1a1a1a;overscroll-behavior:none;overflow-y:scroll;scrollbar-gutter:stable}
+html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Hiragino Sans",sans-serif;background:#fafafa;color:#1a1a1a;overscroll-behavior:none}
 button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
 input{font:inherit;border:none;outline:none}
 
-/* ═══ Demo tag label (top-left) ═══ */
+/* Demo tag label (top-left) */
 .tag-label{
   position:fixed;top:max(6px,env(safe-area-inset-top));left:6px;z-index:60;
   background:var(--gl);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
@@ -21,10 +21,10 @@ input{font:inherit;border:none;outline:none}
 }
 .tag-label svg{width:8px;height:8px;stroke:var(--acb);fill:none;stroke-width:2;vertical-align:-1px;margin-right:3px}
 
-/* ═══ Article page ═══ */
+/* Article page */
 .page{
   min-height:100vh;padding:max(44px,calc(env(safe-area-inset-top) + 8px)) 16px 100px;
-  padding-right:42px;/* room for the right bar (36px) + 6px breathing room */
+  padding-right:50px;
   max-width:640px;margin:0 auto;font-size:14px;line-height:1.72;color:#2a2a31;
 }
 .page h1{font-size:18px;line-height:1.3;margin:0 0 3px;color:#111;font-weight:700}
@@ -33,9 +33,9 @@ input{font:inherit;border:none;outline:none}
 .page h2{font-size:14px;margin:18px 0 5px;color:#111;font-weight:600}
 .page .img-ph{width:100%;height:90px;border-radius:6px;margin:10px 0;background:linear-gradient(135deg,#eee,#ddd)}
 
-/* ═══ Right-edge fixed bar — single glass strip ═══ */
+/* Right-edge fixed bar */
 .r-bar{
-  position:fixed;top:0;right:0;bottom:0;width:36px;z-index:40;
+  position:fixed;top:0;right:0;bottom:0;width:44px;z-index:40;
   display:flex;flex-direction:column;align-items:center;
   padding:max(6px,env(safe-area-inset-top)) 0 max(6px,env(safe-area-inset-bottom));
   background:rgba(22,22,28,.75);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
@@ -45,40 +45,40 @@ input{font:inherit;border:none;outline:none}
 .r-bar-mid{
   flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
 }
-.r-sep{width:20px;height:0;border-top:0.5px dotted var(--bdr);margin:3px 0;flex-shrink:0}
+.r-sep{width:24px;height:0;border-top:0.5px dotted var(--bdr);margin:4px 0;flex-shrink:0}
 
 .rbtn{
-  width:28px;height:28px;display:grid;place-items:center;border-radius:6px;
+  width:32px;height:32px;display:grid;place-items:center;border-radius:7px;
   transition:background .12s,transform .1s;-webkit-user-select:none;user-select:none;
   position:relative;flex-shrink:0;
 }
-.rbtn svg{width:15px;height:15px;stroke:var(--sub);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s,fill .15s}
+.rbtn svg{width:17px;height:17px;stroke:var(--sub);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s,fill .15s}
 .rbtn:active{transform:scale(.85);background:rgba(255,255,255,.08)}
 .rbtn.on svg{stroke:var(--acb);fill:var(--acs)}
 .rbtn.on-nofill svg{stroke:var(--acb);fill:none}
 .rbtn.pop svg{animation:pop .3s ease}
 @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.35)}70%{transform:scale(.92)}100%{transform:scale(1.05)}}
 
-/* ═══ Badge on Next button ═══ */
+/* Badge on Next button */
 .next-badge{
   position:absolute;top:-2px;right:-2px;
-  width:13px;height:13px;border-radius:50%;
+  width:14px;height:14px;border-radius:50%;
   background:var(--ac);color:#fff;
-  font-size:7.5px;font-weight:700;line-height:13px;text-align:center;
+  font-size:8px;font-weight:700;line-height:14px;text-align:center;
   pointer-events:none;
   transform:scale(0);transition:transform .25s cubic-bezier(.34,1.56,.64,1);
 }
 .next-badge.show{transform:scale(1)}
 
-/* ═══ Flyout panels ═══ */
+/* Flyout panels */
 .flyout{
-  position:fixed;top:0;bottom:0;right:36px;width:200px;z-index:35;
+  position:fixed;top:0;bottom:0;right:44px;width:220px;z-index:35;
   background:var(--gl);backdrop-filter:blur(22px) saturate(1.3);-webkit-backdrop-filter:blur(22px) saturate(1.3);
   border-left:1px solid var(--bdr);
   color:var(--tx);font-size:11px;
   transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
   overflow-y:auto;overscroll-behavior:contain;
-  padding:max(11px,calc(env(safe-area-inset-top) + 5px)) 10px 16px;
+  padding:max(14px,calc(env(safe-area-inset-top) + 6px)) 12px 20px;
 }
 .flyout.open{transform:translateX(0)}
 .flyout-backdrop{
@@ -88,48 +88,42 @@ input{font:inherit;border:none;outline:none}
 .flyout-backdrop.show{opacity:1;pointer-events:auto}
 
 /* Flyout typography */
-.fly-h{font-size:11px;font-weight:700;color:var(--acb);margin-bottom:5px;letter-spacing:.04em;display:flex;align-items:center;gap:4px}
-.fly-h svg{width:13px;height:13px;stroke:var(--acb);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.fly-sub{font-size:9px;color:var(--sub);margin-bottom:6px}
-.fly-section{margin-bottom:10px}
+.fly-h{font-size:11px;font-weight:700;color:var(--acb);margin-bottom:6px;letter-spacing:.04em;display:flex;align-items:center;gap:5px}
+.fly-h svg{width:14px;height:14px;stroke:var(--acb);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.fly-sub{font-size:9px;color:var(--sub);margin-bottom:8px}
+.fly-section{margin-bottom:12px}
 
-/* AI Structure / Insight flyout */
+/* Struct tags */
 .struct-tag{
-  display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:500;
+  display:inline-block;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:500;
   background:rgba(167,139,250,.12);color:var(--acb);border:1px solid rgba(167,139,250,.18);
-  margin:0 2px 3px 0;
+  margin:0 3px 4px 0;
 }
 .struct-item{
-  padding:4px 0;border-bottom:1px solid rgba(60,60,70,.25);font-size:10px;color:var(--tx);line-height:1.4;
+  padding:5px 0;border-bottom:1px solid rgba(60,60,70,.25);font-size:10px;color:var(--tx);line-height:1.4;
 }
 .struct-item:last-child{border-bottom:none}
 .struct-label{font-size:8px;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
 
-/* Knowledge tree (inside Insight flyout) */
-.mind-tree{
-  font-family:"SF Mono",Menlo,monospace;font-size:8.5px;line-height:1.45;color:var(--sub);
-  background:rgba(15,15,18,.5);border-radius:5px;padding:5px;white-space:pre;overflow-x:auto;
-}
-
 /* Recommendation flyout */
 .reco-thumb{
-  width:100%;height:44px;border-radius:5px;margin-bottom:5px;
+  width:100%;height:52px;border-radius:6px;margin-bottom:6px;
   background:linear-gradient(135deg,var(--ac),#1e1b4b);
-  display:grid;place-items:center;color:rgba(255,255,255,.85);font-size:10px;font-weight:600;line-height:1.3;text-align:center;padding:0 6px;
+  display:grid;place-items:center;color:rgba(255,255,255,.85);font-size:10px;font-weight:600;line-height:1.3;text-align:center;padding:0 8px;
 }
 .reco-hl{font-size:10.5px;font-weight:600;line-height:1.3;margin-bottom:2px}
-.reco-why{font-size:9px;color:var(--sub);line-height:1.35;margin-bottom:5px}
+.reco-why{font-size:9px;color:var(--sub);line-height:1.4;margin-bottom:6px}
 .reco-btns{display:flex;gap:4px}
 .reco-btn{
-  flex:1;padding:4px;border-radius:5px;font-size:9px;text-align:center;
+  flex:1;padding:5px;border-radius:5px;font-size:9px;text-align:center;
   border:1px solid rgba(60,60,70,.4);background:rgba(26,26,31,.7);color:var(--tx);
 }
 .reco-btn.pri{border-color:var(--ac);background:var(--ac);color:#fff}
 
-/* ═══ Bottom chat bar ═══ */
+/* Bottom chat bar */
 .chat-bar{
   position:fixed;bottom:max(8px,env(safe-area-inset-bottom));
-  left:8px;right:42px;z-index:50;
+  left:8px;right:52px;z-index:50;
   display:flex;align-items:center;gap:6px;
   background:var(--gl);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);
   border:1px solid var(--bdr);border-radius:12px;
@@ -154,11 +148,11 @@ input{font:inherit;border:none;outline:none}
   background:var(--gl);padding:1px 5px;border-radius:3px;border:1px solid var(--bdr);
 }
 
-/* ═══ Chat response popover (above chat bar) ═══ */
+/* Chat response popover */
 .chat-response{
   position:fixed;
   bottom:calc(max(8px,env(safe-area-inset-bottom)) + 50px);
-  left:8px;right:42px;z-index:51;
+  left:8px;right:52px;z-index:51;
   background:rgba(22,22,28,.92);backdrop-filter:blur(22px) saturate(1.3);-webkit-backdrop-filter:blur(22px) saturate(1.3);
   border:1px solid var(--bdr);border-radius:10px;
   padding:10px 12px;
@@ -178,9 +172,92 @@ input{font:inherit;border:none;outline:none}
 .chat-response-close:active{background:rgba(255,255,255,.12)}
 .chat-response-label{font-size:8px;font-weight:600;color:var(--acb);letter-spacing:.04em;margin-bottom:4px}
 
-/* ═══ Typing animation for demo ═══ */
+/* Typing animation for demo */
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 .typing-cursor{animation:blink .6s step-end infinite;color:var(--acb)}
+
+/* ═══ Graph-specific styles ═══ */
+/* Compact graph in flyout */
+.graph-compact{
+  width:100%;height:180px;
+  background:rgba(15,15,18,.5);border-radius:6px;
+  overflow:hidden;position:relative;
+  margin-bottom:8px;
+}
+.graph-compact svg{width:100%;height:100%}
+
+/* Graph footer in flyout */
+.graph-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;
+}
+.graph-selected{font-size:9px;color:var(--sub)}
+.graph-selected span{color:var(--acb);font-weight:600}
+.graph-expand-btn{
+  padding:4px 10px;border-radius:5px;font-size:9px;font-weight:600;
+  background:rgba(91,33,182,.25);color:var(--acb);border:1px solid rgba(167,139,250,.2);
+  transition:background .15s;
+}
+.graph-expand-btn:active{background:rgba(91,33,182,.4)}
+
+/* Legend */
+.graph-legend{
+  display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;
+}
+.graph-legend-item{
+  display:flex;align-items:center;gap:3px;font-size:7.5px;color:var(--sub);
+}
+.graph-legend-dot{width:6px;height:6px;border-radius:50%}
+
+/* Full-screen graph overlay */
+.graph-fullscreen{
+  position:fixed;inset:0;z-index:70;
+  background:rgba(12,12,16,.95);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  display:flex;flex-direction:column;
+  opacity:0;pointer-events:none;
+  transition:opacity .25s ease;
+}
+.graph-fullscreen.open{opacity:1;pointer-events:auto}
+
+.graph-fs-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:max(10px,env(safe-area-inset-top)) 14px 8px;
+  flex-shrink:0;
+}
+.graph-fs-title{font-size:14px;font-weight:700;color:var(--acb);letter-spacing:.03em}
+.graph-fs-close{
+  width:28px;height:28px;border-radius:6px;display:grid;place-items:center;
+  background:rgba(255,255,255,.06);border:1px solid var(--bdr);
+}
+.graph-fs-close svg{width:14px;height:14px;stroke:var(--sub);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.graph-fs-close:active{background:rgba(255,255,255,.12)}
+
+.graph-fs-canvas{flex:1;position:relative;overflow:hidden}
+.graph-fs-canvas canvas{width:100%;height:100%;display:block}
+
+.graph-fs-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px max(10px,env(safe-area-inset-bottom));
+  flex-shrink:0;
+  border-top:1px solid var(--bdr);
+}
+.graph-fs-info{font-size:10px;color:var(--sub);line-height:1.3}
+.graph-fs-info span{color:var(--acb);font-weight:600}
+.graph-fs-done{
+  padding:7px 18px;border-radius:7px;font-size:11px;font-weight:600;
+  background:var(--ac);color:#fff;
+  transition:transform .1s;
+}
+.graph-fs-done:active{transform:scale(.93)}
+
+/* Legend in full-screen */
+.graph-fs-legend{
+  display:flex;gap:12px;padding:0 14px 6px;flex-shrink:0;
+}
+.graph-fs-legend-item{
+  display:flex;align-items:center;gap:4px;font-size:9px;color:var(--sub);
+}
+.graph-fs-legend-dot{width:7px;height:7px;border-radius:50%}
 </style>
 </head>
 <body>
@@ -191,7 +268,7 @@ input{font:inherit;border:none;outline:none}
   Demo
 </div>
 
-<!-- ═══ Article content ═══ -->
+<!-- Article content -->
 <article class="page">
   <h1>The Memex We Didn't Get — And the Browser That Might Finally Deliver It</h1>
   <div class="meta">news.ycombinator.com &middot; 287 pts &middot; 42 comments</div>
@@ -206,18 +283,14 @@ input{font:inherit;border:none;outline:none}
   <p>"I don't want to chat with my tabs. I want my browser to understand what I'm working on." — top comment</p>
 </article>
 
-<!-- ═══ Right-edge fixed bar (6 icons: Insight top, 4 mid, Next bottom) ═══ -->
+<!-- Right-edge fixed bar -->
 <div class="r-bar">
-  <!-- Top: Insight (merged AI構造 + 記憶) -->
   <div class="r-bar-top">
     <button class="rbtn" id="btn-insight" data-flyout="fly-insight">
       <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
     </button>
   </div>
-
   <div class="r-sep"></div>
-
-  <!-- Mid: 4 action icons (like, bookmark, remind, RSS) -->
   <div class="r-bar-mid">
     <button class="rbtn" id="btn-like">
       <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -232,10 +305,7 @@ input{font:inherit;border:none;outline:none}
       <svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.5"/><path d="M4 4a16 16 0 0 1 16 16"/><path d="M4 11a9 9 0 0 1 9 9"/></svg>
     </button>
   </div>
-
   <div class="r-sep"></div>
-
-  <!-- Bot: Next -->
   <div class="r-bar-bot">
     <button class="rbtn" id="btn-next" data-flyout="fly-next">
       <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
@@ -244,68 +314,47 @@ input{font:inherit;border:none;outline:none}
   </div>
 </div>
 
-<!-- ═══ Flyout backdrop ═══ -->
+<!-- Flyout backdrop -->
 <div class="flyout-backdrop" id="fly-backdrop"></div>
 
-<!-- ═══ Flyout: Insight (merged AI構造 + 記憶) ═══ -->
+<!-- Flyout: Insight — now with compact graph -->
 <div class="flyout" id="fly-insight">
   <div class="fly-section">
     <div class="fly-h">
       <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
       Insight
     </div>
-    <div class="fly-sub">ページ分析 &middot; あなたの記憶</div>
+    <div class="fly-sub">Context Map &middot; ノードを選んで文脈を指定</div>
   </div>
 
-  <!-- Page structure section -->
-  <div class="fly-section">
-    <div class="struct-label">Key Topics</div>
-    <div><span class="struct-tag">Memex</span><span class="struct-tag">AI Browser</span><span class="struct-tag">Knowledge Mgmt</span><span class="struct-tag">Vector DB</span></div>
+  <!-- Compact force graph -->
+  <div class="graph-compact" id="graph-compact">
+    <svg id="graph-svg"></svg>
   </div>
-  <div class="fly-section">
-    <div class="struct-label">Entities</div>
-    <div class="struct-item">Vannevar Bush — 1945 Memex 提唱者</div>
-    <div class="struct-item">Comet / Atlas / Dia — 競合AIブラウザ</div>
-    <div class="struct-item">Chromium — ベースエンジン</div>
+
+  <!-- Legend -->
+  <div class="graph-legend">
+    <div class="graph-legend-item"><div class="graph-legend-dot" style="background:#a78bfa"></div>Page</div>
+    <div class="graph-legend-item"><div class="graph-legend-dot" style="background:#60a5fa"></div>Memory</div>
+    <div class="graph-legend-item"><div class="graph-legend-dot" style="background:#34d399"></div>External</div>
   </div>
-  <div class="fly-section">
-    <div class="struct-label">Structure</div>
-    <div class="struct-item">1. 導入: Memex の歴史</div>
-    <div class="struct-item">2. 問題提起: 現状のAIブラウザの限界</div>
-    <div class="struct-item">3. 提案: 階層的コンテキスト</div>
-    <div class="struct-item">4. 議論: ユーザーの声</div>
+
+  <!-- Footer: selected count + expand -->
+  <div class="graph-footer">
+    <div class="graph-selected">Selected: <span id="compact-sel-count">0</span></div>
+    <button class="graph-expand-btn" id="graph-expand-btn">Expand</button>
   </div>
+
+  <div class="r-sep" style="width:100%;margin:4px 0"></div>
+
+  <!-- Keep a small Zeed relevance note -->
   <div class="fly-section">
     <div class="struct-label">Zeed Relevance</div>
-    <div style="font-size:9.5px;color:var(--acb);line-height:1.4">この記事は Zeed の中核コンセプト（Profile/TG/Tab 階層記憶）と直接関連しています</div>
-  </div>
-
-  <!-- Separator between page analysis and knowledge tree -->
-  <div class="r-sep" style="width:100%;margin:6px 0"></div>
-
-  <!-- Knowledge tree section (from Memory) -->
-  <div class="fly-section">
-    <div class="struct-label">Knowledge Tree</div>
-    <div class="mind-tree">Memex
-├ extract→embed ✓
-├ Vector DB (1.5b)
-├ Profile/TG/Tab
-└ 記憶=ユーザーのもの
-
-AI Browser
-├ Zeed concept ✓
-├ sidebar vs article
-├ CC×MCP layer
-└ 3層の問題構造</div>
-  </div>
-  <div class="fly-section">
-    <div class="struct-label">Recent Decisions</div>
-    <div class="struct-item">sidebar-first → article-first に方向転換</div>
-    <div class="struct-item">EmbeddingGemma + sqlite-vec を検討中</div>
+    <div style="font-size:9.5px;color:var(--acb);line-height:1.4">ノードを選択すると、Zeed AI の回答がそのコンテキストに基づきます</div>
   </div>
 </div>
 
-<!-- ═══ Flyout: Next ═══ -->
+<!-- Flyout: Next -->
 <div class="flyout" id="fly-next">
   <div class="fly-section">
     <div class="fly-h">
@@ -323,7 +372,7 @@ AI Browser
       <button class="reco-btn pri">開く</button>
     </div>
   </div>
-  <div class="r-sep reco-card-sep" id="reco-sep-2" style="width:100%;margin:6px 0;display:none"></div>
+  <div class="r-sep reco-card-sep" id="reco-sep-2" style="width:100%;margin:8px 0;display:none"></div>
   <div class="fly-section reco-card" id="reco-card-2" style="display:none">
     <div class="reco-thumb" style="background:linear-gradient(135deg,#1e3a5f,#0f172a)">Embedding Models<br>Comparison 2026</div>
     <div class="reco-hl">Embedding model benchmarks: 最新比較</div>
@@ -335,7 +384,29 @@ AI Browser
   </div>
 </div>
 
-<!-- ═══ Bottom chat bar ═══ -->
+<!-- Full-screen graph overlay -->
+<div class="graph-fullscreen" id="graph-fullscreen">
+  <div class="graph-fs-header">
+    <div class="graph-fs-title">Context Map</div>
+    <button class="graph-fs-close" id="graph-fs-close">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="graph-fs-legend">
+    <div class="graph-fs-legend-item"><div class="graph-fs-legend-dot" style="background:#a78bfa"></div>Current Page</div>
+    <div class="graph-fs-legend-item"><div class="graph-fs-legend-dot" style="background:#60a5fa"></div>Memory</div>
+    <div class="graph-fs-legend-item"><div class="graph-fs-legend-dot" style="background:#34d399"></div>RSS / Web</div>
+  </div>
+  <div class="graph-fs-canvas" id="graph-fs-canvas">
+    <canvas id="graph-canvas"></canvas>
+  </div>
+  <div class="graph-fs-footer">
+    <div class="graph-fs-info">Selected: <span id="fs-sel-count">0</span> nodes<br><span style="font-size:8.5px;color:var(--fnt)">these ground Zeed's answers</span></div>
+    <button class="graph-fs-done" id="graph-fs-done">Done</button>
+  </div>
+</div>
+
+<!-- Bottom chat bar -->
 <div class="chat-bar" id="chat-bar">
   <span class="chat-label">Zeed AI</span>
   <input type="text" id="chat-input" placeholder="AIに聞く...">
@@ -344,7 +415,7 @@ AI Browser
   </button>
 </div>
 
-<!-- ═══ Chat response popover (above chat bar) ═══ -->
+<!-- Chat response popover -->
 <div class="chat-response" id="chat-response">
   <button class="chat-response-close" id="chat-response-close">
     <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -359,7 +430,337 @@ const $=s=>document.querySelector(s);
 const $$=s=>document.querySelectorAll(s);
 const slp=ms=>new Promise(r=>setTimeout(r,ms));
 
-/* ── Flyout management ── */
+/* ═══════════════════════════════════════════
+   Graph Node Data
+   ═══════════════════════════════════════════ */
+const NODES=[
+  // Current page (purple) — center cluster
+  {id:'memex',       label:'Memex',           type:'page',   selected:false},
+  {id:'ai-browser',  label:'AI Browser',      type:'page',   selected:false},
+  {id:'vector-db',   label:'vector database', type:'page',   selected:false},
+  {id:'knowledge-graph',label:'knowledge graph',type:'page', selected:false},
+  // Memory (blue)
+  {id:'sqlite-vec',  label:'sqlite-vec',      type:'memory', selected:false},
+  {id:'embed-gemma', label:'EmbeddingGemma',  type:'memory', selected:false},
+  {id:'profile-tg',  label:'Profile/TG/Tab',  type:'memory', selected:false},
+  {id:'chromium',    label:'Chromium build',   type:'memory', selected:false},
+  // RSS/Web (green)
+  {id:'hn-localdb',  label:'HN: Local-first DB',type:'rss',  selected:false},
+  {id:'arxiv-mem0',  label:'ArXiv: Mem0',     type:'rss',    selected:false},
+  {id:'gh-lancedb',  label:'GitHub: LanceDB', type:'rss',    selected:false},
+];
+
+const EDGES=[
+  ['memex','ai-browser'],
+  ['memex','knowledge-graph'],
+  ['ai-browser','vector-db'],
+  ['ai-browser','chromium'],
+  ['vector-db','sqlite-vec'],
+  ['vector-db','embed-gemma'],
+  ['vector-db','gh-lancedb'],
+  ['knowledge-graph','profile-tg'],
+  ['sqlite-vec','hn-localdb'],
+  ['embed-gemma','arxiv-mem0'],
+  ['profile-tg','chromium'],
+  ['hn-localdb','gh-lancedb'],
+  ['arxiv-mem0','gh-lancedb'],
+  ['memex','profile-tg'],
+  ['ai-browser','profile-tg'],
+];
+
+const TYPE_COLORS={page:'#a78bfa',memory:'#60a5fa',rss:'#34d399'};
+const TYPE_GLOW={page:'rgba(167,139,250,.5)',memory:'rgba(96,165,250,.5)',rss:'rgba(52,211,153,.5)'};
+
+/* Index for quick lookup */
+const nodeMap=Object.create(null);
+NODES.forEach(n=>nodeMap[n.id]=n);
+
+function selectedCount(){return NODES.filter(n=>n.selected).length}
+
+function updateSelCounters(){
+  const c=selectedCount();
+  $('#compact-sel-count').textContent=c;
+  $('#fs-sel-count').textContent=c;
+}
+
+function toggleNode(id){
+  const n=nodeMap[id];
+  if(n){n.selected=!n.selected;updateSelCounters();}
+}
+
+/* ═══════════════════════════════════════════
+   Force simulation (shared, simple)
+   ═══════════════════════════════════════════ */
+function initPositions(w,h){
+  const cx=w/2,cy=h/2;
+  NODES.forEach((n,i)=>{
+    // Cluster by type
+    const angle=(i/NODES.length)*Math.PI*2;
+    let dist=0;
+    if(n.type==='page') dist=w*0.12;
+    else if(n.type==='memory') dist=w*0.3;
+    else dist=w*0.38;
+    n.x=cx+Math.cos(angle)*dist+(Math.random()-0.5)*20;
+    n.y=cy+Math.sin(angle)*dist+(Math.random()-0.5)*20;
+    n.vx=0;n.vy=0;
+  });
+}
+
+function simulate(w,h,iterations){
+  const cx=w/2,cy=h/2;
+  for(let iter=0;iter<iterations;iter++){
+    const alpha=0.3*(1-iter/iterations);
+    // Repulsion between all nodes
+    for(let i=0;i<NODES.length;i++){
+      for(let j=i+1;j<NODES.length;j++){
+        let dx=NODES[j].x-NODES[i].x;
+        let dy=NODES[j].y-NODES[i].y;
+        let d=Math.sqrt(dx*dx+dy*dy)||1;
+        let force=800/(d*d);
+        let fx=dx/d*force*alpha;
+        let fy=dy/d*force*alpha;
+        NODES[i].x-=fx;NODES[i].y-=fy;
+        NODES[j].x+=fx;NODES[j].y+=fy;
+      }
+    }
+    // Attraction along edges
+    EDGES.forEach(([a,b])=>{
+      const na=nodeMap[a],nb=nodeMap[b];
+      let dx=nb.x-na.x,dy=nb.y-na.y;
+      let d=Math.sqrt(dx*dx+dy*dy)||1;
+      let targetDist=w*0.18;
+      let force=(d-targetDist)*0.05*alpha;
+      let fx=dx/d*force,fy=dy/d*force;
+      na.x+=fx;na.y+=fy;
+      nb.x-=fx;nb.y-=fy;
+    });
+    // Center gravity
+    NODES.forEach(n=>{
+      n.x+=(cx-n.x)*0.02*alpha;
+      n.y+=(cy-n.y)*0.02*alpha;
+    });
+    // Bounds
+    const pad=24;
+    NODES.forEach(n=>{
+      n.x=Math.max(pad,Math.min(w-pad,n.x));
+      n.y=Math.max(pad,Math.min(h-pad,n.y));
+    });
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Compact SVG Graph (flyout)
+   ═══════════════════════════════════════════ */
+function renderCompactGraph(){
+  const container=$('#graph-compact');
+  const w=container.clientWidth||196;
+  const h=container.clientHeight||180;
+  const svg=$('#graph-svg');
+
+  initPositions(w,h);
+  simulate(w,h,120);
+
+  // Build SVG
+  let html='';
+  // Edges
+  EDGES.forEach(([a,b])=>{
+    const na=nodeMap[a],nb=nodeMap[b];
+    html+=`<line x1="${na.x}" y1="${na.y}" x2="${nb.x}" y2="${nb.y}" stroke="rgba(255,255,255,.07)" stroke-width="0.8"/>`;
+  });
+  // Nodes
+  NODES.forEach(n=>{
+    const col=TYPE_COLORS[n.type];
+    const glow=TYPE_GLOW[n.type];
+    const r=n.selected?6:4.5;
+    if(n.selected){
+      html+=`<circle cx="${n.x}" cy="${n.y}" r="${r+4}" fill="${glow}" opacity="0.4"/>`;
+      html+=`<circle cx="${n.x}" cy="${n.y}" r="${r}" fill="${col}" stroke="${col}" stroke-width="1.2" data-node="${n.id}" style="cursor:pointer"/>`;
+    } else {
+      html+=`<circle cx="${n.x}" cy="${n.y}" r="${r}" fill="none" stroke="${col}" stroke-width="1" opacity="0.5" data-node="${n.id}" style="cursor:pointer"/>`;
+    }
+    // Label
+    html+=`<text x="${n.x}" y="${n.y+r+9}" text-anchor="middle" fill="${n.selected?col:'rgba(255,255,255,.4)'}" font-size="8" font-family="-apple-system,sans-serif" font-weight="${n.selected?'600':'400'}">${n.label}</text>`;
+  });
+
+  svg.innerHTML=html;
+  svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+
+  // Click handlers on nodes
+  svg.querySelectorAll('[data-node]').forEach(el=>{
+    el.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      toggleNode(el.dataset.node);
+      renderCompactGraph();
+    });
+  });
+  // Also make text clickable
+  svg.querySelectorAll('text').forEach(el=>{
+    el.style.cursor='pointer';
+    el.addEventListener('click',(e)=>{
+      // find nearest node by checking position
+      const tx=parseFloat(el.getAttribute('x'));
+      let closest=null,minD=Infinity;
+      NODES.forEach(n=>{
+        const d=Math.abs(n.x-tx);
+        if(d<minD){minD=d;closest=n;}
+      });
+      if(closest){toggleNode(closest.id);renderCompactGraph();}
+    });
+  });
+
+  updateSelCounters();
+}
+
+/* ═══════════════════════════════════════════
+   Full-Screen Canvas Graph
+   ═══════════════════════════════════════════ */
+let fsCanvas,fsCtx,fsW,fsH;
+let fsDragging=null;
+
+function initFullScreenGraph(){
+  const container=$('#graph-fs-canvas');
+  fsCanvas=$('#graph-canvas');
+  fsW=container.clientWidth;
+  fsH=container.clientHeight;
+  fsCanvas.width=fsW*devicePixelRatio;
+  fsCanvas.height=fsH*devicePixelRatio;
+  fsCanvas.style.width=fsW+'px';
+  fsCanvas.style.height=fsH+'px';
+  fsCtx=fsCanvas.getContext('2d');
+  fsCtx.scale(devicePixelRatio,devicePixelRatio);
+
+  // Re-layout for larger space
+  initPositions(fsW,fsH);
+  simulate(fsW,fsH,200);
+  drawFullScreenGraph();
+}
+
+function drawFullScreenGraph(){
+  if(!fsCtx)return;
+  fsCtx.clearRect(0,0,fsW,fsH);
+
+  // Edges
+  EDGES.forEach(([a,b])=>{
+    const na=nodeMap[a],nb=nodeMap[b];
+    fsCtx.beginPath();
+    fsCtx.moveTo(na.x,na.y);
+    fsCtx.lineTo(nb.x,nb.y);
+    fsCtx.strokeStyle='rgba(255,255,255,.08)';
+    fsCtx.lineWidth=1;
+    fsCtx.stroke();
+  });
+
+  // Nodes
+  NODES.forEach(n=>{
+    const col=TYPE_COLORS[n.type];
+    const glow=TYPE_GLOW[n.type];
+    const r=n.selected?10:7;
+
+    if(n.selected){
+      // Glow
+      fsCtx.beginPath();
+      fsCtx.arc(n.x,n.y,r+8,0,Math.PI*2);
+      const grad=fsCtx.createRadialGradient(n.x,n.y,r,n.x,n.y,r+8);
+      grad.addColorStop(0,glow);
+      grad.addColorStop(1,'rgba(0,0,0,0)');
+      fsCtx.fillStyle=grad;
+      fsCtx.fill();
+      // Solid fill
+      fsCtx.beginPath();
+      fsCtx.arc(n.x,n.y,r,0,Math.PI*2);
+      fsCtx.fillStyle=col;
+      fsCtx.fill();
+    } else {
+      // Outline only, dim
+      fsCtx.beginPath();
+      fsCtx.arc(n.x,n.y,r,0,Math.PI*2);
+      fsCtx.strokeStyle=col;
+      fsCtx.lineWidth=1.2;
+      fsCtx.globalAlpha=0.45;
+      fsCtx.stroke();
+      fsCtx.globalAlpha=1;
+    }
+
+    // Label
+    fsCtx.font=`${n.selected?'600':'400'} 11px -apple-system,sans-serif`;
+    fsCtx.fillStyle=n.selected?col:'rgba(255,255,255,.4)';
+    fsCtx.textAlign='center';
+    fsCtx.fillText(n.label,n.x,n.y+r+14);
+  });
+
+  updateSelCounters();
+}
+
+function fsHitTest(px,py){
+  let closest=null,minD=Infinity;
+  NODES.forEach(n=>{
+    const dx=n.x-px,dy=n.y-py;
+    const d=Math.sqrt(dx*dx+dy*dy);
+    const hitR=n.selected?18:14;
+    if(d<hitR&&d<minD){minD=d;closest=n;}
+  });
+  return closest;
+}
+
+function onFsClick(e){
+  const rect=fsCanvas.getBoundingClientRect();
+  const px=e.clientX-rect.left;
+  const py=e.clientY-rect.top;
+  const hit=fsHitTest(px,py);
+  if(hit){
+    toggleNode(hit.id);
+    drawFullScreenGraph();
+  }
+}
+
+function onFsTouchEnd(e){
+  if(e.changedTouches.length===0)return;
+  const t=e.changedTouches[0];
+  const rect=fsCanvas.getBoundingClientRect();
+  const px=t.clientX-rect.left;
+  const py=t.clientY-rect.top;
+  const hit=fsHitTest(px,py);
+  if(hit){
+    e.preventDefault();
+    toggleNode(hit.id);
+    drawFullScreenGraph();
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Full-screen open / close
+   ═══════════════════════════════════════════ */
+function openFullScreen(){
+  const overlay=$('#graph-fullscreen');
+  overlay.classList.add('open');
+  // Small delay to let layout settle
+  requestAnimationFrame(()=>{
+    initFullScreenGraph();
+    fsCanvas.addEventListener('click',onFsClick);
+    fsCanvas.addEventListener('touchend',onFsTouchEnd,{passive:false});
+  });
+}
+
+function closeFullScreen(){
+  const overlay=$('#graph-fullscreen');
+  overlay.classList.remove('open');
+  if(fsCanvas){
+    fsCanvas.removeEventListener('click',onFsClick);
+    fsCanvas.removeEventListener('touchend',onFsTouchEnd);
+  }
+  // Re-render compact graph to reflect any changes
+  renderCompactGraph();
+}
+
+$('#graph-expand-btn').addEventListener('click',()=>{
+  openFullScreen();
+});
+$('#graph-fs-close').addEventListener('click',closeFullScreen);
+$('#graph-fs-done').addEventListener('click',closeFullScreen);
+
+/* ═══════════════════════════════════════════
+   Flyout management
+   ═══════════════════════════════════════════ */
 let activeFlyout=null;
 const backdrop=$('#fly-backdrop');
 
@@ -371,10 +772,13 @@ function openFlyout(id){
   el.classList.add('open');
   backdrop.classList.add('show');
   activeFlyout=id;
-  // highlight the triggering button
   $$('.rbtn[data-flyout]').forEach(b=>{
     b.classList.toggle('on-nofill',b.dataset.flyout===id);
   });
+  // If insight flyout, render graph
+  if(id==='fly-insight'){
+    requestAnimationFrame(renderCompactGraph);
+  }
 }
 
 function closeFlyout(){
@@ -389,7 +793,6 @@ function closeFlyout(){
 backdrop.addEventListener('click',closeFlyout);
 
 /* ── Right bar button handlers ── */
-// Toggle actions (like, save, remind, rss) — toggle on/off with pop
 ['btn-like','btn-save','btn-remind','btn-rss'].forEach(id=>{
   const btn=$('#'+id);
   btn.addEventListener('click',()=>{
@@ -400,7 +803,6 @@ backdrop.addEventListener('click',closeFlyout);
   });
 });
 
-// Flyout buttons
 $$('.rbtn[data-flyout]').forEach(btn=>{
   btn.addEventListener('click',()=>openFlyout(btn.dataset.flyout));
 });
@@ -416,45 +818,29 @@ function setRecoCount(n){
   if(n===recoCount)return;
   recoCount=n;
   if(n===0){
-    badge.classList.remove('show');
-    badge.textContent='';
-    recoCard1.style.display='none';
-    recoSep2.style.display='none';
-    recoCard2.style.display='none';
+    badge.classList.remove('show');badge.textContent='';
+    recoCard1.style.display='none';recoSep2.style.display='none';recoCard2.style.display='none';
   } else if(n>=1){
-    badge.textContent=String(n);
-    badge.classList.add('show');
+    badge.textContent=String(n);badge.classList.add('show');
     recoCard1.style.display='';
-    if(n>=2){
-      recoSep2.style.display='';
-      recoCard2.style.display='';
-    } else {
-      recoSep2.style.display='none';
-      recoCard2.style.display='none';
-    }
+    if(n>=2){recoSep2.style.display='';recoCard2.style.display='';}
+    else{recoSep2.style.display='none';recoCard2.style.display='none';}
   }
 }
-
-// Initially hidden
 setRecoCount(0);
 
-// Scroll listener
 window.addEventListener('scroll',()=>{
-  if(demoRunning)return; // don't interfere with demo
+  if(demoRunning)return;
   const scrollTop=window.scrollY||document.documentElement.scrollTop;
   const docHeight=document.documentElement.scrollHeight-document.documentElement.clientHeight;
   if(docHeight<=0)return;
   const pct=scrollTop/docHeight;
-  if(pct>=0.7){
-    setRecoCount(2);
-  } else if(pct>=0.4){
-    setRecoCount(1);
-  } else {
-    setRecoCount(0);
-  }
+  if(pct>=0.7) setRecoCount(2);
+  else if(pct>=0.4) setRecoCount(1);
+  else setRecoCount(0);
 });
 
-/* ── Chat bar — inline response popover ── */
+/* ── Chat bar ── */
 const chatInput=$('#chat-input');
 const chatResponse=$('#chat-response');
 const chatResponseBody=$('#chat-response-body');
@@ -463,20 +849,14 @@ function showChatResponse(text){
   chatResponseBody.innerHTML=text;
   chatResponse.classList.add('show');
 }
-function hideChatResponse(){
-  chatResponse.classList.remove('show');
-}
+function hideChatResponse(){chatResponse.classList.remove('show')}
 
 $('#chat-response-close').addEventListener('click',(e)=>{
-  e.stopPropagation();
-  hideChatResponse();
+  e.stopPropagation();hideChatResponse();
 });
 
-// Send handler — fake AI response
 function handleChatSend(){
-  const q=chatInput.value.trim();
-  if(!q)return;
-  // Simulate AI response
+  const q=chatInput.value.trim();if(!q)return;
   const fakeResponses={
     'この記事の要点は？':'この記事は、1945年の Memex 構想と現代のAIブラウザを比較し、タブやブックマークの原始的な構造を超える「階層的コンテキスト」の必要性を論じています。Zeed の Profile/TG/Tab 設計と直接関連する内容です。',
     'default':'この記事はAIブラウザの進化について論じています。現状の課題は、チャットUIをChromium上に被せるだけで根本的なプリミティブ（タブ、ブックマーク）を再設計していない点です。'
@@ -491,8 +871,20 @@ chatInput.addEventListener('keydown',(e)=>{
   if(e.key==='Enter'){e.preventDefault();handleChatSend();}
 });
 
-/* ── Demo auto-play ── */
+/* ═══════════════════════════════════════════
+   Demo auto-play
+   ═══════════════════════════════════════════ */
 let demoRunning=false;
+
+function selectNodeById(id){
+  const n=nodeMap[id];
+  if(n&&!n.selected){n.selected=true;updateSelCounters();}
+}
+function deselectAll(){
+  NODES.forEach(n=>n.selected=false);
+  updateSelCounters();
+}
+
 $('#demo-btn').addEventListener('click',()=>{void(async()=>{
   if(demoRunning)return;
   demoRunning=true;
@@ -501,10 +893,10 @@ $('#demo-btn').addEventListener('click',()=>{void(async()=>{
 
   // Reset everything
   ['btn-like','btn-save','btn-remind','btn-rss'].forEach(id=>$('#'+id).classList.remove('on','pop'));
-  closeFlyout();
-  hideChatResponse();
+  closeFlyout();closeFullScreen();hideChatResponse();
   chatInput.value='';
   setRecoCount(0);
+  deselectAll();
   window.scrollTo({top:0,behavior:'instant'});
   await slp(400);
 
@@ -518,34 +910,61 @@ $('#demo-btn').addEventListener('click',()=>{void(async()=>{
   save.classList.add('on');save.classList.add('pop');
   await slp(800);save.classList.remove('pop');
 
-  // 3. Open Insight flyout (merged AI構造 + 記憶)
+  // 3. Open Insight flyout — shows graph
   openFlyout('fly-insight');
-  await slp(2800);
+  await slp(1200);
 
-  // 4. Close
+  // 4. Select a couple nodes in compact view
+  selectNodeById('memex');
+  renderCompactGraph();
+  await slp(700);
+  selectNodeById('vector-db');
+  renderCompactGraph();
+  await slp(1000);
+
+  // 5. Open full-screen graph
+  openFullScreen();
+  await slp(1200);
+
+  // 6. Select more nodes in full-screen
+  selectNodeById('sqlite-vec');
+  drawFullScreenGraph();
+  await slp(600);
+  selectNodeById('profile-tg');
+  drawFullScreenGraph();
+  await slp(600);
+  selectNodeById('hn-localdb');
+  drawFullScreenGraph();
+  await slp(1500);
+
+  // 7. Close full-screen (returns to flyout with selections persisted)
+  closeFullScreen();
+  await slp(1200);
+
+  // 8. Close flyout
   closeFlyout();
   await slp(500);
 
-  // 5. Scroll to 45% — triggers badge "1"
+  // 9. Scroll to 45% — triggers badge "1"
   const docHeight=document.documentElement.scrollHeight-document.documentElement.clientHeight;
   window.scrollTo({top:docHeight*0.45,behavior:'smooth'});
   setRecoCount(1);
   await slp(1200);
 
-  // 6. Scroll to 75% — triggers badge "2"
+  // 10. Scroll to 75% — triggers badge "2"
   window.scrollTo({top:docHeight*0.75,behavior:'smooth'});
   setRecoCount(2);
   await slp(1200);
 
-  // 7. Open 次へ flyout (now shows 2 cards)
+  // 11. Open 次へ flyout
   openFlyout('fly-next');
   await slp(2200);
 
-  // 8. Close
+  // 12. Close
   closeFlyout();
   await slp(500);
 
-  // 9. Type in chat box and show inline response
+  // 13. Type in chat box and show inline response
   const text='この記事の要点は？';
   chatInput.value='';
   for(let i=0;i<text.length;i++){
@@ -553,14 +972,10 @@ $('#demo-btn').addEventListener('click',()=>{void(async()=>{
     await slp(80);
   }
   await slp(600);
-
-  // Show response popover above chat bar
   showChatResponse('この記事は、1945年の Memex 構想と現代のAIブラウザを比較し、タブやブックマークの原始的な構造を超える「階層的コンテキスト」の必要性を論じています。Zeed の Profile/TG/Tab 設計と直接関連する内容です。');
   await slp(3000);
 
-  // Close response
-  hideChatResponse();
-  await slp(300);
+  hideChatResponse();await slp(300);
   chatInput.value='';
 
   // Done
