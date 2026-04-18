@@ -212,6 +212,26 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 .chat-msg.user .chat-bubble{background:var(--ac);color:#fff;border-bottom-right-radius:4px}
 .chat-msg.asst .chat-bubble{background:var(--el1);color:var(--tx);border-bottom-left-radius:4px;border:1px solid #2a2a31}
 
+/* Outcome card */
+.outcome-card{
+  background:var(--el1);border-left:3px solid var(--green);border-radius:10px;
+  padding:10px 12px;font-size:12px;margin-bottom:10px;
+}
+.outcome-card.pending{border-left-color:var(--amber)}
+.outcome-card .oc-title{font-weight:600;margin-bottom:4px;font-size:12px}
+.outcome-card .oc-item{color:var(--sub);line-height:1.55}
+.outcome-card .oc-item .oc-check{color:var(--green)}
+.outcome-card .oc-footer{font-size:10px;color:var(--fnt);margin-top:6px}
+.outcome-card .oc-actions{display:flex;gap:6px;margin-top:8px}
+.outcome-card .oc-btn{
+  font-size:11px;padding:4px 14px;border-radius:6px;font-weight:500;
+  cursor:pointer;transition:background .15s;
+}
+.outcome-card .oc-btn.accent{background:var(--ac);color:#fff;border:1px solid var(--ac)}
+.outcome-card .oc-btn.accent:hover{background:#6d28d9}
+.outcome-card .oc-btn.subtle{background:var(--el2);color:var(--sub);border:1px solid #2a2a31}
+.outcome-card .oc-btn.subtle:hover{background:var(--el3);color:var(--tx)}
+
 /* Memory pane */
 .mem-list{display:flex;flex-direction:column;gap:6px}
 .mem-item{
@@ -228,6 +248,49 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
 .mem-kind.question{background:rgba(34,197,94,.15);color:#4ade80}
 .mem-text{font-size:12px;line-height:1.45;color:var(--sub)}
 .mem-ts{font-size:9px;color:var(--fnt);margin-top:3px}
+
+/* Tasks pane */
+.tasks-group-label{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--fnt);margin-bottom:6px;margin-top:14px;
+}
+.tasks-group-label:first-child{margin-top:0}
+.task-item{
+  background:var(--el1);border:1px solid #2a2a31;border-radius:8px;padding:10px 12px;
+  display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;
+}
+.task-check{
+  width:16px;height:16px;border-radius:50%;border:2px solid var(--fnt);
+  flex-shrink:0;margin-top:1px;cursor:pointer;transition:all .15s;
+  display:grid;place-items:center;
+}
+.task-check:hover{border-color:var(--acb)}
+.task-check.done{border-color:var(--green);background:var(--green)}
+.task-check.done::after{
+  content:'';display:block;width:6px;height:3px;
+  border-left:1.5px solid #fff;border-bottom:1.5px solid #fff;
+  transform:rotate(-45deg) translateY(-0.5px);
+}
+.task-item.completed .task-title{text-decoration:line-through;color:var(--fnt)}
+.task-body{flex:1;min-width:0}
+.task-title{font-size:12px;font-weight:500;line-height:1.4;margin-bottom:4px}
+.task-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.task-priority{
+  font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.task-priority.high{background:rgba(239,68,68,.15);color:var(--red)}
+.task-priority.medium{background:rgba(245,158,11,.15);color:var(--amber)}
+.task-priority.low{background:rgba(107,107,115,.15);color:var(--fnt)}
+.task-due{font-size:10px;color:var(--fnt)}
+.task-group{font-size:9px;color:var(--acb);background:var(--acs);padding:1px 6px;border-radius:4px;margin-left:auto}
+.task-add-btn{
+  width:100%;margin-top:12px;padding:8px;border-radius:8px;
+  font-size:12px;color:var(--fnt);border:1px dashed #2a2a31;
+  background:transparent;text-align:center;cursor:pointer;
+  transition:color .15s,border-color .15s;
+}
+.task-add-btn:hover{color:var(--sub);border-color:var(--sub)}
 
 /* Map pane (Context Map) — force graph */
 .map-header{margin-bottom:8px;flex-shrink:0}
@@ -467,6 +530,7 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
       <div class="mode-tab active" data-pane="chat">Chat</div>
       <div class="mode-tab" data-pane="memory">Memory<span class="mode-badge" id="mem-badge">5</span></div>
       <div class="mode-tab" data-pane="map">Map</div>
+      <div class="mode-tab" data-pane="tasks">Tasks<span class="mode-badge" id="tasks-badge">6</span></div>
     </div>
   </div>
 
@@ -549,6 +613,81 @@ input,textarea{font:inherit;border:none;outline:none;background:none;color:inher
         <div class="map-legend-item"><div class="map-legend-dot" style="background:#3b82f6"></div>Memory</div>
         <div class="map-legend-item"><div class="map-legend-dot" style="background:#22c55e"></div>RSS / Web</div>
       </div>
+    </div>
+
+    <!-- Tasks pane -->
+    <div class="pane" id="pane-tasks">
+      <div class="tasks-group-label">In Progress</div>
+      <div class="task-item" data-task="0">
+        <div class="task-check"></div>
+        <div class="task-body">
+          <div class="task-title">sqlite-vec のベンチマーク実行</div>
+          <div class="task-meta">
+            <span class="task-priority high">High</span>
+            <span class="task-due">Today</span>
+            <span class="task-group">Memory 設計</span>
+          </div>
+        </div>
+      </div>
+      <div class="task-item" data-task="1">
+        <div class="task-check"></div>
+        <div class="task-body">
+          <div class="task-title">Context Map のノード選択 UI を仕様化</div>
+          <div class="task-meta">
+            <span class="task-priority medium">Medium</span>
+            <span class="task-due">Today</span>
+            <span class="task-group">Memory 設計</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tasks-group-label">Up Next</div>
+      <div class="task-item" data-task="2">
+        <div class="task-check"></div>
+        <div class="task-body">
+          <div class="task-title">EmbeddingGemma のモデルサイズ比較</div>
+          <div class="task-meta">
+            <span class="task-priority medium">Medium</span>
+            <span class="task-due">Tomorrow</span>
+            <span class="task-group">Memory 設計</span>
+          </div>
+        </div>
+      </div>
+      <div class="task-item" data-task="3">
+        <div class="task-check"></div>
+        <div class="task-body">
+          <div class="task-title">freee 月次決算の確認</div>
+          <div class="task-meta">
+            <span class="task-priority high">High</span>
+            <span class="task-due">Apr 20</span>
+            <span class="task-group">経理</span>
+          </div>
+        </div>
+      </div>
+      <div class="task-item" data-task="4">
+        <div class="task-check"></div>
+        <div class="task-body">
+          <div class="task-title">GDPR 対応: 物理消去フローの設計</div>
+          <div class="task-meta">
+            <span class="task-priority high">High</span>
+            <span class="task-due">Apr 21</span>
+            <span class="task-group">法務</span>
+          </div>
+        </div>
+      </div>
+      <div class="task-item" data-task="5">
+        <div class="task-check"></div>
+        <div class="task-body">
+          <div class="task-title">ブログ記事: Zeed の Context Map 解説</div>
+          <div class="task-meta">
+            <span class="task-priority low">Low</span>
+            <span class="task-due">Apr 23</span>
+            <span class="task-group">発信</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="task-add-btn">+ タスク追加</button>
     </div>
   </div>
 
@@ -995,6 +1134,14 @@ $$('.vtab').forEach(t=>{
   };
 });
 
+/* Task checkbox toggle */
+$$('.task-check').forEach(chk=>{
+  chk.onclick=()=>{
+    chk.classList.toggle('done');
+    chk.closest('.task-item').classList.toggle('completed');
+  };
+});
+
 /* Mode tabs */
 $$('.mode-tab').forEach(t=>{
   t.onclick=()=>{
@@ -1047,6 +1194,30 @@ function addChatMsg(role,text){
   area.appendChild(msg);
   area.parentElement.scrollTop=area.parentElement.scrollHeight;
   return msg;
+}
+
+function addOutcomeCard(type, title, items, footer, actions){
+  const area=$('#chat-area');
+  const card=document.createElement('div');
+  card.className='outcome-card' + (type==='pending'?' pending':'');
+  let html='<div class="oc-title">'+title+'</div>';
+  items.forEach(item=>{
+    html+='<div class="oc-item">'+item+'</div>';
+  });
+  if(footer){
+    html+='<div class="oc-footer">'+footer+'</div>';
+  }
+  if(actions && actions.length){
+    html+='<div class="oc-actions">';
+    actions.forEach(a=>{
+      html+='<button class="oc-btn '+a.style+'">'+a.label+'</button>';
+    });
+    html+='</div>';
+  }
+  card.innerHTML=html;
+  area.appendChild(card);
+  area.parentElement.scrollTop=area.parentElement.scrollHeight;
+  return card;
 }
 
 async function streamText(bubble,text,speed){
@@ -1206,10 +1377,13 @@ demoBtn.onclick=()=>{void(async()=>{
   hideDetail();
   nodeVisibleCount = 0;
   stopGraph();
+  // Reset task checkboxes
+  $$('.task-check').forEach(c=>c.classList.remove('done'));
+  $$('.task-item').forEach(t=>t.classList.remove('completed'));
   await slp(500);
 
   /* Step 1: Like + Bookmark */
-  await showStep('Step 1/8 — アクションアイコン');
+  await showStep('Step 1/10 — アクションアイコン');
   $('#al').click();
   await slp(500);
   $('#ab').click();
@@ -1217,13 +1391,13 @@ demoBtn.onclick=()=>{void(async()=>{
   hideStep();
 
   /* Step 2: RSS subscribe */
-  await showStep('Step 2/8 — RSS 登録');
+  await showStep('Step 2/10 — RSS 登録');
   $('#arss').click();
   await slp(1000);
   hideStep();
 
   /* Step 3: Ask question */
-  await showStep('Step 3/8 — 質問（Ask モード）');
+  await showStep('Step 3/10 — 質問（Ask モード）');
   const question='この記事の要点を3行で';
   ta.focus();
   for(let i=0;i<question.length;i++){
@@ -1237,7 +1411,7 @@ demoBtn.onclick=()=>{void(async()=>{
   hideStep();
 
   /* Step 4: Switch to Auto mode + open related links */
-  await showStep('Step 4/8 — Auto: 関連リンクを開く');
+  await showStep('Step 4/10 — Auto: 関連リンクを開く');
   $('#mode-auto').click();
   await slp(400);
   ta.value='';
@@ -1250,32 +1424,58 @@ demoBtn.onclick=()=>{void(async()=>{
   await slp(400);
   $('#send-btn').click();
   await slp(5000);
+
+  /* Step 5: Outcome card — success */
+  await showStep('Step 5/10 — Outcome: 完了カード');
+  addOutcomeCard('success', 'Auto: 完了', [
+    '<span class="oc-check">\u2713</span> Memex (Wikipedia) をバックグラウンドで開きました',
+    '<span class="oc-check">\u2713</span> sqlite-vec GitHub をバックグラウンドで開きました',
+    '<span class="oc-check">\u2713</span> HN: Browser AI をバックグラウンドで開きました',
+  ], '3 tabs opened in Memory 設計 group');
+  await slp(2000);
   hideStep();
 
-  /* Step 5: Scroll to trigger keyword detection + recommendation stack */
-  await showStep('Step 5/8 — スクロール: キーワード検出');
+  /* Step 6: Outcome card — pending confirmation */
+  await showStep('Step 6/10 — Outcome: 確認待ちカード');
+  addOutcomeCard('pending', 'Auto: 確認待ち', [
+    '「世界一のイヤホン」を Amazon.co.jp で検索しました。Sennheiser IE 900 が最有力候補です。',
+  ], 'カートに追加しますか？', [
+    {label:'追加する', style:'accent'},
+    {label:'やめる', style:'subtle'},
+  ]);
+  await slp(2500);
+  hideStep();
+
+  /* Step 7: Show Tasks tab */
+  await showStep('Step 7/10 — Tasks タブ');
+  $$('.mode-tab')[3].click();
+  await slp(2500);
+  hideStep();
+
+  /* Step 8: Scroll to trigger keyword detection + recommendation stack */
+  await showStep('Step 8/10 — スクロール: キーワード検出');
+  $$('.mode-tab')[0].click();
   scrollHighlightEnabled=true;
   viewport.scrollTo({top:350,behavior:'smooth'});
   await slp(1500);
-  await showStep('Step 5/8 — 30%: レコメンド1枚目');
+  await showStep('Step 8/10 — 30%: レコメンド1枚目');
   viewport.scrollTo({top:viewport.scrollHeight*0.35,behavior:'smooth'});
   await slp(1500);
-  await showStep('Step 5/8 — 55%: レコメンド2枚目');
+  await showStep('Step 8/10 — 55%: レコメンド2枚目');
   viewport.scrollTo({top:viewport.scrollHeight*0.6,behavior:'smooth'});
   await slp(1500);
-  await showStep('Step 5/8 — 80%: レコメンド3枚目');
+  await showStep('Step 8/10 — 80%: レコメンド3枚目');
   viewport.scrollTo({top:viewport.scrollHeight*0.85,behavior:'smooth'});
   await slp(2000);
   hideStep();
 
-  /* Step 6: Show Memory tab */
-  await showStep('Step 6/8 — Memory タブ');
+  /* Step 9: Show Memory tab + Map tab */
+  await showStep('Step 9/10 — Memory タブ');
   $$('.mode-tab')[1].click();
   await slp(2000);
   hideStep();
 
-  /* Step 7: Show Map tab — Knowledge Graph with staggered nodes */
-  await showStep('Step 7/8 — Context Map: Knowledge Graph');
+  await showStep('Step 9/10 — Context Map: Knowledge Graph');
   initPositions();
   nodeVisibleCount = 0;
   gSelected = -1;
@@ -1294,7 +1494,7 @@ demoBtn.onclick=()=>{void(async()=>{
   await slp(1500);
 
   // Demo: user taps nodes
-  await showStep('Step 7/8 — ノード選択/解除');
+  await showStep('Step 9/10 — ノード選択/解除');
   await slp(600);
   // Deselect "AI Browser"
   const aiBrowser = nodes.find(n=>n.label==='AI Browser');
@@ -1313,8 +1513,8 @@ demoBtn.onclick=()=>{void(async()=>{
   await slp(1200);
   hideStep();
 
-  /* Step 8: Back to Chat + Read Later + scroll back */
-  await showStep('Step 8/8 — 完了');
+  /* Step 10: Back to Chat + Read Later + scroll back */
+  await showStep('Step 10/10 — 完了');
   $$('.mode-tab')[0].click();
   stopGraph();
   await slp(500);
