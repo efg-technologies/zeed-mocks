@@ -176,15 +176,15 @@ input{font:inherit;border:none;outline:none}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 .typing-cursor{animation:blink .6s step-end infinite;color:var(--acb)}
 
-/* ═══ Graph-specific styles ═══ */
+/* ---- Graph-specific styles ---- */
 /* Compact graph in flyout */
 .graph-compact{
-  width:100%;height:180px;
+  width:100%;height:200px;
   background:rgba(15,15,18,.5);border-radius:6px;
   overflow:hidden;position:relative;
   margin-bottom:8px;
 }
-.graph-compact svg{width:100%;height:100%}
+.graph-compact canvas{width:100%;height:100%;display:block}
 
 /* Graph footer in flyout */
 .graph-footer{
@@ -233,7 +233,7 @@ input{font:inherit;border:none;outline:none}
 .graph-fs-close:active{background:rgba(255,255,255,.12)}
 
 .graph-fs-canvas{flex:1;position:relative;overflow:hidden}
-.graph-fs-canvas canvas{width:100%;height:100%;display:block}
+.graph-fs-canvas canvas{display:block;position:absolute;top:0;left:0}
 
 .graph-fs-footer{
   display:flex;align-items:center;justify-content:space-between;
@@ -258,6 +258,24 @@ input{font:inherit;border:none;outline:none}
   display:flex;align-items:center;gap:4px;font-size:9px;color:var(--sub);
 }
 .graph-fs-legend-dot{width:7px;height:7px;border-radius:50%}
+
+/* Detail card in full-screen */
+.graph-fs-detail{
+  position:absolute;bottom:0;left:0;right:0;z-index:5;
+  transform:translateY(100%);transition:transform .3s ease;
+  padding:12px;pointer-events:none;
+}
+.graph-fs-detail.open{transform:translateY(0);pointer-events:auto}
+.graph-fs-detail .card{
+  background:rgba(22,22,28,.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;max-width:360px;margin:0 auto;
+}
+.graph-fs-detail .d-label{font-size:14px;font-weight:600;color:#fff;margin-bottom:4px}
+.graph-fs-detail .d-badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:4px;font-weight:500;margin-bottom:8px}
+.graph-fs-detail .d-conn{font-size:11px;color:#ccc}
+.graph-fs-detail .d-conn-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.graph-fs-detail .d-conn-row .bar-bg{flex:1;height:3px;background:rgba(255,255,255,.08);border-radius:2px;max-width:60px}
+.graph-fs-detail .d-conn-row .bar{height:100%;border-radius:2px}
 </style>
 </head>
 <body>
@@ -317,19 +335,19 @@ input{font:inherit;border:none;outline:none}
 <!-- Flyout backdrop -->
 <div class="flyout-backdrop" id="fly-backdrop"></div>
 
-<!-- Flyout: Insight — now with compact graph -->
+<!-- Flyout: Insight -- with compact canvas graph -->
 <div class="flyout" id="fly-insight">
   <div class="fly-section">
     <div class="fly-h">
       <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
       Insight
     </div>
-    <div class="fly-sub">Context Map &middot; ノードを選んで文脈を指定</div>
+    <div class="fly-sub">Context Map &middot; select nodes to set context</div>
   </div>
 
-  <!-- Compact force graph -->
+  <!-- Compact force graph (canvas) -->
   <div class="graph-compact" id="graph-compact">
-    <svg id="graph-svg"></svg>
+    <canvas id="compact-canvas"></canvas>
   </div>
 
   <!-- Legend -->
@@ -347,10 +365,10 @@ input{font:inherit;border:none;outline:none}
 
   <div class="r-sep" style="width:100%;margin:4px 0"></div>
 
-  <!-- Keep a small Zeed relevance note -->
+  <!-- Zeed relevance note -->
   <div class="fly-section">
     <div class="struct-label">Zeed Relevance</div>
-    <div style="font-size:9.5px;color:var(--acb);line-height:1.4">ノードを選択すると、Zeed AI の回答がそのコンテキストに基づきます</div>
+    <div style="font-size:9.5px;color:var(--acb);line-height:1.4">Selected nodes ground Zeed AI answers to this context</div>
   </div>
 </div>
 
@@ -359,27 +377,27 @@ input{font:inherit;border:none;outline:none}
   <div class="fly-section">
     <div class="fly-h">
       <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      次に読むなら
+      Next
     </div>
-    <div class="fly-sub">あなたの記憶に基づく推薦</div>
+    <div class="fly-sub">Recommendations based on your memory</div>
   </div>
   <div class="fly-section reco-card" id="reco-card-1">
     <div class="reco-thumb">sqlite-vec: vector DB<br>in 200 LOC</div>
     <div class="reco-hl">sqlite-vec: fast vector search in browser</div>
-    <div class="reco-why">先週 EmbeddingGemma + sqlite-vec を検討していた関連記事</div>
+    <div class="reco-why">Related to your EmbeddingGemma + sqlite-vec research last week</div>
     <div class="reco-btns">
-      <button class="reco-btn">後で</button>
-      <button class="reco-btn pri">開く</button>
+      <button class="reco-btn">Later</button>
+      <button class="reco-btn pri">Open</button>
     </div>
   </div>
   <div class="r-sep reco-card-sep" id="reco-sep-2" style="width:100%;margin:8px 0;display:none"></div>
   <div class="fly-section reco-card" id="reco-card-2" style="display:none">
     <div class="reco-thumb" style="background:linear-gradient(135deg,#1e3a5f,#0f172a)">Embedding Models<br>Comparison 2026</div>
-    <div class="reco-hl">Embedding model benchmarks: 最新比較</div>
-    <div class="reco-why">Vector DB の検討に直結する内容</div>
+    <div class="reco-hl">Embedding model benchmarks: latest comparison</div>
+    <div class="reco-why">Directly relevant to your Vector DB exploration</div>
     <div class="reco-btns">
-      <button class="reco-btn">後で</button>
-      <button class="reco-btn pri">開く</button>
+      <button class="reco-btn">Later</button>
+      <button class="reco-btn pri">Open</button>
     </div>
   </div>
 </div>
@@ -399,6 +417,9 @@ input{font:inherit;border:none;outline:none}
   </div>
   <div class="graph-fs-canvas" id="graph-fs-canvas">
     <canvas id="graph-canvas"></canvas>
+    <div class="graph-fs-detail" id="graph-fs-detail">
+      <div class="card" id="graph-fs-detail-card"></div>
+    </div>
   </div>
   <div class="graph-fs-footer">
     <div class="graph-fs-info">Selected: <span id="fs-sel-count">0</span> nodes<br><span style="font-size:8.5px;color:var(--fnt)">these ground Zeed's answers</span></div>
@@ -409,7 +430,7 @@ input{font:inherit;border:none;outline:none}
 <!-- Bottom chat bar -->
 <div class="chat-bar" id="chat-bar">
   <span class="chat-label">Zeed AI</span>
-  <input type="text" id="chat-input" placeholder="AIに聞く...">
+  <input type="text" id="chat-input" placeholder="Ask AI...">
   <button class="chat-send" id="chat-send-btn">
     <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
   </button>
@@ -425,342 +446,531 @@ input{font:inherit;border:none;outline:none}
 </div>
 
 <script>
-/* ── Helpers ── */
+/* -- Helpers -- */
 const $=s=>document.querySelector(s);
 const $$=s=>document.querySelectorAll(s);
 const slp=ms=>new Promise(r=>setTimeout(r,ms));
 
-/* ═══════════════════════════════════════════
-   Graph Node Data
-   ═══════════════════════════════════════════ */
-const NODES=[
-  // Current page (purple) — center cluster
-  {id:'memex',       label:'Memex',           type:'page',   selected:false},
-  {id:'ai-browser',  label:'AI Browser',      type:'page',   selected:false},
-  {id:'vector-db',   label:'vector database', type:'page',   selected:false},
-  {id:'knowledge-graph',label:'knowledge graph',type:'page', selected:false},
+/* =============================================
+   Graph Node & Edge Data
+   ============================================= */
+const nodes=[
+  // Current page (purple)
+  {id:0, label:'Memex',           type:'page',   imp:5, selected:false},
+  {id:1, label:'AI Browser',      type:'page',   imp:5, selected:false},
+  {id:2, label:'vector DB',       type:'page',   imp:4, selected:false},
+  {id:3, label:'knowledge graph', type:'page',   imp:4, selected:false},
   // Memory (blue)
-  {id:'sqlite-vec',  label:'sqlite-vec',      type:'memory', selected:false},
-  {id:'embed-gemma', label:'EmbeddingGemma',  type:'memory', selected:false},
-  {id:'profile-tg',  label:'Profile/TG/Tab',  type:'memory', selected:false},
-  {id:'chromium',    label:'Chromium build',   type:'memory', selected:false},
+  {id:4, label:'sqlite-vec',      type:'memory', imp:3, selected:false},
+  {id:5, label:'EmbeddingGemma',  type:'memory', imp:3, selected:false},
+  {id:6, label:'Profile/TG/Tab',  type:'memory', imp:4, selected:false},
+  {id:7, label:'LLM Memory',      type:'memory', imp:4, selected:false},
   // RSS/Web (green)
-  {id:'hn-localdb',  label:'HN: Local-first DB',type:'rss',  selected:false},
-  {id:'arxiv-mem0',  label:'ArXiv: Mem0',     type:'rss',    selected:false},
-  {id:'gh-lancedb',  label:'GitHub: LanceDB', type:'rss',    selected:false},
+  {id:8, label:'HN: Local-first', type:'rss',    imp:3, selected:false},
+  {id:9, label:'ArXiv: Mem0',     type:'rss',    imp:3, selected:false},
+  {id:10,label:'LanceDB',         type:'rss',    imp:3, selected:false},
 ];
 
-const EDGES=[
-  ['memex','ai-browser'],
-  ['memex','knowledge-graph'],
-  ['ai-browser','vector-db'],
-  ['ai-browser','chromium'],
-  ['vector-db','sqlite-vec'],
-  ['vector-db','embed-gemma'],
-  ['vector-db','gh-lancedb'],
-  ['knowledge-graph','profile-tg'],
-  ['sqlite-vec','hn-localdb'],
-  ['embed-gemma','arxiv-mem0'],
-  ['profile-tg','chromium'],
-  ['hn-localdb','gh-lancedb'],
-  ['arxiv-mem0','gh-lancedb'],
-  ['memex','profile-tg'],
-  ['ai-browser','profile-tg'],
+const edgesDef=[
+  [0,1,.9],[0,3,.7],[0,7,.6],
+  [1,2,.8],[1,6,.7],[1,3,.5],
+  [2,4,.9],[2,5,.7],[2,10,.6],
+  [3,6,.7],[3,7,.6],
+  [4,8,.5],[4,5,.4],
+  [5,9,.6],
+  [6,7,.5],[6,1,.5],
+  [7,9,.5],[7,5,.4],
+  [8,10,.6],
+  [9,10,.5],
+  [0,6,.4],
 ];
+const edges=edgesDef.map(([s,t,str])=>({source:s,target:t,strength:str}));
 
-const TYPE_COLORS={page:'#a78bfa',memory:'#60a5fa',rss:'#34d399'};
+const TYPE_COLOR={page:'#a78bfa',memory:'#60a5fa',rss:'#34d399'};
 const TYPE_GLOW={page:'rgba(167,139,250,.5)',memory:'rgba(96,165,250,.5)',rss:'rgba(52,211,153,.5)'};
 
-/* Index for quick lookup */
-const nodeMap=Object.create(null);
-NODES.forEach(n=>nodeMap[n.id]=n);
+/* Adjacency for highlight */
+const adj=nodes.map(()=>new Set());
+edges.forEach(e=>{adj[e.source].add(e.target);adj[e.target].add(e.source)});
 
-function selectedCount(){return NODES.filter(n=>n.selected).length}
-
+function selectedCount(){return nodes.filter(n=>n.selected).length}
 function updateSelCounters(){
   const c=selectedCount();
   $('#compact-sel-count').textContent=c;
   $('#fs-sel-count').textContent=c;
 }
-
 function toggleNode(id){
-  const n=nodeMap[id];
+  const n=nodes[id];
   if(n){n.selected=!n.selected;updateSelCounters();}
 }
 
-/* ═══════════════════════════════════════════
-   Force simulation (shared, simple)
-   ═══════════════════════════════════════════ */
-function initPositions(w,h){
-  const cx=w/2,cy=h/2;
-  NODES.forEach((n,i)=>{
-    // Cluster by type
-    const angle=(i/NODES.length)*Math.PI*2;
-    let dist=0;
-    if(n.type==='page') dist=w*0.12;
-    else if(n.type==='memory') dist=w*0.3;
-    else dist=w*0.38;
-    n.x=cx+Math.cos(angle)*dist+(Math.random()-0.5)*20;
-    n.y=cy+Math.sin(angle)*dist+(Math.random()-0.5)*20;
-    n.vx=0;n.vy=0;
-  });
-}
-
-function simulate(w,h,iterations){
-  const cx=w/2,cy=h/2;
+/* =============================================
+   Physics engine (from map/a.html model)
+   ============================================= */
+/* These constants mirror map/a.html: REPEL / d^2, attraction to target length, damping, center gravity */
+function runPhysics(W,H,iterations,repelK,targetLen,attractK,dampK,centerK){
   for(let iter=0;iter<iterations;iter++){
-    const alpha=0.3*(1-iter/iterations);
-    // Repulsion between all nodes
-    for(let i=0;i<NODES.length;i++){
-      for(let j=i+1;j<NODES.length;j++){
-        let dx=NODES[j].x-NODES[i].x;
-        let dy=NODES[j].y-NODES[i].y;
-        let d=Math.sqrt(dx*dx+dy*dy)||1;
-        let force=800/(d*d);
-        let fx=dx/d*force*alpha;
-        let fy=dy/d*force*alpha;
-        NODES[i].x-=fx;NODES[i].y-=fy;
-        NODES[j].x+=fx;NODES[j].y+=fy;
+    const alpha=1-iter/iterations;
+    // Center gravity
+    for(let i=0;i<nodes.length;i++){
+      const n=nodes[i];
+      n.vx-=n.x*centerK;
+      n.vy-=n.y*centerK;
+    }
+    // Repulsion (all pairs)
+    for(let i=0;i<nodes.length;i++){
+      const a=nodes[i];
+      for(let j=i+1;j<nodes.length;j++){
+        const b=nodes[j];
+        let dx=a.x-b.x, dy=a.y-b.y;
+        let d2=dx*dx+dy*dy; if(d2<1)d2=1;
+        const d=Math.sqrt(d2);
+        const f=repelK/d2;
+        const fx=dx/d*f, fy=dy/d*f;
+        a.vx+=fx;a.vy+=fy;b.vx-=fx;b.vy-=fy;
       }
     }
     // Attraction along edges
-    EDGES.forEach(([a,b])=>{
-      const na=nodeMap[a],nb=nodeMap[b];
-      let dx=nb.x-na.x,dy=nb.y-na.y;
-      let d=Math.sqrt(dx*dx+dy*dy)||1;
-      let targetDist=w*0.18;
-      let force=(d-targetDist)*0.05*alpha;
-      let fx=dx/d*force,fy=dy/d*force;
-      na.x+=fx;na.y+=fy;
-      nb.x-=fx;nb.y-=fy;
+    edges.forEach(e=>{
+      const a=nodes[e.source],b=nodes[e.target];
+      let dx=b.x-a.x, dy=b.y-a.y;
+      const d=Math.sqrt(dx*dx+dy*dy)||1;
+      const f=(d-targetLen)*attractK*e.strength;
+      const fx=dx/d*f, fy=dy/d*f;
+      a.vx+=fx;a.vy+=fy;b.vx-=fx;b.vy-=fy;
     });
-    // Center gravity
-    NODES.forEach(n=>{
-      n.x+=(cx-n.x)*0.02*alpha;
-      n.y+=(cy-n.y)*0.02*alpha;
-    });
-    // Bounds
-    const pad=24;
-    NODES.forEach(n=>{
-      n.x=Math.max(pad,Math.min(w-pad,n.x));
-      n.y=Math.max(pad,Math.min(h-pad,n.y));
+    // Damping + integrate
+    nodes.forEach(n=>{
+      if(n._pinned)return;
+      n.vx*=dampK;n.vy*=dampK;
+      n.x+=n.vx;n.y+=n.vy;
     });
   }
 }
 
-/* ═══════════════════════════════════════════
-   Compact SVG Graph (flyout)
-   ═══════════════════════════════════════════ */
-function renderCompactGraph(){
+function scatterPositions(W,H){
+  nodes.forEach(n=>{
+    n.x=(Math.random()-.5)*Math.min(W,H)*.5;
+    n.y=(Math.random()-.5)*Math.min(W,H)*.5;
+    n.vx=0;n.vy=0;
+  });
+}
+
+/* =============================================
+   Compact Canvas Graph (flyout, ~180x200)
+   ============================================= */
+let compactCanvas,compactCtx,compactW,compactH;
+
+function initCompactGraph(){
   const container=$('#graph-compact');
-  const w=container.clientWidth||196;
-  const h=container.clientHeight||180;
-  const svg=$('#graph-svg');
+  compactCanvas=$('#compact-canvas');
+  compactW=container.clientWidth||180;
+  compactH=container.clientHeight||200;
+  const dpr=devicePixelRatio||1;
+  compactCanvas.width=compactW*dpr;
+  compactCanvas.height=compactH*dpr;
+  compactCanvas.style.width=compactW+'px';
+  compactCanvas.style.height=compactH+'px';
+  compactCtx=compactCanvas.getContext('2d');
+  compactCtx.scale(dpr,dpr);
 
-  initPositions(w,h);
-  simulate(w,h,120);
+  // Layout: scatter then run 150 iterations with compact params
+  scatterPositions(compactW,compactH);
+  // Reduced repel (600 vs 1800), shorter target (50 vs 120), same physics model
+  runPhysics(compactW,compactH,150, 600,50, 0.0006, 0.88, 0.001);
 
-  // Build SVG
-  let html='';
+  // Clamp to visible bounds
+  const pad=16;
+  nodes.forEach(n=>{
+    n.x=Math.max(-compactW/2+pad,Math.min(compactW/2-pad,n.x));
+    n.y=Math.max(-compactH/2+pad,Math.min(compactH/2-pad,n.y));
+  });
+}
+
+function drawCompactGraph(){
+  if(!compactCtx)return;
+  const ctx=compactCtx;
+  const cx=compactW/2, cy=compactH/2;
+  ctx.clearRect(0,0,compactW,compactH);
+
   // Edges
-  EDGES.forEach(([a,b])=>{
-    const na=nodeMap[a],nb=nodeMap[b];
-    html+=`<line x1="${na.x}" y1="${na.y}" x2="${nb.x}" y2="${nb.y}" stroke="rgba(255,255,255,.07)" stroke-width="0.8"/>`;
+  edges.forEach(e=>{
+    const a=nodes[e.source],b=nodes[e.target];
+    ctx.beginPath();
+    ctx.moveTo(a.x+cx,a.y+cy);
+    ctx.lineTo(b.x+cx,b.y+cy);
+    ctx.strokeStyle='rgba(255,255,255,.07)';
+    ctx.lineWidth=0.8;
+    ctx.stroke();
   });
+
   // Nodes
-  NODES.forEach(n=>{
-    const col=TYPE_COLORS[n.type];
+  nodes.forEach(n=>{
+    const sx=n.x+cx, sy=n.y+cy;
+    const col=TYPE_COLOR[n.type];
     const glow=TYPE_GLOW[n.type];
-    const r=n.selected?6:4.5;
+    const r=3+n.imp*2; // compact radius
+
     if(n.selected){
-      html+=`<circle cx="${n.x}" cy="${n.y}" r="${r+4}" fill="${glow}" opacity="0.4"/>`;
-      html+=`<circle cx="${n.x}" cy="${n.y}" r="${r}" fill="${col}" stroke="${col}" stroke-width="1.2" data-node="${n.id}" style="cursor:pointer"/>`;
+      // Glow
+      const grad=ctx.createRadialGradient(sx,sy,r*.4,sx,sy,r*2.5);
+      grad.addColorStop(0,glow);
+      grad.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.beginPath();ctx.arc(sx,sy,r*2.5,0,Math.PI*2);
+      ctx.fillStyle=grad;ctx.fill();
+      // Solid fill
+      ctx.beginPath();ctx.arc(sx,sy,r,0,Math.PI*2);
+      ctx.fillStyle=col;ctx.fill();
     } else {
-      html+=`<circle cx="${n.x}" cy="${n.y}" r="${r}" fill="none" stroke="${col}" stroke-width="1" opacity="0.5" data-node="${n.id}" style="cursor:pointer"/>`;
+      // Outline only
+      ctx.beginPath();ctx.arc(sx,sy,r,0,Math.PI*2);
+      ctx.strokeStyle=col;ctx.lineWidth=1;
+      ctx.globalAlpha=0.5;ctx.stroke();ctx.globalAlpha=1;
     }
-    // Label
-    html+=`<text x="${n.x}" y="${n.y+r+9}" text-anchor="middle" fill="${n.selected?col:'rgba(255,255,255,.4)'}" font-size="8" font-family="-apple-system,sans-serif" font-weight="${n.selected?'600':'400'}">${n.label}</text>`;
-  });
 
-  svg.innerHTML=html;
-  svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
-
-  // Click handlers on nodes
-  svg.querySelectorAll('[data-node]').forEach(el=>{
-    el.addEventListener('click',(e)=>{
-      e.stopPropagation();
-      toggleNode(el.dataset.node);
-      renderCompactGraph();
-    });
+    // Labels: 7px, only imp>=4 or selected
+    if(n.imp>=4||n.selected){
+      ctx.font=`${n.selected?'600':'400'} 7px -apple-system,sans-serif`;
+      ctx.textAlign='center';
+      ctx.fillStyle=n.selected?col:'rgba(255,255,255,.45)';
+      ctx.fillText(n.label,sx,sy+r+8);
+    }
   });
-  // Also make text clickable
-  svg.querySelectorAll('text').forEach(el=>{
-    el.style.cursor='pointer';
-    el.addEventListener('click',(e)=>{
-      // find nearest node by checking position
-      const tx=parseFloat(el.getAttribute('x'));
-      let closest=null,minD=Infinity;
-      NODES.forEach(n=>{
-        const d=Math.abs(n.x-tx);
-        if(d<minD){minD=d;closest=n;}
-      });
-      if(closest){toggleNode(closest.id);renderCompactGraph();}
-    });
-  });
-
   updateSelCounters();
 }
 
-/* ═══════════════════════════════════════════
-   Full-Screen Canvas Graph
-   ═══════════════════════════════════════════ */
+function compactHitTest(px,py){
+  const cx=compactW/2, cy=compactH/2;
+  let closest=null,minD=Infinity;
+  nodes.forEach(n=>{
+    const dx=(n.x+cx)-px, dy=(n.y+cy)-py;
+    const d=Math.sqrt(dx*dx+dy*dy);
+    const hitR=(3+n.imp*2)+8;
+    if(d<hitR&&d<minD){minD=d;closest=n;}
+  });
+  return closest;
+}
+
+function renderCompactGraph(){
+  initCompactGraph();
+  drawCompactGraph();
+
+  // Tap handler
+  const handler=e=>{
+    const rect=compactCanvas.getBoundingClientRect();
+    let px,py;
+    if(e.changedTouches){
+      px=e.changedTouches[0].clientX-rect.left;
+      py=e.changedTouches[0].clientY-rect.top;
+    } else {
+      px=e.clientX-rect.left;
+      py=e.clientY-rect.top;
+    }
+    // Scale for DPR
+    px=px*(compactW/rect.width);
+    py=py*(compactH/rect.height);
+    const hit=compactHitTest(px,py);
+    if(hit){
+      toggleNode(hit.id);
+      drawCompactGraph();
+    }
+  };
+  compactCanvas.onclick=handler;
+}
+
+/* =============================================
+   Full-Screen Canvas Graph (ported from map/a.html)
+   ============================================= */
 let fsCanvas,fsCtx,fsW,fsH;
-let fsDragging=null;
+let fsZoom=1, fsPanX=0, fsPanY=0;
+let fsDragging=-1, fsDragOX=0, fsDragOY=0;
+let fsPanning=false, fsPanStartX=0, fsPanStartY=0, fsPanOX=0, fsPanOY=0;
+let fsSelected=-1;
+let fsAnimId=null;
+let fsPointers=new Map(), fsPinchDist0=0, fsPinchZoom0=1;
+
+function fsToScreen(x,y){return[(x+fsPanX)*fsZoom+fsW/2,(y+fsPanY)*fsZoom+fsH/2]}
+function fsToWorld(sx,sy){return[(sx-fsW/2)/fsZoom-fsPanX,(sy-fsH/2)/fsZoom-fsPanY]}
+
+function fsNodeRadius(n){return 4+n.imp*4}
+
+function fsHitTest(sx,sy){
+  const [wx,wy]=fsToWorld(sx,sy);
+  for(let i=nodes.length-1;i>=0;i--){
+    const n=nodes[i];
+    const dx=n.x-wx, dy=n.y-wy;
+    const r=fsNodeRadius(n)+6/fsZoom;
+    if(dx*dx+dy*dy<r*r)return i;
+  }
+  return -1;
+}
+
+function showFsDetail(id){
+  const n=nodes[id];
+  const conns=[];
+  edges.forEach(e=>{
+    if(e.source===id)conns.push({node:nodes[e.target],str:e.strength});
+    else if(e.target===id)conns.push({node:nodes[e.source],str:e.strength});
+  });
+  conns.sort((a,b)=>b.str-a.str);
+  const col=TYPE_COLOR[n.type];
+  const card=$('#graph-fs-detail-card');
+  card.innerHTML=`<div class="d-label">${n.label}</div>
+    <span class="d-badge" style="background:${col}22;color:${col};border:1px solid ${col}44">${n.type}</span>
+    <div class="d-conn">${conns.slice(0,4).map(c=>`<div class="d-conn-row"><span style="width:100px;flex-shrink:0">${c.node.label}</span><div class="bar-bg"><div class="bar" style="width:${c.str*100}%;background:${col}"></div></div><span style="color:#666;font-size:10px">${c.str.toFixed(1)}</span></div>`).join('')}</div>`;
+  $('#graph-fs-detail').classList.add('open');
+}
+
+function hideFsDetail(){$('#graph-fs-detail').classList.remove('open')}
+
+function drawFullScreenGraph(){
+  if(!fsCtx)return;
+  fsCtx.clearRect(0,0,fsW,fsH);
+  const hasSel=fsSelected>=0;
+  const neighborSet=hasSel?adj[fsSelected]:null;
+
+  // Edges
+  edges.forEach(e=>{
+    const a=nodes[e.source],b=nodes[e.target];
+    const [x1,y1]=fsToScreen(a.x,a.y);
+    const [x2,y2]=fsToScreen(b.x,b.y);
+    const highlight=hasSel&&(e.source===fsSelected||e.target===fsSelected);
+    fsCtx.beginPath();fsCtx.moveTo(x1,y1);fsCtx.lineTo(x2,y2);
+    if(hasSel&&!highlight){
+      fsCtx.strokeStyle='rgba(255,255,255,.03)';fsCtx.lineWidth=.5;
+    } else {
+      fsCtx.strokeStyle=highlight?`rgba(167,139,250,${.3+e.strength*.5})`:`rgba(255,255,255,${.04+e.strength*.1})`;
+      fsCtx.lineWidth=highlight?1.5*fsZoom:.8*fsZoom;
+    }
+    fsCtx.stroke();
+  });
+
+  // Nodes
+  nodes.forEach(n=>{
+    const [sx,sy]=fsToScreen(n.x,n.y);
+    const r=fsNodeRadius(n)*fsZoom;
+    const isActive=n.id===fsSelected;
+    const isNeighbor=hasSel&&neighborSet&&neighborSet.has(n.id);
+    const dimmed=hasSel&&!isActive&&!isNeighbor;
+    const col=TYPE_COLOR[n.type];
+    const glow=TYPE_GLOW[n.type];
+
+    // Selection glow (persistent selection via n.selected)
+    if(n.selected){
+      const grad=fsCtx.createRadialGradient(sx,sy,r*.5,sx,sy,r*2.5);
+      grad.addColorStop(0,glow);
+      grad.addColorStop(1,'rgba(0,0,0,0)');
+      fsCtx.beginPath();fsCtx.arc(sx,sy,r*2.5,0,Math.PI*2);
+      fsCtx.fillStyle=grad;fsCtx.fill();
+    }
+
+    // Focus highlight (tap-selected for detail)
+    if(isActive){
+      const grad=fsCtx.createRadialGradient(sx,sy,r*.5,sx,sy,r*3);
+      grad.addColorStop(0,'rgba(91,33,182,.4)');grad.addColorStop(1,'transparent');
+      fsCtx.beginPath();fsCtx.arc(sx,sy,r*3,0,Math.PI*2);
+      fsCtx.fillStyle=grad;fsCtx.fill();
+    }
+
+    fsCtx.beginPath();fsCtx.arc(sx,sy,r,0,Math.PI*2);
+    if(n.selected){
+      fsCtx.fillStyle=dimmed?'rgba(255,255,255,.12)':col;
+      fsCtx.globalAlpha=dimmed?.4:1;fsCtx.fill();fsCtx.globalAlpha=1;
+    } else {
+      fsCtx.fillStyle=dimmed?'rgba(255,255,255,.06)':col;
+      fsCtx.globalAlpha=dimmed?.3:.6;fsCtx.fill();fsCtx.globalAlpha=1;
+      // Outline for unselected
+      fsCtx.strokeStyle=col;fsCtx.lineWidth=1.2;
+      fsCtx.globalAlpha=dimmed?.15:.4;fsCtx.stroke();fsCtx.globalAlpha=1;
+    }
+
+    if(isActive||isNeighbor){
+      fsCtx.strokeStyle=isActive?'#5B21B6':'rgba(255,255,255,.2)';
+      fsCtx.lineWidth=isActive?2:1;fsCtx.stroke();
+    }
+
+    // Labels
+    const showLabel=n.imp>=4||isActive||isNeighbor||n.selected||(fsZoom>1.2&&n.imp>=3);
+    if(showLabel){
+      fsCtx.font=`${n.selected||isActive?'600':'400'} ${Math.round(11*Math.max(fsZoom,.8))}px -apple-system,sans-serif`;
+      fsCtx.textAlign='center';fsCtx.textBaseline='top';
+      fsCtx.fillStyle=dimmed?'rgba(255,255,255,.15)':'rgba(255,255,255,.85)';
+      fsCtx.fillText(n.label,sx,sy+r+4*fsZoom);
+    }
+  });
+}
+
+/* Full-screen physics tick (continuous) */
+function fsTick(){
+  // Same constants as map/a.html
+  const REPEL=1800, ATTRACT=0.0004, DAMP=0.88, CENTER=0.0005;
+  for(let i=0;i<nodes.length;i++){
+    const a=nodes[i];
+    a.vx-=a.x*CENTER;a.vy-=a.y*CENTER;
+    for(let j=i+1;j<nodes.length;j++){
+      const b=nodes[j];
+      let dx=a.x-b.x,dy=a.y-b.y;
+      let d2=dx*dx+dy*dy;if(d2<1)d2=1;
+      const d=Math.sqrt(d2);
+      const f=REPEL/d2;
+      const fx=dx/d*f, fy=dy/d*f;
+      a.vx+=fx;a.vy+=fy;b.vx-=fx;b.vy-=fy;
+    }
+  }
+  edges.forEach(e=>{
+    const a=nodes[e.source],b=nodes[e.target];
+    let dx=b.x-a.x,dy=b.y-a.y;
+    const d=Math.sqrt(dx*dx+dy*dy)||1;
+    const f=(d-120)*ATTRACT*e.strength;
+    const fx=dx*f, fy=dy*f;
+    a.vx+=fx;a.vy+=fy;b.vx-=fx;b.vy-=fy;
+  });
+  nodes.forEach(n=>{
+    if(n.id===fsDragging)return;
+    n.vx*=DAMP;n.vy*=DAMP;n.x+=n.vx;n.y+=n.vy;
+  });
+}
+
+function fsLoop(){
+  fsTick();
+  drawFullScreenGraph();
+  fsAnimId=requestAnimationFrame(fsLoop);
+}
 
 function initFullScreenGraph(){
   const container=$('#graph-fs-canvas');
   fsCanvas=$('#graph-canvas');
   fsW=container.clientWidth;
   fsH=container.clientHeight;
-  fsCanvas.width=fsW*devicePixelRatio;
-  fsCanvas.height=fsH*devicePixelRatio;
+  const dpr=devicePixelRatio||1;
+  fsCanvas.width=fsW*dpr;
+  fsCanvas.height=fsH*dpr;
   fsCanvas.style.width=fsW+'px';
   fsCanvas.style.height=fsH+'px';
   fsCtx=fsCanvas.getContext('2d');
-  fsCtx.scale(devicePixelRatio,devicePixelRatio);
+  fsCtx.scale(dpr,dpr);
 
-  // Re-layout for larger space
-  initPositions(fsW,fsH);
-  simulate(fsW,fsH,200);
-  drawFullScreenGraph();
+  // Scatter positions for full-screen space, then settle a bit
+  scatterPositions(fsW,fsH);
+  // Run a few static iterations to get initial layout, then animate
+  runPhysics(fsW,fsH,80, 1800,120, 0.0004, 0.88, 0.0005);
+
+  fsZoom=1;fsPanX=0;fsPanY=0;
+  fsSelected=-1;fsDragging=-1;
+  hideFsDetail();
+
+  // Start animation loop
+  if(fsAnimId)cancelAnimationFrame(fsAnimId);
+  fsLoop();
 }
 
-function drawFullScreenGraph(){
-  if(!fsCtx)return;
-  fsCtx.clearRect(0,0,fsW,fsH);
+/* Pointer events for full-screen */
+function setupFsPointerEvents(){
+  const c=$('#graph-canvas');
 
-  // Edges
-  EDGES.forEach(([a,b])=>{
-    const na=nodeMap[a],nb=nodeMap[b];
-    fsCtx.beginPath();
-    fsCtx.moveTo(na.x,na.y);
-    fsCtx.lineTo(nb.x,nb.y);
-    fsCtx.strokeStyle='rgba(255,255,255,.08)';
-    fsCtx.lineWidth=1;
-    fsCtx.stroke();
-  });
-
-  // Nodes
-  NODES.forEach(n=>{
-    const col=TYPE_COLORS[n.type];
-    const glow=TYPE_GLOW[n.type];
-    const r=n.selected?10:7;
-
-    if(n.selected){
-      // Glow
-      fsCtx.beginPath();
-      fsCtx.arc(n.x,n.y,r+8,0,Math.PI*2);
-      const grad=fsCtx.createRadialGradient(n.x,n.y,r,n.x,n.y,r+8);
-      grad.addColorStop(0,glow);
-      grad.addColorStop(1,'rgba(0,0,0,0)');
-      fsCtx.fillStyle=grad;
-      fsCtx.fill();
-      // Solid fill
-      fsCtx.beginPath();
-      fsCtx.arc(n.x,n.y,r,0,Math.PI*2);
-      fsCtx.fillStyle=col;
-      fsCtx.fill();
-    } else {
-      // Outline only, dim
-      fsCtx.beginPath();
-      fsCtx.arc(n.x,n.y,r,0,Math.PI*2);
-      fsCtx.strokeStyle=col;
-      fsCtx.lineWidth=1.2;
-      fsCtx.globalAlpha=0.45;
-      fsCtx.stroke();
-      fsCtx.globalAlpha=1;
-    }
-
-    // Label
-    fsCtx.font=`${n.selected?'600':'400'} 11px -apple-system,sans-serif`;
-    fsCtx.fillStyle=n.selected?col:'rgba(255,255,255,.4)';
-    fsCtx.textAlign='center';
-    fsCtx.fillText(n.label,n.x,n.y+r+14);
-  });
-
-  updateSelCounters();
-}
-
-function fsHitTest(px,py){
-  let closest=null,minD=Infinity;
-  NODES.forEach(n=>{
-    const dx=n.x-px,dy=n.y-py;
-    const d=Math.sqrt(dx*dx+dy*dy);
-    const hitR=n.selected?18:14;
-    if(d<hitR&&d<minD){minD=d;closest=n;}
-  });
-  return closest;
-}
-
-function onFsClick(e){
-  const rect=fsCanvas.getBoundingClientRect();
-  const px=e.clientX-rect.left;
-  const py=e.clientY-rect.top;
-  const hit=fsHitTest(px,py);
-  if(hit){
-    toggleNode(hit.id);
-    drawFullScreenGraph();
-  }
-}
-
-function onFsTouchEnd(e){
-  if(e.changedTouches.length===0)return;
-  const t=e.changedTouches[0];
-  const rect=fsCanvas.getBoundingClientRect();
-  const px=t.clientX-rect.left;
-  const py=t.clientY-rect.top;
-  const hit=fsHitTest(px,py);
-  if(hit){
+  c.addEventListener('pointerdown',e=>{
     e.preventDefault();
-    toggleNode(hit.id);
-    drawFullScreenGraph();
-  }
-}
+    fsPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(fsPointers.size===1){
+      const rect=c.getBoundingClientRect();
+      const sx=e.clientX-rect.left, sy=e.clientY-rect.top;
+      const hit=fsHitTest(sx,sy);
+      if(hit>=0){
+        fsDragging=hit;
+        const [wx,wy]=fsToWorld(sx,sy);
+        fsDragOX=nodes[hit].x-wx;fsDragOY=nodes[hit].y-wy;
+        nodes[hit].vx=0;nodes[hit].vy=0;
+        // Show detail
+        fsSelected=hit;
+        showFsDetail(hit);
+      } else {
+        fsSelected=-1;
+        hideFsDetail();
+        fsPanning=true;
+        fsPanStartX=e.clientX;fsPanStartY=e.clientY;
+        fsPanOX=fsPanX;fsPanOY=fsPanY;
+      }
+    }
+    if(fsPointers.size===2){
+      fsDragging=-1;fsPanning=false;
+      const pts=[...fsPointers.values()];
+      fsPinchDist0=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+      fsPinchZoom0=fsZoom;
+    }
+  });
 
-/* ═══════════════════════════════════════════
+  c.addEventListener('pointermove',e=>{
+    if(!fsPointers.has(e.pointerId))return;
+    fsPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(fsPointers.size===2){
+      const pts=[...fsPointers.values()];
+      const dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+      fsZoom=Math.max(.3,Math.min(5,fsPinchZoom0*(dist/fsPinchDist0)));
+      return;
+    }
+    const rect=c.getBoundingClientRect();
+    if(fsDragging>=0){
+      const sx=e.clientX-rect.left, sy=e.clientY-rect.top;
+      const [wx,wy]=fsToWorld(sx,sy);
+      nodes[fsDragging].x=wx+fsDragOX;
+      nodes[fsDragging].y=wy+fsDragOY;
+      nodes[fsDragging].vx=0;nodes[fsDragging].vy=0;
+    } else if(fsPanning){
+      const dx=(e.clientX-fsPanStartX)/fsZoom;
+      const dy=(e.clientY-fsPanStartY)/fsZoom;
+      fsPanX=fsPanOX+dx;fsPanY=fsPanOY+dy;
+    }
+  });
+
+  const upHandler=e=>{
+    // Tap-to-toggle selection (if didn't drag much)
+    if(fsDragging>=0&&fsPointers.has(e.pointerId)){
+      const start=fsPointers.get(e.pointerId);
+      const dx=Math.abs(e.clientX-start.x), dy=Math.abs(e.clientY-start.y);
+      if(dx<6&&dy<6){
+        // It was a tap, toggle selection
+        toggleNode(fsDragging);
+        drawFullScreenGraph();
+      }
+    }
+    fsPointers.delete(e.pointerId);
+    if(fsPointers.size<2){fsDragging=-1;fsPanning=false;}
+  };
+  c.addEventListener('pointerup',upHandler);
+  c.addEventListener('pointercancel',upHandler);
+
+  c.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const factor=e.deltaY>0?.92:1.08;
+    fsZoom=Math.max(.3,Math.min(5,fsZoom*factor));
+  },{passive:false});
+}
+setupFsPointerEvents();
+
+/* =============================================
    Full-screen open / close
-   ═══════════════════════════════════════════ */
+   ============================================= */
 function openFullScreen(){
   const overlay=$('#graph-fullscreen');
   overlay.classList.add('open');
-  // Small delay to let layout settle
-  requestAnimationFrame(()=>{
-    initFullScreenGraph();
-    fsCanvas.addEventListener('click',onFsClick);
-    fsCanvas.addEventListener('touchend',onFsTouchEnd,{passive:false});
-  });
+  requestAnimationFrame(()=>initFullScreenGraph());
 }
 
 function closeFullScreen(){
   const overlay=$('#graph-fullscreen');
   overlay.classList.remove('open');
-  if(fsCanvas){
-    fsCanvas.removeEventListener('click',onFsClick);
-    fsCanvas.removeEventListener('touchend',onFsTouchEnd);
-  }
-  // Re-render compact graph to reflect any changes
+  if(fsAnimId){cancelAnimationFrame(fsAnimId);fsAnimId=null;}
+  // Re-render compact graph to reflect selections
   renderCompactGraph();
 }
 
-$('#graph-expand-btn').addEventListener('click',()=>{
-  openFullScreen();
-});
+$('#graph-expand-btn').addEventListener('click',()=>openFullScreen());
 $('#graph-fs-close').addEventListener('click',closeFullScreen);
 $('#graph-fs-done').addEventListener('click',closeFullScreen);
 
-/* ═══════════════════════════════════════════
+/* =============================================
    Flyout management
-   ═══════════════════════════════════════════ */
+   ============================================= */
 let activeFlyout=null;
 const backdrop=$('#fly-backdrop');
 
@@ -775,7 +985,6 @@ function openFlyout(id){
   $$('.rbtn[data-flyout]').forEach(b=>{
     b.classList.toggle('on-nofill',b.dataset.flyout===id);
   });
-  // If insight flyout, render graph
   if(id==='fly-insight'){
     requestAnimationFrame(renderCompactGraph);
   }
@@ -792,7 +1001,7 @@ function closeFlyout(){
 
 backdrop.addEventListener('click',closeFlyout);
 
-/* ── Right bar button handlers ── */
+/* -- Right bar button handlers -- */
 ['btn-like','btn-save','btn-remind','btn-rss'].forEach(id=>{
   const btn=$('#'+id);
   btn.addEventListener('click',()=>{
@@ -807,7 +1016,7 @@ $$('.rbtn[data-flyout]').forEach(btn=>{
   btn.addEventListener('click',()=>openFlyout(btn.dataset.flyout));
 });
 
-/* ── Badge & scroll-based recommendation count ── */
+/* -- Badge & scroll-based recommendation count -- */
 let recoCount=0;
 const badge=$('#next-badge');
 const recoCard1=$('#reco-card-1');
@@ -840,7 +1049,7 @@ window.addEventListener('scroll',()=>{
   else setRecoCount(0);
 });
 
-/* ── Chat bar ── */
+/* -- Chat bar -- */
 const chatInput=$('#chat-input');
 const chatResponse=$('#chat-response');
 const chatResponseBody=$('#chat-response-body');
@@ -857,11 +1066,7 @@ $('#chat-response-close').addEventListener('click',(e)=>{
 
 function handleChatSend(){
   const q=chatInput.value.trim();if(!q)return;
-  const fakeResponses={
-    'この記事の要点は？':'この記事は、1945年の Memex 構想と現代のAIブラウザを比較し、タブやブックマークの原始的な構造を超える「階層的コンテキスト」の必要性を論じています。Zeed の Profile/TG/Tab 設計と直接関連する内容です。',
-    'default':'この記事はAIブラウザの進化について論じています。現状の課題は、チャットUIをChromium上に被せるだけで根本的なプリミティブ（タブ、ブックマーク）を再設計していない点です。'
-  };
-  const answer=fakeResponses[q]||fakeResponses['default'];
+  const answer='This article compares the 1945 Memex vision with modern AI browsers, arguing that layering chat on Chromium without redesigning primitives (tabs, bookmarks) misses the point. Hierarchical context (Profile/TG/Tab) is the key missing piece.';
   showChatResponse(answer);
   chatInput.value='';
 }
@@ -871,17 +1076,17 @@ chatInput.addEventListener('keydown',(e)=>{
   if(e.key==='Enter'){e.preventDefault();handleChatSend();}
 });
 
-/* ═══════════════════════════════════════════
+/* =============================================
    Demo auto-play
-   ═══════════════════════════════════════════ */
+   ============================================= */
 let demoRunning=false;
 
 function selectNodeById(id){
-  const n=nodeMap[id];
+  const n=nodes[id];
   if(n&&!n.selected){n.selected=true;updateSelCounters();}
 }
 function deselectAll(){
-  NODES.forEach(n=>n.selected=false);
+  nodes.forEach(n=>n.selected=false);
   updateSelCounters();
 }
 
@@ -889,7 +1094,7 @@ $('#demo-btn').addEventListener('click',()=>{void(async()=>{
   if(demoRunning)return;
   demoRunning=true;
   const tag=$('#demo-btn');
-  tag.innerHTML='再生中...';
+  tag.innerHTML='Playing...';
 
   // Reset everything
   ['btn-like','btn-save','btn-remind','btn-rss'].forEach(id=>$('#'+id).classList.remove('on','pop'));
@@ -910,16 +1115,16 @@ $('#demo-btn').addEventListener('click',()=>{void(async()=>{
   save.classList.add('on');save.classList.add('pop');
   await slp(800);save.classList.remove('pop');
 
-  // 3. Open Insight flyout — shows graph
+  // 3. Open Insight flyout -- shows compact graph
   openFlyout('fly-insight');
   await slp(1200);
 
-  // 4. Select a couple nodes in compact view
-  selectNodeById('memex');
-  renderCompactGraph();
+  // 4. Select nodes in compact view
+  selectNodeById(0); // Memex
+  drawCompactGraph();
   await slp(700);
-  selectNodeById('vector-db');
-  renderCompactGraph();
+  selectNodeById(2); // vector DB
+  drawCompactGraph();
   await slp(1000);
 
   // 5. Open full-screen graph
@@ -927,17 +1132,14 @@ $('#demo-btn').addEventListener('click',()=>{void(async()=>{
   await slp(1200);
 
   // 6. Select more nodes in full-screen
-  selectNodeById('sqlite-vec');
-  drawFullScreenGraph();
+  selectNodeById(4); // sqlite-vec
   await slp(600);
-  selectNodeById('profile-tg');
-  drawFullScreenGraph();
+  selectNodeById(6); // Profile/TG/Tab
   await slp(600);
-  selectNodeById('hn-localdb');
-  drawFullScreenGraph();
+  selectNodeById(8); // HN: Local-first
   await slp(1500);
 
-  // 7. Close full-screen (returns to flyout with selections persisted)
+  // 7. Close full-screen
   closeFullScreen();
   await slp(1200);
 
@@ -945,18 +1147,18 @@ $('#demo-btn').addEventListener('click',()=>{void(async()=>{
   closeFlyout();
   await slp(500);
 
-  // 9. Scroll to 45% — triggers badge "1"
+  // 9. Scroll to 45% -- triggers badge "1"
   const docHeight=document.documentElement.scrollHeight-document.documentElement.clientHeight;
   window.scrollTo({top:docHeight*0.45,behavior:'smooth'});
   setRecoCount(1);
   await slp(1200);
 
-  // 10. Scroll to 75% — triggers badge "2"
+  // 10. Scroll to 75% -- triggers badge "2"
   window.scrollTo({top:docHeight*0.75,behavior:'smooth'});
   setRecoCount(2);
   await slp(1200);
 
-  // 11. Open 次へ flyout
+  // 11. Open Next flyout
   openFlyout('fly-next');
   await slp(2200);
 
@@ -964,15 +1166,15 @@ $('#demo-btn').addEventListener('click',()=>{void(async()=>{
   closeFlyout();
   await slp(500);
 
-  // 13. Type in chat box and show inline response
-  const text='この記事の要点は？';
+  // 13. Type in chat box and show response
+  const text='What are the key points?';
   chatInput.value='';
   for(let i=0;i<text.length;i++){
     chatInput.value=text.slice(0,i+1);
     await slp(80);
   }
   await slp(600);
-  showChatResponse('この記事は、1945年の Memex 構想と現代のAIブラウザを比較し、タブやブックマークの原始的な構造を超える「階層的コンテキスト」の必要性を論じています。Zeed の Profile/TG/Tab 設計と直接関連する内容です。');
+  showChatResponse('This article compares the 1945 Memex vision with modern AI browsers, arguing that layering chat on Chromium without redesigning primitives (tabs, bookmarks) misses the point. Hierarchical context (Profile/TG/Tab) is the key missing piece.');
   await slp(3000);
 
   hideChatResponse();await slp(300);
